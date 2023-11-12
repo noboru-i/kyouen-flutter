@@ -28,3 +28,12 @@ the `lib/src/localization` directory.
 To support additional languages, please visit the tutorial on
 [Internationalizing Flutter
 apps](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
+
+## Scripts
+
+### Setup Firebase
+dev
+
+```
+flutterfire configure --project api-project-732262258565 --android-package-name hm.orz.chaos114.android.tumekyouen.dev --ios-bundle-id hm.orz.chaos114.android.tumekyouen.dev --macos-bundle-id= --platforms=android,ios,web
+```
