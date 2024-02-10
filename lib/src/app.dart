@@ -4,11 +4,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/title/title_page.dart';
-
-import 'sample_feature/sample_item_details_view.dart';
-import 'sample_feature/sample_item_list_view.dart';
-import 'settings/settings_controller.dart';
-import 'settings/settings_view.dart';
+import 'package:kyouen_flutter/src/settings/settings_controller.dart';
+import 'package:kyouen_flutter/src/settings/settings_view.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -53,11 +50,8 @@ class MyApp extends StatelessWidget {
                   // TODO: remove the followings.
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
                   default:
-                    return const SampleItemListView();
+                    throw Exception();
                 }
               },
             );

@@ -1,13 +1,12 @@
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-
-import 'src/app.dart';
-import 'src/settings/settings_controller.dart';
-import 'src/settings/settings_service.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:kyouen_flutter/firebase_options.dart';
+import 'package:kyouen_flutter/src/app.dart';
+import 'package:kyouen_flutter/src/settings/settings_controller.dart';
+import 'package:kyouen_flutter/src/settings/settings_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

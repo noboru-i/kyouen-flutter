@@ -11,14 +11,15 @@ class SignInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const _SignInView();
-            }
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const _SignInView();
+          }
 
-            return _LogoutView(user: snapshot.data!);
-          }),
+          return _LogoutView(user: snapshot.data!);
+        },
+      ),
     );
   }
 }
@@ -43,17 +44,13 @@ class _SignInView extends StatelessWidget {
         ),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-              _signInWithTwitter();
-            },
+            onPressed: _signInWithTwitter,
             child: const Text('Sign in with X (Twitter)'),
           ),
         ),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-              _signInWithApple();
-            },
+            onPressed: _signInWithApple,
             child: const Text('Sign in with Apple'),
           ),
         ),
@@ -62,7 +59,7 @@ class _SignInView extends StatelessWidget {
   }
 
   Future<void> _signInWithTwitter() async {
-    FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signOut();
     final twitterProvider = TwitterAuthProvider();
 
     if (kIsWeb) {
