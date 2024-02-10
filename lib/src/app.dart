@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
+import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
+import 'package:kyouen_flutter/src/features/title/title_page.dart';
 
 import 'sample_feature/sample_item_details_view.dart';
 import 'sample_feature/sample_item_list_view.dart';
@@ -41,6 +44,13 @@ class MyApp extends StatelessWidget {
               settings: routeSettings,
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
+                  case TitlePage.routeName:
+                    return const TitlePage();
+                  case StagePage.routeName:
+                    return const StagePage();
+                  case SignInPage.routeName:
+                    return const SignInPage();
+                  // TODO: remove the followings.
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   case SampleItemDetailsView.routeName:
