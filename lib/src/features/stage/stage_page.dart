@@ -105,11 +105,18 @@ class _Body extends ConsumerWidget {
         return const Text('error');
       },
       loading: () {
-        return const AspectRatio(
+        return AspectRatio(
           aspectRatio: 1,
           child: ColoredBox(
             color: Colors.green,
-            child: CircularProgressIndicator.adaptive(),
+            child: Container(
+              alignment: Alignment.center,
+              constraints: const BoxConstraints(
+                maxWidth: 24,
+                maxHeight: 24,
+              ),
+              child: const CircularProgressIndicator.adaptive(),
+            ),
           ),
         );
       },
