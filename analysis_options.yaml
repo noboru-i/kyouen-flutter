@@ -6,3 +6,5 @@ analyzer:
     - "lib/firebase_options.dart"
   errors:
     flutter_style_todos: ignore
+  plugins:
+    - custom_lint

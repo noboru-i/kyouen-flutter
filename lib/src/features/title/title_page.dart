@@ -10,30 +10,32 @@ class TitlePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 30),
-          Text(
-            '詰め共円',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.displayLarge,
-          ),
-          const SizedBox(height: 30),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.restorablePushNamed(context, StagePage.routeName);
-            },
-            child: const Text('スタート'),
-          ),
-          const SizedBox(height: 30),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.restorablePushNamed(context, SignInPage.routeName);
-            },
-            child: const Text('ログイン'),
-          ),
-        ],
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 30),
+            Text(
+              '詰め共円',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.displayLarge,
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.restorablePushNamed(context, StagePage.routeName);
+              },
+              child: const Text('スタート'),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.restorablePushNamed(context, SignInPage.routeName);
+              },
+              child: const Text('ログイン'),
+            ),
+          ],
+        ),
       ),
     );
   }
