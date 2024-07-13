@@ -11,7 +11,7 @@ abstract class ApiClient {
 
   @GET('/stages')
   Future<List<StageResponse>> getStages({
-    @Query('startStageNo') int startStageNo = 1,
+    @Query('start_stage_no') int startStageNo = 1,
   });
 }
 
