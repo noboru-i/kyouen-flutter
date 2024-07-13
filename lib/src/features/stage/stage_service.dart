@@ -42,7 +42,21 @@ class CurrentStageNo extends _$CurrentStageNo {
 }
 
 @riverpod
-Future<StageResponse> currentStage(CurrentStageRef ref) async {
-  final currentStageNo = ref.watch(currentStageNoProvider);
-  return ref.watch(fetchStageProvider(stageNo: currentStageNo).future);
+class CurrentStage extends _$CurrentStage {
+  @override
+  Future<StageResponse> build() async {
+    final currentStageNo = ref.watch(currentStageNoProvider);
+    return ref.watch(fetchStageProvider(stageNo: currentStageNo).future);
+  }
+
+  void toggleSelect(int index) {
+    final currentStage = state.asData!.value;
+    final stage = currentStage.stage;
+    final stageAsList = stage.split('');
+    if (stageAsList[index] == '0') {
+      return;
+    }
+    stageAsList[index] = stageAsList[index] == '1' ? '2' : '1';
+    state = AsyncData(currentStage.copyWith(stage: stageAsList.join()));
+  }
 }
