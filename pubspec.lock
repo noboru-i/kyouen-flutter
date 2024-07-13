@@ -517,6 +517,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.8.0"
+  kyouen:
+    dependency: "direct main"
+    description:
+      name: kyouen
+      sha256: "3909805d46d62e1dbe2908d3a20b6849fb764f24d54a799a1e283706a658123c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   leak_tracker:
     dependency: transitive
     description:

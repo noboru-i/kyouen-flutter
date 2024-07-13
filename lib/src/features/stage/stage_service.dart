@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -59,4 +62,37 @@ class CurrentStage extends _$CurrentStage {
     stageAsList[index] = stageAsList[index] == '1' ? '2' : '1';
     state = AsyncData(currentStage.copyWith(stage: stageAsList.join()));
   }
+
+  void reset() {
+    final currentStage = state.asData!.value;
+    final stage = currentStage.stage;
+    final stageAsList = stage.split('');
+    for (var i = 0; i < stageAsList.length; i++) {
+      if (stageAsList[i] == '2') {
+        stageAsList[i] = '1';
+      }
+    }
+    state = AsyncData(currentStage.copyWith(stage: stageAsList.join()));
+  }
+
+  bool isKyouen() {
+    final kyouenStage = Kyouen(stonesFromString(state.asData!.value.stage));
+
+    return kyouenStage.hasKyouen() != null;
+  }
+}
+
+List<KyouenPoint> stonesFromString(String stage) {
+  final size = sqrt(stage.length).toInt();
+  final stoneArray = <KyouenPoint>[];
+  for (var x = 0; x < size; x++) {
+    for (var y = 0; y < size; y++) {
+      final index = x + y * size;
+      final char = stage.substring(index, index + 1);
+      if (char == '2') {
+        stoneArray.add(KyouenPoint(x.toDouble(), y.toDouble()));
+      }
+    }
+  }
+  return stoneArray;
 }

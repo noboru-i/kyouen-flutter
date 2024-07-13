@@ -20,6 +20,7 @@ class StagePage extends ConsumerWidget {
           children: [
             _Header(),
             _Body(),
+            _Footer(),
           ],
         ),
       ),
@@ -61,6 +62,85 @@ class _Header extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _Footer extends ConsumerWidget {
+  const _Footer();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentStage = ref.watch(currentStageProvider);
+    final isEnabled = currentStage.asData?.value.stage
+            .split('')
+            .where((element) => element == '2')
+            .length ==
+        4;
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: ElevatedButton(
+        onPressed: isEnabled
+            ? () async {
+                final isKyouen =
+                    ref.read(currentStageProvider.notifier).isKyouen();
+                if (isKyouen) {
+                  // ignore: avoid_print
+                  print('KYOUEN!');
+                  await _showKyouenDialog(context);
+                  ref.read(currentStageNoProvider.notifier).next();
+                } else {
+                  // ignore: avoid_print
+                  print('NOT KYOUEN!');
+                  await _showNotKyouenDialog(context);
+                  ref.read(currentStageProvider.notifier).reset();
+                }
+              }
+            : null,
+        child: const Text('共円！！'),
+      ),
+    );
+  }
+
+  Future<void> _showKyouenDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('共円！！'),
+          content: const Text('おめでとうございます！'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showNotKyouenDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('残念！'),
+          content: const Text('共円ではありませんでした。'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

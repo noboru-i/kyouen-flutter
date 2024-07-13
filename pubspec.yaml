@@ -22,6 +22,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   freezed_annotation: ^2.4.1
   json_annotation: ^4.9.0
+  kyouen: ^0.0.1
   logger: any
   retrofit: ">=4.0.0 <5.0.0"
   riverpod_annotation: ^2.3.5
