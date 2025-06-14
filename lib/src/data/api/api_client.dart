@@ -19,8 +19,6 @@ abstract class ApiClient {
 @riverpod
 ApiClient apiClient(Ref ref) {
   final dio = Dio();
-  dio.interceptors.add(
-    LogInterceptor(responseBody: true),
-  );
+  dio.interceptors.add(LogInterceptor(responseBody: true));
   return ApiClient(dio);
 }

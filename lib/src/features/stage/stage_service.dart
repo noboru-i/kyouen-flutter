@@ -10,20 +10,14 @@ part 'stage_service.g.dart';
 
 /// page starts with 1. (page 1 includes no.1 - no.10.)
 @riverpod
-Future<List<StageResponse>> fetchStages(
-  Ref ref, {
-  required int page,
-}) async {
+Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
   return ref
       .watch(apiClientProvider)
       .getStages(startStageNo: ((page - 1) * 10) + 1);
 }
 
 @riverpod
-Future<StageResponse> fetchStage(
-  Ref ref, {
-  required int stageNo,
-}) async {
+Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
   final page = ((stageNo - 1) / 10).floor() + 1;
   final stages = await ref.watch(fetchStagesProvider(page: page).future);
   return stages[((stageNo - 1) % 10)];

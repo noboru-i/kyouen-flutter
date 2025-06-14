@@ -8,10 +8,7 @@ import 'package:kyouen_flutter/src/settings/settings_controller.dart';
 import 'package:kyouen_flutter/src/settings/settings_view.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-    required this.settingsController,
-  });
+  const MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
 
@@ -28,11 +25,9 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('en', ''),
-          ],
-          onGenerateTitle: (BuildContext context) =>
-              AppLocalizations.of(context)!.appTitle,
+          supportedLocales: const [Locale('en', '')],
+          onGenerateTitle:
+              (BuildContext context) => AppLocalizations.of(context)!.appTitle,
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
