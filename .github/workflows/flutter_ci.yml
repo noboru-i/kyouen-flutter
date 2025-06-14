@@ -28,41 +28,7 @@ jobs:
         # Create a mock firebase_options.dart for CI if it doesn't exist
         if [ ! -f "lib/firebase_options.dart" ]; then
           mkdir -p lib
-          cat > lib/firebase_options.dart << 'EOF'
-        // Mock firebase options for CI
-        import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-        import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
-        
-        class DefaultFirebaseOptions {
-          static FirebaseOptions get currentPlatform {
-            if (kIsWeb) return web;
-            switch (defaultTargetPlatform) {
-              case TargetPlatform.android: return android;
-              case TargetPlatform.iOS: return ios;
-              default: throw UnsupportedError('DefaultFirebaseOptions have not been configured for this platform.');
-            }
-          }
-          static const FirebaseOptions web = FirebaseOptions(
-            apiKey: 'mock-api-key',
-            appId: 'mock-app-id',
-            messagingSenderId: 'mock-sender-id',
-            projectId: 'mock-project-id',
-          );
-          static const FirebaseOptions android = FirebaseOptions(
-            apiKey: 'mock-api-key',
-            appId: 'mock-app-id',
-            messagingSenderId: 'mock-sender-id',
-            projectId: 'mock-project-id',
-          );
-          static const FirebaseOptions ios = FirebaseOptions(
-            apiKey: 'mock-api-key',
-            appId: 'mock-app-id',
-            messagingSenderId: 'mock-sender-id',
-            projectId: 'mock-project-id',
-            iosBundleId: 'mock-bundle-id',
-          );
-        }
-        EOF
+          mv .github/workflows/firebase_options_mock.dart lib/firebase_options.dart
         fi
         
         # Generate build_runner files
