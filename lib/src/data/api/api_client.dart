@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -16,10 +17,8 @@ abstract class ApiClient {
 }
 
 @riverpod
-ApiClient apiClient(ApiClientRef ref) {
+ApiClient apiClient(Ref ref) {
   final dio = Dio();
-  dio.interceptors.add(
-    LogInterceptor(responseBody: true),
-  );
+  dio.interceptors.add(LogInterceptor(responseBody: true));
   return ApiClient(dio);
 }
