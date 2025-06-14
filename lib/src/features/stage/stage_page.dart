@@ -80,13 +80,11 @@ class _Footer extends ConsumerWidget {
                   final isKyouen =
                       ref.read(currentStageProvider.notifier).isKyouen();
                   if (isKyouen) {
-                    // ignore: avoid_print
-                    print('KYOUEN!');
+                    debugPrint('KYOUEN!');
                     await _showKyouenDialog(context);
                     ref.read(currentStageNoProvider.notifier).next();
                   } else {
-                    // ignore: avoid_print
-                    print('NOT KYOUEN!');
+                    debugPrint('NOT KYOUEN!');
                     await _showNotKyouenDialog(context);
                     ref.read(currentStageProvider.notifier).reset();
                   }
@@ -173,8 +171,8 @@ class _Body extends ConsumerWidget {
         );
       },
       error: (error, stackTrace) {
-        print(error);
-        print(stackTrace);
+        debugPrint(error.toString());
+        debugPrint(stackTrace.toString());
         return const Text('error');
       },
       loading: () {
