@@ -1,0 +1,43 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.1'
+        channel: 'stable'
+        cache: true
+    
+    - name: Get dependencies
+      run: flutter pub get
+    
+    - name: Run custom lint
+      run: flutter pub run custom_lint
+    
+    - name: Check for TODO/FIXME comments in main code
+      run: |
+        if grep -r --include="*.dart" --exclude-dir=test "TODO\|FIXME" lib/; then
+          echo "Found TODO/FIXME comments in main code. Please address them before merging."
+          exit 1
+        fi
+        echo "No TODO/FIXME comments found in main code."
+    
+    - name: Check for debug prints
+      run: |
+        if grep -r --include="*.dart" --exclude-dir=test "print(" lib/; then
+          echo "Found print() statements in main code. Please use logger instead."
+          exit 1
+        fi
+        echo "No debug print statements found in main code."
