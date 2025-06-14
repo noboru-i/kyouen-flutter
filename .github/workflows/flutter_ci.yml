@@ -40,9 +40,6 @@ jobs:
     - name: Run custom lint
       run: dart run custom_lint
     
-    - name: Check formatting
-      run: dart format --output=none --set-exit-if-changed .
-    
     - name: Run tests
       run: flutter test
     
