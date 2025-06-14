@@ -17,11 +17,7 @@ class StagePage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _Header(),
-            _Body(),
-            _Footer(),
-          ],
+          children: [_Header(), _Body(), _Footer()],
         ),
       ),
     );
@@ -35,10 +31,7 @@ class _Header extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 8,
-        horizontal: 8,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
         children: [
           ElevatedButton(
@@ -72,7 +65,8 @@ class _Footer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
-    final isEnabled = currentStage.asData?.value.stage
+    final isEnabled =
+        currentStage.asData?.value.stage
             .split('')
             .where((element) => element == '2')
             .length ==
@@ -80,23 +74,24 @@ class _Footer extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: ElevatedButton(
-        onPressed: isEnabled
-            ? () async {
-                final isKyouen =
-                    ref.read(currentStageProvider.notifier).isKyouen();
-                if (isKyouen) {
-                  // ignore: avoid_print
-                  print('KYOUEN!');
-                  await _showKyouenDialog(context);
-                  ref.read(currentStageNoProvider.notifier).next();
-                } else {
-                  // ignore: avoid_print
-                  print('NOT KYOUEN!');
-                  await _showNotKyouenDialog(context);
-                  ref.read(currentStageProvider.notifier).reset();
+        onPressed:
+            isEnabled
+                ? () async {
+                  final isKyouen =
+                      ref.read(currentStageProvider.notifier).isKyouen();
+                  if (isKyouen) {
+                    // ignore: avoid_print
+                    print('KYOUEN!');
+                    await _showKyouenDialog(context);
+                    ref.read(currentStageNoProvider.notifier).next();
+                  } else {
+                    // ignore: avoid_print
+                    print('NOT KYOUEN!');
+                    await _showNotKyouenDialog(context);
+                    ref.read(currentStageProvider.notifier).reset();
+                  }
                 }
-              }
-            : null,
+                : null,
         child: const Text('共円！！'),
       ),
     );
@@ -159,22 +154,20 @@ class _Body extends ConsumerWidget {
             color: Colors.green,
             child: GridView.count(
               crossAxisCount: 6,
-              children: data.stage.split('').indexed.map((element) {
-                final (index, state) = element;
-                final stateEnum = switch (state) {
-                  '0' => StoneState.none,
-                  '1' => StoneState.black,
-                  '2' => StoneState.white,
-                  String() => StoneState.none,
-                };
-                return GestureDetector(
-                  onTap: () => _onTapStone(ref, index),
-                  child: _Stone(
-                    state: stateEnum,
-                    key: ValueKey(index),
-                  ),
-                );
-              }).toList(),
+              children:
+                  data.stage.split('').indexed.map((element) {
+                    final (index, state) = element;
+                    final stateEnum = switch (state) {
+                      '0' => StoneState.none,
+                      '1' => StoneState.black,
+                      '2' => StoneState.white,
+                      String() => StoneState.none,
+                    };
+                    return GestureDetector(
+                      onTap: () => _onTapStone(ref, index),
+                      child: _Stone(state: stateEnum, key: ValueKey(index)),
+                    );
+                  }).toList(),
             ),
           ),
         );
@@ -191,10 +184,7 @@ class _Body extends ConsumerWidget {
             color: Colors.green,
             child: Container(
               alignment: Alignment.center,
-              constraints: const BoxConstraints(
-                maxWidth: 24,
-                maxHeight: 24,
-              ),
+              constraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
               child: const CircularProgressIndicator.adaptive(),
             ),
           ),
@@ -209,10 +199,7 @@ class _Body extends ConsumerWidget {
 }
 
 class _Stone extends StatelessWidget {
-  const _Stone({
-    required this.state,
-    super.key,
-  });
+  const _Stone({required this.state, super.key});
 
   final StoneState state;
 
@@ -223,17 +210,13 @@ class _Stone extends StatelessWidget {
         Align(
           child: Container(
             height: 2,
-            decoration: const BoxDecoration(
-              color: Colors.brown,
-            ),
+            decoration: const BoxDecoration(color: Colors.brown),
           ),
         ),
         Align(
           child: Container(
             width: 2,
-            decoration: const BoxDecoration(
-              color: Colors.brown,
-            ),
+            decoration: const BoxDecoration(color: Colors.brown),
           ),
         ),
         _buildStone(),
@@ -271,8 +254,4 @@ class _Stone extends StatelessWidget {
   }
 }
 
-enum StoneState {
-  none,
-  black,
-  white,
-}
+enum StoneState { none, black, white }
