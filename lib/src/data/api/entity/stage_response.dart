@@ -5,7 +5,7 @@ part 'stage_response.freezed.dart';
 part 'stage_response.g.dart';
 
 @freezed
-class StageResponse with _$StageResponse {
+abstract class StageResponse with _$StageResponse {
   const factory StageResponse({
     required int stageNo,
     required int size,

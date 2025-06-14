@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
@@ -10,7 +11,7 @@ part 'stage_service.g.dart';
 /// page starts with 1. (page 1 includes no.1 - no.10.)
 @riverpod
 Future<List<StageResponse>> fetchStages(
-  FetchStagesRef ref, {
+  Ref ref, {
   required int page,
 }) async {
   return ref
@@ -20,7 +21,7 @@ Future<List<StageResponse>> fetchStages(
 
 @riverpod
 Future<StageResponse> fetchStage(
-  FetchStageRef ref, {
+  Ref ref, {
   required int stageNo,
 }) async {
   final page = ((stageNo - 1) / 10).floor() + 1;
