@@ -37,6 +37,9 @@ jobs:
     - name: Analyze project source
       run: flutter analyze --fatal-infos
     
+    - name: Run custom lint
+      run: dart run custom_lint
+    
     - name: Check formatting
       run: dart format --output=none --set-exit-if-changed .
     
