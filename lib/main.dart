@@ -16,19 +16,11 @@ void main() async {
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
 
-  runApp(
-    ProviderScope(
-      child: MyApp(
-        settingsController: settingsController,
-      ),
-    ),
-  );
+  runApp(ProviderScope(child: MyApp(settingsController: settingsController)));
 }
 
 Future<void> _setupFirebase() async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FlutterError.onError = (errorDetails) {
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
   };
