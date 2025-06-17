@@ -24,4 +24,3 @@ ApiClient apiClient(Ref ref) {
   dio.interceptors.add(LogInterceptor(responseBody: true));
   return ApiClient(dio, baseUrl: Environment.apiBaseUrl);
 }
-}
