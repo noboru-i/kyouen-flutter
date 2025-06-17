@@ -42,7 +42,6 @@ class _Header extends ConsumerWidget {
           ),
           Expanded(
             child: Text(
-              // ignore: lines_longer_than_80_chars
               'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : '?'}',
               textAlign: TextAlign.center,
             ),

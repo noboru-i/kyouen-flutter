@@ -10,3 +10,7 @@ analyzer:
     flutter_style_todos: ignore
   plugins:
     - custom_lint
+
+linter:
+  rules:
+    lines_longer_than_80_chars: false

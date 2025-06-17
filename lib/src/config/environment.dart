@@ -5,7 +5,7 @@ class Environment {
   /// API base URL
   /// Default: https://kyouen.app/v2/
   /// Dev: https://dev.kyouen.app/v2/ (example)
-  static const String apiBaseUrl = String.fromEnvironment(
+  static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'https://kyouen.app/v2/',
   );
@@ -13,7 +13,7 @@ class Environment {
   /// Firebase project ID
   /// Default: my-android-server (production)
   /// Dev: api-project-732262258565-dev (example)
-  static const String firebaseProjectId = String.fromEnvironment(
+  static const firebaseProjectId = String.fromEnvironment(
     'FIREBASE_PROJECT_ID',
     defaultValue: 'my-android-server',
   );
@@ -21,7 +21,7 @@ class Environment {
   /// Environment type
   /// Values: 'dev', 'prod'
   /// Default: 'prod'
-  static const String environmentType = String.fromEnvironment(
+  static const environmentType = String.fromEnvironment(
     'ENVIRONMENT',
     defaultValue: 'prod',
   );
