@@ -3,11 +3,14 @@
 # Production environment build script
 echo "Building for production environment..."
 
-# Copy firebase options template if needed
-if [ ! -f "lib/firebase_options.dart" ]; then
-  echo "Copying firebase_options template..."
-  cp lib/firebase_options_template.dart lib/firebase_options.dart
-fi
+# Configure Firebase for production environment
+echo "Configuring Firebase for production environment..."
+flutterfire configure \
+  --project api-project-732262258565 \
+  --android-package-name hm.orz.chaos114.android.tumekyouen \
+  --ios-bundle-id hm.orz.chaos114.TumeKyouen \
+  --platforms=android,ios,web \
+  --yes
 
 flutter build web \
   --dart-define=ENVIRONMENT=prod \

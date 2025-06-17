@@ -44,7 +44,12 @@ This app supports environment switching using `dart-define` to configure:
 
 ### Firebase Configuration
 
-The `lib/firebase_options.dart` file is automatically generated from `lib/firebase_options_template.dart` when running the build or run scripts. This file is gitignored and uses environment variables to configure Firebase for different environments.
+The `lib/firebase_options.dart` file is automatically generated using the `flutterfire configure` command when running the build or run scripts. This file is gitignored and will be configured for the appropriate Firebase project based on the environment:
+
+- **Development environment**: Uses project `api-project-732262258565-dev`
+- **Production environment**: Uses project `api-project-732262258565`
+
+Each script automatically runs the appropriate `flutterfire configure` command to set up Firebase for the target environment.
 
 ### Running in Different Environments
 
@@ -86,9 +91,26 @@ flutter run \
 
 ## Scripts
 
-### Setup Firebase
-dev
+### Manual Firebase Setup
 
+If you need to manually configure Firebase for different environments, you can use these commands:
+
+#### Development Environment
+```bash
+flutterfire configure \
+  --project api-project-732262258565-dev \
+  --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
+  --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
+  --platforms=android,ios,web
 ```
-flutterfire configure --project api-project-732262258565 --android-package-name hm.orz.chaos114.android.tumekyouen.dev --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev --platforms=android,ios,web
+
+#### Production Environment
+```bash
+flutterfire configure \
+  --project api-project-732262258565 \
+  --android-package-name hm.orz.chaos114.android.tumekyouen \
+  --ios-bundle-id hm.orz.chaos114.TumeKyouen \
+  --platforms=android,ios,web
 ```
+
+**Note**: The build and run scripts automatically handle Firebase configuration, so manual setup is typically not required.

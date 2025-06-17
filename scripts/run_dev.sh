@@ -3,11 +3,14 @@
 # Development environment run script
 echo "Running in development environment..."
 
-# Copy firebase options template if needed
-if [ ! -f "lib/firebase_options.dart" ]; then
-  echo "Copying firebase_options template..."
-  cp lib/firebase_options_template.dart lib/firebase_options.dart
-fi
+# Configure Firebase for development environment
+echo "Configuring Firebase for development environment..."
+flutterfire configure \
+  --project api-project-732262258565-dev \
+  --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
+  --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
+  --platforms=android,ios,web \
+  --yes
 
 flutter run \
   --dart-define=ENVIRONMENT=dev \
