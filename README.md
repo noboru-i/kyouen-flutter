@@ -35,5 +35,5 @@ apps](https://flutter.dev/docs/development/accessibility-and-localization/intern
 dev
 
 ```
-flutterfire configure --project api-project-732262258565 --android-package-name hm.orz.chaos114.android.tumekyouen.dev --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev --macos-bundle-id= --platforms=android,ios,web
+flutterfire configure --project api-project-732262258565 --android-package-name hm.orz.chaos114.android.tumekyouen.dev --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev --platforms=android,ios,web
 ```
