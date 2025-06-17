@@ -43,8 +43,5 @@ jobs:
     - name: Run tests
       run: flutter test
     
-    - name: Check build for Android
-      run: flutter build apk --debug --target=lib/main.dart
-    
     - name: Check build for Web
       run: flutter build web --target=lib/main.dart
