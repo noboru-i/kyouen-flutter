@@ -40,14 +40,14 @@ This app supports environment switching using `dart-define` to configure:
 
 - `ENVIRONMENT`: Set to `dev` or `prod` (default: `prod`)
 - `API_BASE_URL`: API endpoint URL (default: `https://kyouen.app/v2/`)
-- `FIREBASE_PROJECT_ID`: Firebase project ID (default: `api-project-732262258565`)
+- `FIREBASE_PROJECT_ID`: Firebase project ID (default: `my-android-server`)
 
 ### Firebase Configuration
 
 The `lib/firebase_options.dart` file is automatically generated using the `flutterfire configure` command when running the build or run scripts. This file is gitignored and will be configured for the appropriate Firebase project based on the environment:
 
 - **Development environment**: Uses project `api-project-732262258565-dev`
-- **Production environment**: Uses project `api-project-732262258565`
+- **Production environment**: Uses project `my-android-server`
 
 Each script automatically runs the appropriate `flutterfire configure` command to set up Firebase for the target environment.
 
@@ -74,7 +74,7 @@ flutter run \
 flutter run \
   --dart-define=ENVIRONMENT=prod \
   --dart-define=API_BASE_URL=https://kyouen.app/v2/ \
-  --dart-define=FIREBASE_PROJECT_ID=api-project-732262258565
+  --dart-define=FIREBASE_PROJECT_ID=my-android-server
 ```
 
 ### Building for Different Environments
@@ -107,7 +107,7 @@ flutterfire configure \
 #### Production Environment
 ```bash
 flutterfire configure \
-  --project api-project-732262258565 \
+  --project my-android-server \
   --android-package-name hm.orz.chaos114.android.tumekyouen \
   --ios-bundle-id hm.orz.chaos114.TumeKyouen \
   --platforms=android,ios,web

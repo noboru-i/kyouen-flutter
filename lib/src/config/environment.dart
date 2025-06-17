@@ -11,11 +11,11 @@ class Environment {
   );
 
   /// Firebase project ID
-  /// Default: api-project-732262258565 (production)
+  /// Default: my-android-server (production)
   /// Dev: api-project-732262258565-dev (example)
   static const String firebaseProjectId = String.fromEnvironment(
     'FIREBASE_PROJECT_ID',
-    defaultValue: 'api-project-732262258565',
+    defaultValue: 'my-android-server',
   );
 
   /// Environment type
