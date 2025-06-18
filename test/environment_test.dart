@@ -9,7 +9,7 @@ void main() {
       expect(Environment.isProduction, isTrue);
       expect(Environment.isDevelopment, isFalse);
       expect(Environment.apiBaseUrl, equals('https://kyouen.app/v2/'));
-      expect(Environment.firebaseProjectId, equals('api-project-732262258565'));
+      expect(Environment.firebaseProjectId, equals('my-android-server'));
       expect(Environment.appName, equals('詰め共円'));
     });
 

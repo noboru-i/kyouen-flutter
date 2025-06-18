@@ -46,7 +46,7 @@ This app supports environment switching using `dart-define` to configure:
 
 The `lib/firebase_options.dart` file is automatically generated using the `flutterfire configure` command when running the build or run scripts. This file is gitignored and will be configured for the appropriate Firebase project based on the environment:
 
-- **Development environment**: Uses project `api-project-732262258565-dev`
+- **Development environment**: Uses project `api-project-732262258565`
 - **Production environment**: Uses project `my-android-server`
 
 Each script automatically runs the appropriate `flutterfire configure` command to set up Firebase for the target environment.
@@ -62,7 +62,7 @@ Each script automatically runs the appropriate `flutterfire configure` command t
 flutter run \
   --dart-define=ENVIRONMENT=dev \
   --dart-define=API_BASE_URL=https://dev.kyouen.app/v2/ \
-  --dart-define=FIREBASE_PROJECT_ID=api-project-732262258565-dev
+  --dart-define=FIREBASE_PROJECT_ID=api-project-732262258565
 ```
 
 #### Production Environment
@@ -98,7 +98,7 @@ If you need to manually configure Firebase for different environments, you can u
 #### Development Environment
 ```bash
 flutterfire configure \
-  --project api-project-732262258565-dev \
+  --project api-project-732262258565 \
   --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
   --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
   --platforms=android,ios,web
