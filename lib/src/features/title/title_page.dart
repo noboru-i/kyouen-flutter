@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 
@@ -16,7 +17,7 @@ class TitlePage extends StatelessWidget {
           children: [
             const SizedBox(height: 30),
             Text(
-              '詰め共円',
+              Environment.appName,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.displayLarge,
             ),

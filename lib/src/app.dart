@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/title/title_page.dart';
@@ -26,8 +27,7 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en', '')],
-          onGenerateTitle:
-              (BuildContext context) => AppLocalizations.of(context)!.appTitle,
+          onGenerateTitle: (BuildContext context) => Environment.appName,
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
