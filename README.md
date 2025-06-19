@@ -38,6 +38,12 @@ This app supports environment switching using `dart-define` to configure:
 
 ### Environment Variables
 
+The application uses environment variables configured via `--dart-define-from-file` using `.env` files:
+
+- `.env.dev`: Development environment configuration
+- `.env.prod`: Production environment configuration
+
+Environment variables:
 - `ENVIRONMENT`: Set to `dev` or `prod` (default: `prod`)
 - `API_BASE_URL`: API endpoint URL (default: `https://kyouen.app/v2/`)
 - `FIREBASE_PROJECT_ID`: Firebase project ID (default: `my-android-server`)
@@ -60,9 +66,7 @@ Each script automatically runs the appropriate `flutterfire configure` command t
 
 # Or manually
 flutter run \
-  --dart-define=ENVIRONMENT=dev \
-  --dart-define=API_BASE_URL=https://dev.kyouen.app/v2/ \
-  --dart-define=FIREBASE_PROJECT_ID=api-project-732262258565
+  --dart-define-from-file=.env.dev
 ```
 
 #### Production Environment
@@ -72,9 +76,7 @@ flutter run \
 
 # Or manually
 flutter run \
-  --dart-define=ENVIRONMENT=prod \
-  --dart-define=API_BASE_URL=https://kyouen.app/v2/ \
-  --dart-define=FIREBASE_PROJECT_ID=my-android-server
+  --dart-define-from-file=.env.prod
 ```
 
 ### Building for Different Environments

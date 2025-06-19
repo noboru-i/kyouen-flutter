@@ -1,20 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kyouen_flutter/src/data/api/api_client.dart';
+import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends ConsumerWidget {
   const SignInPage({super.key});
 
   static const routeName = '/sign_in';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const _SignInView();
+            return _SignInView(ref: ref);
           }
 
           return _LogoutView(user: snapshot.data!);
@@ -25,7 +28,9 @@ class SignInPage extends StatelessWidget {
 }
 
 class _SignInView extends StatelessWidget {
-  const _SignInView();
+  const _SignInView({required this.ref});
+
+  final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
@@ -62,20 +67,69 @@ class _SignInView extends StatelessWidget {
     await FirebaseAuth.instance.signOut();
     final twitterProvider = TwitterAuthProvider();
 
-    if (kIsWeb) {
-      await FirebaseAuth.instance.signInWithPopup(twitterProvider);
-    } else {
-      await FirebaseAuth.instance.signInWithProvider(twitterProvider);
+    try {
+      UserCredential userCredential;
+      if (kIsWeb) {
+        userCredential = await FirebaseAuth.instance.signInWithPopup(
+          twitterProvider,
+        );
+      } else {
+        userCredential = await FirebaseAuth.instance.signInWithProvider(
+          twitterProvider,
+        );
+      }
+
+      await _callLoginApi(userCredential.user);
+    } on Exception catch (e) {
+      debugPrint('Twitter sign-in failed: $e');
     }
   }
 
   Future<void> _signInWithApple() async {
     final appleProvider = AppleAuthProvider();
 
-    if (kIsWeb) {
-      await FirebaseAuth.instance.signInWithPopup(appleProvider);
-    } else {
-      await FirebaseAuth.instance.signInWithProvider(appleProvider);
+    try {
+      UserCredential userCredential;
+      if (kIsWeb) {
+        userCredential = await FirebaseAuth.instance.signInWithPopup(
+          appleProvider,
+        );
+      } else {
+        userCredential = await FirebaseAuth.instance.signInWithProvider(
+          appleProvider,
+        );
+      }
+
+      await _callLoginApi(userCredential.user);
+    } on Exception catch (e) {
+      debugPrint('Apple sign-in failed: $e');
+    }
+  }
+
+  Future<void> _callLoginApi(User? user) async {
+    if (user == null) {
+      return;
+    }
+
+    try {
+      final idToken = await user.getIdToken();
+      if (idToken == null) {
+        debugPrint('ID token is null');
+        return;
+      }
+
+      final apiClient = ref.read(apiClientProvider);
+      final loginRequest = LoginRequest(token: idToken);
+
+      final response = await apiClient.login(loginRequest);
+
+      if (response.isSuccessful && response.body != null) {
+        debugPrint('Login successful: ${response.body!.screenName}');
+      } else {
+        debugPrint('Login failed: ${response.error}');
+      }
+    } on Exception catch (e) {
+      debugPrint('Login API call failed: $e');
     }
   }
 }

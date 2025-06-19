@@ -13,9 +13,7 @@ flutterfire configure \
   --yes
 
 flutter build web \
-  --dart-define=ENVIRONMENT=prod \
-  --dart-define=API_BASE_URL=https://kyouen.app/v2/ \
-  --dart-define=FIREBASE_PROJECT_ID=my-android-server
+  --dart-define-from-file=.env.prod
 
 echo "Production build completed!"
 echo "App name will show as: '詰め共円'"

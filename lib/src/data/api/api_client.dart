@@ -1,6 +1,8 @@
 import 'package:chopper/chopper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
+import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
+import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,6 +18,9 @@ abstract class ApiClient extends ChopperService {
   Future<Response<List<StageResponse>>> getStages({
     @Query('start_stage_no') int startStageNo = 1,
   });
+
+  @POST(path: '/users/login')
+  Future<Response<LoginResponse>> login(@Body() LoginRequest request);
 }
 
 @riverpod
