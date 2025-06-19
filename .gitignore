@@ -58,3 +58,4 @@ android/app/cert/release.keystore
 # Generated code
 *.g.dart
 *.freezed.dart
+*.chopper.dart
