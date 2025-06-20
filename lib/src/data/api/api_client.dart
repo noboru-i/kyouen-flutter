@@ -1,9 +1,13 @@
+import 'dart:developer' as developer;
+
 import 'package:chopper/chopper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/api/json_serializable_converter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'api_client.chopper.dart';
@@ -11,8 +15,7 @@ part 'api_client.g.dart';
 
 @ChopperApi(baseUrl: '/')
 abstract class ApiClient extends ChopperService {
-  static ApiClient create([ChopperClient? client]) =>
-      _$ApiClient(client);
+  static ApiClient create([ChopperClient? client]) => _$ApiClient(client);
 
   @GET(path: '/stages')
   Future<Response<List<StageResponse>>> getStages({
@@ -27,13 +30,9 @@ abstract class ApiClient extends ChopperService {
 ApiClient apiClient(Ref ref) {
   final client = ChopperClient(
     baseUrl: Uri.parse(Environment.apiBaseUrl),
-    services: [
-      ApiClient.create(),
-    ],
-    converter: const JsonConverter(),
-    interceptors: [
-      HttpLoggingInterceptor(),
-    ],
+    services: [ApiClient.create()],
+    converter: JsonSerializableConverter(),
+    interceptors: [if (kDebugMode) HttpLoggingInterceptor()],
   );
   return ApiClient.create(client);
 }
