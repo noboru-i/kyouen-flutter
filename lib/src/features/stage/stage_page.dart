@@ -30,6 +30,9 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
+    final currentStageNo = currentStage.hasValue ? currentStage.value!.stageNo : 0;
+    final isClearedAsync = ref.watch(isStageClearedProvider(stageNo: currentStageNo));
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
@@ -41,16 +44,34 @@ class _Header extends ConsumerWidget {
             child: const Text('前へ'),
           ),
           Expanded(
-            child: Text(
-              'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : '?'}',
-              textAlign: TextAlign.center,
+            child: Column(
+              children: [
+                Text(
+                  'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : '?'}',
+                  textAlign: TextAlign.center,
+                ),
+                isClearedAsync.when(
+                  data: (isCleared) => isCleared
+                      ? const Text(
+                          'CLEARED',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+              ],
             ),
           ),
           ElevatedButton(
             onPressed: () {
               ref.read(currentStageNoProvider.notifier).next();
             },
-            child: const Text('前へ'),
+            child: const Text('次へ'),
           ),
         ],
       ),
