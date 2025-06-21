@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
-import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
-import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
-import 'package:kyouen_flutter/src/features/title/title_page.dart';
+import 'package:kyouen_flutter/src/config/router.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/settings/settings_controller.dart';
-import 'package:kyouen_flutter/src/settings/settings_view.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.settingsController});
@@ -18,7 +15,10 @@ class MyApp extends StatelessWidget {
     return ListenableBuilder(
       listenable: settingsController,
       builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
+        final router = createRouter(settingsController);
+        
+        return MaterialApp.router(
+          routerConfig: router,
           restorationScopeId: 'app',
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -31,26 +31,6 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                switch (routeSettings.name) {
-                  case TitlePage.routeName:
-                    return const TitlePage();
-                  case StagePage.routeName:
-                    return const StagePage();
-                  case SignInPage.routeName:
-                    return const SignInPage();
-                  // TODO: remove the followings.
-                  case SettingsView.routeName:
-                    return SettingsView(controller: settingsController);
-                  default:
-                    throw Exception();
-                }
-              },
-            );
-          },
         );
       },
     );

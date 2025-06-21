@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
-import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
-import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});
-
-  static const routeName = '/';
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +21,14 @@ class TitlePage extends StatelessWidget {
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                Navigator.restorablePushNamed(context, StagePage.routeName);
+                context.go('/stage');
               },
               child: const Text('スタート'),
             ),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                Navigator.restorablePushNamed(context, SignInPage.routeName);
+                context.go('/sign_in');
               },
               child: const Text('ログイン'),
             ),
