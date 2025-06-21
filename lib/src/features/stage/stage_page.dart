@@ -5,8 +5,6 @@ import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
 
-  static const routeName = '/stage';
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // initialize and keep instance

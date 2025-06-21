@@ -1,11 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
-
-  static const routeName = '/sign_in';
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,7 @@ class _SignInView extends StatelessWidget {
           alignment: Alignment.topLeft,
           child: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
             },
             icon: const Icon(Icons.arrow_back),
           ),
