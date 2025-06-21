@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/database/stage_repository.dart';
+import 'package:kyouen_flutter/src/data/database/stage_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stage_service.g.dart';
@@ -11,17 +13,41 @@ part 'stage_service.g.dart';
 /// page starts with 1. (page 1 includes no.1 - no.10.)
 @riverpod
 Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
-  final response = await ref
-      .watch(apiClientProvider)
-      .getStages(startStageNo: ((page - 1) * 10) + 1);
-  return response.body ?? [];
+  final repository = ref.watch(stageRepositoryProvider);
+  final entities = await repository.fetchAndSaveStages(
+    startStageNo: ((page - 1) * 10) + 1,
+  );
+  return entities.map(_entityToResponse).toList();
 }
 
 @riverpod
 Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
-  final page = ((stageNo - 1) / 10).floor() + 1;
-  final stages = await ref.watch(fetchStagesProvider(page: page).future);
-  return stages[((stageNo - 1) % 10)];
+  final repository = ref.watch(stageRepositoryProvider);
+  final entity = await repository.getStage(stageNo);
+  
+  if (entity == null) {
+    throw Exception('Stage $stageNo not found');
+  }
+  
+  return _entityToResponse(entity);
+}
+
+/// Check if a specific stage is cleared
+@riverpod
+Future<bool> isStageCleared(Ref ref, {required int stageNo}) async {
+  final repository = ref.watch(stageRepositoryProvider);
+  final entity = await repository.getStage(stageNo);
+  return entity?.isCleared ?? false;
+}
+
+StageResponse _entityToResponse(StageEntity entity) {
+  return StageResponse(
+    stageNo: entity.stageNo,
+    size: entity.size,
+    stage: entity.stage,
+    creator: entity.creator,
+    registDate: '', // Note: registDate not stored in local DB
+  );
 }
 
 @riverpod
@@ -56,7 +82,11 @@ class CurrentStage extends _$CurrentStage {
       return;
     }
     stageAsList[index] = stageAsList[index] == '1' ? '2' : '1';
-    state = AsyncData(currentStage.copyWith(stage: stageAsList.join()));
+    final updatedStage = currentStage.copyWith(stage: stageAsList.join());
+    state = AsyncData(updatedStage);
+    
+    // Persist the stage state to database
+    _saveCurrentStageState(updatedStage);
   }
 
   void reset() {
@@ -68,13 +98,41 @@ class CurrentStage extends _$CurrentStage {
         stageAsList[i] = '1';
       }
     }
-    state = AsyncData(currentStage.copyWith(stage: stageAsList.join()));
+    final updatedStage = currentStage.copyWith(stage: stageAsList.join());
+    state = AsyncData(updatedStage);
+    
+    // Persist the stage state to database
+    _saveCurrentStageState(updatedStage);
   }
 
   bool isKyouen() {
     final kyouenStage = Kyouen(stonesFromString(state.asData!.value.stage));
+    final hasKyouen = kyouenStage.hasKyouen() != null;
+    
+    // If kyouen is achieved, mark as cleared
+    if (hasKyouen) {
+      _markAsCleared();
+    }
+    
+    return hasKyouen;
+  }
 
-    return kyouenStage.hasKyouen() != null;
+  void _saveCurrentStageState(StageResponse stageResponse) {
+    // Convert to entity and save to database
+    final repository = ref.read(stageRepositoryProvider);
+    final entity = StageEntity(
+      stageNo: stageResponse.stageNo,
+      size: stageResponse.size,
+      stage: stageResponse.stage,
+      creator: stageResponse.creator,
+    );
+    repository.updateStageState(entity);
+  }
+
+  void _markAsCleared() {
+    final currentStage = state.asData!.value;
+    final repository = ref.read(stageRepositoryProvider);
+    repository.updateClearStatus(currentStage.stageNo, true);
   }
 }
 

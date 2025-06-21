@@ -59,3 +59,8 @@ android/app/cert/release.keystore
 *.g.dart
 *.freezed.dart
 *.chopper.dart
+
+# Temporary downloads
+flutter.tar.xz
+flutter_linux_*.tar.xz
+flutter/
