@@ -41,6 +41,7 @@ dev_dependencies:
   pedantic_mono: ^1.28.0
   riverpod_generator: ^2.6.5
   riverpod_lint: ^2.6.5
+  sqflite_common_ffi: ^2.4.1
 
 flutter:
   uses-material-design: true
