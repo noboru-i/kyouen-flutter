@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 
 class StagePage extends ConsumerWidget {
@@ -34,7 +35,16 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
+    final currentStageNo = ref.watch(currentStageNoProvider);
+    final clearedStages = ref.watch(clearedStagesProvider);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
+    
+    // Check if current stage is cleared
+    final isCleared = clearedStages.when(
+      data: (cleared) => cleared.contains(currentStageNo),
+      loading: () => false,
+      error: (_, _) => false,
+    );
     
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -51,13 +61,27 @@ class _Header extends ConsumerWidget {
           ),
           Expanded(
             flex: isSmallScreen ? 3 : 4,
-            child: Text(
-              'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : '?'}',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: isSmallScreen ? 16 : 18,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : '?'}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 16 : 18,
+                    fontWeight: FontWeight.bold,
+                    color: isCleared ? const Color(0xFF2E7D32) : null, // Dark green for cleared
+                  ),
+                ),
+                if (isCleared) ...[
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.check_circle,
+                    color: const Color(0xFF4CAF50), // Material green
+                    size: isSmallScreen ? 16 : 20,
+                  ),
+                ],
+              ],
             ),
           ),
           Expanded(
@@ -97,11 +121,17 @@ class _Footer extends ConsumerWidget {
                       ref.read(currentStageProvider.notifier).isKyouen();
                   if (isKyouen) {
                     debugPrint('KYOUEN!');
-                    await _showKyouenDialog(context);
+                    // Mark stage as cleared
+                    await ref.read(currentStageProvider.notifier).markCurrentStageCleared();
+                    if (context.mounted) {
+                      await _showKyouenDialog(context);
+                    }
                     ref.read(currentStageNoProvider.notifier).next();
                   } else {
                     debugPrint('NOT KYOUEN!');
-                    await _showNotKyouenDialog(context);
+                    if (context.mounted) {
+                      await _showNotKyouenDialog(context);
+                    }
                     ref.read(currentStageProvider.notifier).reset();
                   }
                 }
@@ -117,14 +147,38 @@ class _Footer extends ConsumerWidget {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          title: const Text('共円！！'),
-          content: const Text('おめでとうございます！'),
+          title: const Row(
+            children: [
+              Icon(Icons.celebration, color: Color(0xFFFFD700)), // Gold color
+              SizedBox(width: 8),
+              Text('共円！！'),
+            ],
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: Color(0xFF4CAF50),
+                size: 48,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'おめでとうございます！\nステージクリア！',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('OK'),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF2E7D32),
+              ),
+              child: const Text('次のステージへ'),
             ),
           ],
         );

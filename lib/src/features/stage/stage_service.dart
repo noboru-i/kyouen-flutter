@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stage_service.g.dart';
@@ -75,6 +76,14 @@ class CurrentStage extends _$CurrentStage {
     final kyouenStage = Kyouen(stonesFromString(state.asData!.value.stage));
 
     return kyouenStage.hasKyouen() != null;
+  }
+
+  Future<void> markCurrentStageCleared() async {
+    final currentStageNo = ref.read(currentStageNoProvider);
+    final clearedService = ref.read(clearedStagesServiceProvider);
+    await clearedService.markStageCleared(currentStageNo);
+    // Invalidate the cleared stages provider to refresh UI
+    ref.invalidate(clearedStagesProvider);
   }
 }
 
