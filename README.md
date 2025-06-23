@@ -18,15 +18,32 @@
 
 # 本番環境での実行
 ./scripts/run_prod.sh
+
+# Web用ビルド
+flutter build web --dart-define-from-file=.env.prod
+```
+
+### Web対応
+
+このアプリはFlutter webでも動作します。Web用のビルドには以下の追加設定が必要です：
+
+```bash
+# sqflite web用セットアップ（初回のみ）
+dart run sqflite_common_ffi_web:setup
+
+# Web用ビルド
+flutter build web --no-tree-shake-icons
 ```
 
 ## 技術スタック
 
-- **フレームワーク**: Flutter
+- **フレームワーク**: Flutter (Mobile & Web対応)
 - **状態管理**: Riverpod
 - **API通信**: Chopper + HTTP
+- **ローカルDB**: sqflite (Mobile), sqflite_common_ffi_web (Web)
 - **バックエンド**: Firebase (Auth, Analytics, Crashlytics)
 - **アーキテクチャ**: Feature-based architecture with Clean Architecture
+- **CI/CD**: GitHub Actions
 
 ## コントリビューション
 

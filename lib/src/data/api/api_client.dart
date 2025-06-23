@@ -2,8 +2,11 @@ import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
+import 'package:kyouen_flutter/src/data/api/entity/clear_stage.dart';
+import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
+import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:kyouen_flutter/src/data/api/json_serializable_converter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,10 +21,25 @@ abstract class ApiClient extends ChopperService {
   @GET(path: '/stages')
   Future<Response<List<StageResponse>>> getStages({
     @Query('start_stage_no') int startStageNo = 1,
+    @Query('limit') int? limit,
   });
 
   @POST(path: '/users/login')
   Future<Response<LoginResponse>> login(@Body() LoginRequest request);
+
+  @POST(path: '/stages')
+  Future<Response<StageResponse>> createStage(@Body() NewStage newStage);
+
+  @PUT(path: '/stages/{stageNo}/clear')
+  Future<Response<void>> clearStage(
+    @Path('stageNo') int stageNo,
+    @Body() ClearStage clearStage,
+  );
+
+  @POST(path: '/stages/sync')
+  Future<Response<List<ClearedStage>>> syncStages(
+    @Body() List<ClearedStage> clearedStages,
+  );
 }
 
 @riverpod
