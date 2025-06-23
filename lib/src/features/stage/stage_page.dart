@@ -278,7 +278,7 @@ class _Stone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFFF4E4BC), // Light wood color
         border: Border.all(

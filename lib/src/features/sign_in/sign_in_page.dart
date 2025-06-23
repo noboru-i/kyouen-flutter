@@ -34,7 +34,7 @@ class _SignInView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -54,7 +54,7 @@ class _SignInView extends StatelessWidget {
               // Back button
               Align(
                 alignment: Alignment.topLeft,
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -276,7 +276,7 @@ class _LogoutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -296,7 +296,7 @@ class _LogoutView extends StatelessWidget {
               // Back button
               Align(
                 alignment: Alignment.topLeft,
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
