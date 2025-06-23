@@ -17,7 +17,11 @@ class StagePage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [_Header(), _Body(), _Footer()],
+          children: [
+            _Header(),
+            Expanded(child: _Body()),
+            _Footer(),
+          ],
         ),
       ),
     );
@@ -50,7 +54,7 @@ class _Header extends ConsumerWidget {
             onPressed: () {
               ref.read(currentStageNoProvider.notifier).next();
             },
-            child: const Text('前へ'),
+            child: const Text('次へ'),
           ),
         ],
       ),
