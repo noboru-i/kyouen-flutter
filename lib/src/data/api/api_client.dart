@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

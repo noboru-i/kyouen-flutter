@@ -6,7 +6,9 @@ import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 
 class JsonSerializableConverter extends JsonConverter {
   @override
-  Response<BodyType> convertResponse<BodyType, InnerType>(Response<dynamic> response) {
+  Response<BodyType> convertResponse<BodyType, InnerType>(
+    Response<dynamic> response,
+  ) {
     return response.copyWith<BodyType>(
       body: fromJsonData<BodyType, InnerType>(
         response.body as String,
@@ -30,8 +32,11 @@ class JsonSerializableConverter extends JsonConverter {
   T _convertList<T, InnerType>(List<dynamic> jsonList) {
     if (InnerType == StageResponse) {
       return jsonList
-          .map((item) => StageResponse.fromJson(item as Map<String, dynamic>))
-          .toList() as T;
+              .map(
+                (item) => StageResponse.fromJson(item as Map<String, dynamic>),
+              )
+              .toList()
+          as T;
     }
 
     return jsonList as T;
