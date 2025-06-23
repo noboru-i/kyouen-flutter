@@ -34,27 +34,40 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
         children: [
-          ElevatedButton(
-            onPressed: () {
-              ref.read(currentStageNoProvider.notifier).prev();
-            },
-            child: const Text('前へ'),
+          Expanded(
+            flex: isSmallScreen ? 1 : 2,
+            child: ElevatedButton(
+              onPressed: () {
+                ref.read(currentStageNoProvider.notifier).prev();
+              },
+              child: Text(isSmallScreen ? '前' : '前へ'),
+            ),
           ),
           Expanded(
+            flex: isSmallScreen ? 3 : 4,
             child: Text(
               'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : '?'}',
               textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: isSmallScreen ? 16 : 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              ref.read(currentStageNoProvider.notifier).next();
-            },
-            child: const Text('次へ'),
+          Expanded(
+            flex: isSmallScreen ? 1 : 2,
+            child: ElevatedButton(
+              onPressed: () {
+                ref.read(currentStageNoProvider.notifier).next();
+              },
+              child: Text(isSmallScreen ? '次' : '次へ'),
+            ),
           ),
         ],
       ),
@@ -147,28 +160,39 @@ class _Body extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxBoardSize = screenWidth * 0.9;
+    
     return currentStage.when(
       data: (data) {
-        return AspectRatio(
-          aspectRatio: 1,
-          child: ColoredBox(
-            color: Colors.green,
-            child: GridView.count(
-              crossAxisCount: 6,
-              children:
-                  data.stage.split('').indexed.map((element) {
-                    final (index, state) = element;
-                    final stateEnum = switch (state) {
-                      '0' => StoneState.none,
-                      '1' => StoneState.black,
-                      '2' => StoneState.white,
-                      String() => StoneState.none,
-                    };
-                    return GestureDetector(
-                      onTap: () => _onTapStone(ref, index),
-                      child: _Stone(state: stateEnum, key: ValueKey(index)),
-                    );
-                  }).toList(),
+        return Center(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: maxBoardSize,
+              maxHeight: maxBoardSize,
+            ),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: ColoredBox(
+                color: Colors.green,
+                child: GridView.count(
+                  crossAxisCount: 6,
+                  children:
+                      data.stage.split('').indexed.map((element) {
+                        final (index, state) = element;
+                        final stateEnum = switch (state) {
+                          '0' => StoneState.none,
+                          '1' => StoneState.black,
+                          '2' => StoneState.white,
+                          String() => StoneState.none,
+                        };
+                        return GestureDetector(
+                          onTap: () => _onTapStone(ref, index),
+                          child: _Stone(state: stateEnum, key: ValueKey(index)),
+                        );
+                      }).toList(),
+                ),
+              ),
             ),
           ),
         );
@@ -179,14 +203,21 @@ class _Body extends ConsumerWidget {
         return const Text('error');
       },
       loading: () {
-        return AspectRatio(
-          aspectRatio: 1,
-          child: ColoredBox(
-            color: Colors.green,
-            child: Container(
-              alignment: Alignment.center,
-              constraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
-              child: const CircularProgressIndicator.adaptive(),
+        return Center(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: maxBoardSize,
+              maxHeight: maxBoardSize,
+            ),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: ColoredBox(
+                color: Colors.green,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: const CircularProgressIndicator.adaptive(),
+                ),
+              ),
             ),
           ),
         );
