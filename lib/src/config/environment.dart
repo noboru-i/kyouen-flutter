@@ -4,7 +4,7 @@ class Environment {
 
   /// API base URL
   /// Default: https://kyouen.app/v2/
-  /// Dev: https://dev.kyouen.app/v2/ (example)
+  /// Dev: https://kyouen-server-dev-732262258565.asia-northeast1.run.app/v2/ (example)
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'https://kyouen.app/v2/',

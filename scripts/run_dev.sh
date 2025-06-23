@@ -13,11 +13,9 @@ flutterfire configure \
   --yes
 
 flutter run \
-  --dart-define=ENVIRONMENT=dev \
-  --dart-define=API_BASE_URL=https://dev.kyouen.app/v2/ \
-  --dart-define=FIREBASE_PROJECT_ID=api-project-732262258565
+  --dart-define-from-file=.env.dev
 
 echo "Development app is running!"
 echo "App name will show as: 'DEV 詰め共円'"
-echo "API will connect to: https://dev.kyouen.app/v2/"
+echo "API will connect to: https://kyouen-server-dev-732262258565.asia-northeast1.run.app/v2/"
 echo "Firebase project: api-project-732262258565"
