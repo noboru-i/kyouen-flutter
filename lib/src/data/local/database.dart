@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/local/dao/tume_kyouen_dao.dart';
 import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart' as web;
 
 part 'database.g.dart';
 
@@ -16,6 +18,11 @@ class AppDatabase {
   static const _databaseVersion = 3;
 
   static Future<AppDatabase> create() async {
+    // Initialize sqflite for web
+    if (kIsWeb) {
+      databaseFactory = web.databaseFactoryFfiWeb;
+    }
+
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, _databaseName);
 
