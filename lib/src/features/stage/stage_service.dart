@@ -5,6 +5,8 @@ import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
+import 'package:kyouen_flutter/src/data/local/database.dart';
+import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stage_service.g.dart';
@@ -24,6 +26,7 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
   final stages = await ref.watch(fetchStagesProvider(page: page).future);
   return stages[((stageNo - 1) % 10)];
 }
+
 
 @riverpod
 class CurrentStageNo extends _$CurrentStageNo {
@@ -80,8 +83,30 @@ class CurrentStage extends _$CurrentStage {
 
   Future<void> markCurrentStageCleared() async {
     final currentStageNo = ref.read(currentStageNoProvider);
-    final clearedService = ref.read(clearedStagesServiceProvider);
-    await clearedService.markStageCleared(currentStageNo);
+    final currentStageData = state.asData!.value;
+    
+    // Save or update stage data in SQLite with clear flag
+    final dao = await ref.read(tumeKyouenDaoProvider.future);
+    final existingStage = await dao.findStage(currentStageNo);
+    
+    if (existingStage == null) {
+      // Insert new stage record
+      final tumeKyouen = [
+        TumeKyouen(
+          stageNo: currentStageData.stageNo,
+          size: currentStageData.size,
+          stage: currentStageData.stage,
+          creator: currentStageData.creator,
+          clearFlag: TumeKyouen.cleared,
+          clearDate: DateTime.now().millisecondsSinceEpoch,
+        ),
+      ];
+      await dao.insertAll(tumeKyouen);
+    } else {
+      // Update existing record with clear flag
+      await dao.clearStage(currentStageNo, DateTime.now().millisecondsSinceEpoch);
+    }
+    
     // Invalidate the cleared stages provider to refresh UI
     ref.invalidate(clearedStagesProvider);
   }
