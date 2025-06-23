@@ -14,19 +14,86 @@ part 'stage_service.g.dart';
 /// page starts with 1. (page 1 includes no.1 - no.10.)
 @riverpod
 Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
+  // Fetch from API
   final response = await ref
       .watch(apiClientProvider)
       .getStages(startStageNo: ((page - 1) * 10) + 1);
-  return response.body ?? [];
+  final apiStages = response.body ?? [];
+  
+  // Save all stages to SQLite for future offline access
+  if (apiStages.isNotEmpty) {
+    final dao = await ref.watch(tumeKyouenDaoProvider.future);
+    final tumeKyouens = apiStages.map((apiStage) => TumeKyouen(
+      stageNo: apiStage.stageNo,
+      size: apiStage.size,
+      stage: apiStage.stage,
+      creator: apiStage.creator,
+      clearFlag: TumeKyouen.notCleared,
+      clearDate: 0,
+    )).toList();
+    
+    // Insert with REPLACE to handle duplicates
+    await dao.insertAll(tumeKyouens);
+  }
+  
+  return apiStages;
 }
 
 @riverpod
 Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
+  // First check if stage exists in SQLite
+  final dao = await ref.watch(tumeKyouenDaoProvider.future);
+  final localStage = await dao.findStage(stageNo);
+  
+  if (localStage != null) {
+    // Return from SQLite if available
+    return StageResponse(
+      stageNo: localStage.stageNo,
+      size: localStage.size,
+      stage: localStage.stage,
+      creator: localStage.creator,
+      registDate: '', // This field isn't stored in SQLite
+    );
+  }
+  
+  // If not in SQLite, fetch from API and save to SQLite
   final page = ((stageNo - 1) / 10).floor() + 1;
   final stages = await ref.watch(fetchStagesProvider(page: page).future);
-  return stages[((stageNo - 1) % 10)];
+  final apiStage = stages[((stageNo - 1) % 10)];
+  
+  // Save to SQLite for future use
+  final tumeKyouen = TumeKyouen(
+    stageNo: apiStage.stageNo,
+    size: apiStage.size,
+    stage: apiStage.stage,
+    creator: apiStage.creator,
+    clearFlag: TumeKyouen.notCleared,
+    clearDate: 0,
+  );
+  
+  await dao.insertAll([tumeKyouen]);
+  
+  return apiStage;
 }
 
+/// Get stage directly from SQLite (for offline access)
+@riverpod
+Future<StageResponse?> fetchStageFromLocal(Ref ref, {required int stageNo}) async {
+  final dao = await ref.watch(tumeKyouenDaoProvider.future);
+  final localStage = await dao.findStage(stageNo);
+  
+  if (localStage == null) {
+    return null;
+  }
+  
+  return StageResponse(
+    stageNo: localStage.stageNo,
+    size: localStage.size,
+    stage: localStage.stage,
+    creator: localStage.creator,
+    registDate: '', // Not stored in SQLite
+  );
+}
 
 @riverpod
 class CurrentStageNo extends _$CurrentStageNo {
@@ -83,29 +150,11 @@ class CurrentStage extends _$CurrentStage {
 
   Future<void> markCurrentStageCleared() async {
     final currentStageNo = ref.read(currentStageNoProvider);
-    final currentStageData = state.asData!.value;
     
-    // Save or update stage data in SQLite with clear flag
+    // Since stage data is now always in SQLite (from fetchStage),
+    // we only need to update the clear flag
     final dao = await ref.read(tumeKyouenDaoProvider.future);
-    final existingStage = await dao.findStage(currentStageNo);
-    
-    if (existingStage == null) {
-      // Insert new stage record
-      final tumeKyouen = [
-        TumeKyouen(
-          stageNo: currentStageData.stageNo,
-          size: currentStageData.size,
-          stage: currentStageData.stage,
-          creator: currentStageData.creator,
-          clearFlag: TumeKyouen.cleared,
-          clearDate: DateTime.now().millisecondsSinceEpoch,
-        ),
-      ];
-      await dao.insertAll(tumeKyouen);
-    } else {
-      // Update existing record with clear flag
-      await dao.clearStage(currentStageNo, DateTime.now().millisecondsSinceEpoch);
-    }
+    await dao.clearStage(currentStageNo, DateTime.now().millisecondsSinceEpoch);
     
     // Invalidate the cleared stages provider to refresh UI
     ref.invalidate(clearedStagesProvider);
