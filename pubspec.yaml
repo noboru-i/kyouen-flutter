@@ -25,7 +25,9 @@ dependencies:
   json_annotation: ^4.9.0
   kyouen: ^0.0.1
   logger: any
+  path: ^1.9.0
   riverpod_annotation: ^2.3.5
+  sqflite: ^2.3.3+2
 
 dev_dependencies:
   build_runner: ^2.4.13
