@@ -5,9 +5,11 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 
 # IntelliJ related
@@ -34,6 +36,9 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+
+# Dart defines generated file
+**/ios/Flutter/Dart-Defines.xcconfig
 
 # Symbolication related
 app.*.symbols
