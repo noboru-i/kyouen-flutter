@@ -1,0 +1,204 @@
+name: Build and Distribute
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to build for'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+
+jobs:
+  prepare:
+    name: Prepare Build Environment
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.4'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+      
+      - name: Configure Firebase for environment
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
+            # Development environment
+            flutterfire configure \
+              --project api-project-732262258565 \
+              --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
+              --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
+              --platforms=android,ios \
+              --yes
+          else
+            # Production environment
+            flutterfire configure \
+              --project my-android-server \
+              --android-package-name hm.orz.chaos114.android.tumekyouen \
+              --ios-bundle-id hm.orz.chaos114.TumeKyouen \
+              --platforms=android,ios \
+              --yes
+          fi
+      
+      - name: Upload prepared source
+        uses: actions/upload-artifact@v4
+        with:
+          name: prepared-source-${{ github.event.inputs.environment }}
+          path: |
+            .
+            !.git
+            !.github
+          retention-days: 1
+
+  build-ios:
+    name: Build iOS App
+    runs-on: macos-latest
+    environment: ${{ github.event.inputs.environment }}
+    needs: prepare
+    
+    steps:
+      - name: Download prepared source
+        uses: actions/download-artifact@v4
+        with:
+          name: prepared-source-${{ github.event.inputs.environment }}
+          path: .
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.4'
+          channel: 'stable'
+      
+      - name: Install Apple Certificate and provisioning profile
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # import certificate and provisioning profile from secrets
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+          # create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+          # apply provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+      
+      - name: Build iOS IPA
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
+            flutter build ipa --dart-define-from-file=.env.dev --release
+          else
+            flutter build ipa --dart-define-from-file=.env.prod --release
+          fi
+      
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app-${{ github.event.inputs.environment }}
+          path: build/ios/ipa/*.ipa
+      
+      - name: Distribute to Firebase App Distribution (iOS)
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          groups: testers
+          file: build/ios/ipa/*.ipa
+          releaseNotes: "Build from GitHub Actions - iOS ${{ github.event.inputs.environment }}"
+      
+      - name: Clean up keychain and provisioning profile
+        if: ${{ always() }}
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
+          rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+
+  build-android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    needs: prepare
+    
+    steps:
+      - name: Download prepared source
+        uses: actions/download-artifact@v4
+        with:
+          name: prepared-source-${{ github.event.inputs.environment }}
+          path: .
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'microsoft'
+          java-version: '17'
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.4'
+          channel: 'stable'
+      
+      - name: Build Android APK
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
+            flutter build apk --dart-define-from-file=.env.dev --release
+          else
+            flutter build apk --dart-define-from-file=.env.prod --release
+          fi
+      
+      - name: Build Android AAB
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
+            flutter build appbundle --dart-define-from-file=.env.dev --release
+          else
+            flutter build appbundle --dart-define-from-file=.env.prod --release
+          fi
+      
+      - name: Upload Android APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-${{ github.event.inputs.environment }}
+          path: build/app/outputs/flutter-apk/app-release.apk
+      
+      - name: Upload Android AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-${{ github.event.inputs.environment }}
+          path: build/app/outputs/bundle/release/app-release.aab
+      
+      - name: Distribute APK to Firebase App Distribution (Android)
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          groups: testers
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: "Build from GitHub Actions - Android ${{ github.event.inputs.environment }}"
