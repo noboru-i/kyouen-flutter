@@ -39,11 +39,18 @@ lib/
     ├── config/
     │   └── environment.dart     # 環境設定
     ├── data/
-    │   └── api/
-    │       ├── api_client.dart         # Chopper API client
-    │       ├── api_client.chopper.dart # 生成されたChopperコード
-    │       ├── json_serializable_converter.dart # カスタムJSON converter
-    │       └── entity/          # API data models (Freezed使用)
+    │   ├── api/
+    │   │   ├── api_client.dart         # Chopper API client
+    │   │   ├── api_client.chopper.dart # 生成されたChopperコード
+    │   │   ├── json_serializable_converter.dart # カスタムJSON converter
+    │   │   └── entity/          # API data models (Freezed使用)
+    │   └── local/              # SQLite関連
+    │       ├── database.dart           # SQLiteデータベース設定
+    │       ├── cleared_stages_service.dart # クリア状況管理
+    │       ├── dao/                    # Data Access Object層
+    │       │   └── tume_kyouen_dao.dart
+    │       └── entity/                 # ローカルデータモデル
+    │           └── tume_kyouen.dart
     ├── features/               # Feature-based構成
     │   ├── sign_in/           # ユーザー認証
     │   ├── stage/             # ゲームステージロジック
@@ -57,6 +64,7 @@ lib/
 - **Riverpod for state management**: dependency injectionと状態管理にproviderを使用
 - **Repository pattern**: ChopperによるAPI clientの抽象化
 - **Clean architecture**: data, domain, presentation layerの分離
+- **SQLite-first data architecture**: APIデータをSQLiteに自動保存し、以降のアクセスはローカルDBから実行
 
 ## 環境設定
 
@@ -129,24 +137,6 @@ flutter analyze
 dart run custom_lint
 ```
 
-## 最近の移行: dio+retrofit → http+Chopper
-
-**ステータス**: 最近完了 (commit e185309時点)
-
-### 変更内容
-- **API Client**: dio+retrofitからhttp+Chopperに移行
-- **変更されたファイル**:
-  - `lib/src/data/api/api_client.dart` - 新しいChopper-based API client
-  - `lib/src/data/api/json_serializable_converter.dart` - Chopper用カスタムJSON converter
-- **生成ファイル**: `*.retrofit.dart`の代わりに`*.chopper.dart`を生成
-- **Gitignore**: `*.chopper.dart`ファイルを除外対象に追加
-
-### 主な実装詳細
-- **API Client**: endpoint定義に`@ChopperApi` annotationを使用
-- **JSON Conversion**: 異なるresponse type (LoginResponse, StageResponse) を処理するカスタムconverter
-- **Logging**: debug modeでHTTP logging interceptorを有効化
-- **Riverpod Integration**: `apiClientProvider`を通じてAPI clientを提供
-
 ## Firebase設定
 
 ### 自動設定
@@ -207,10 +197,22 @@ flutterfire configure \
 
 ## 主要なProviders (Riverpod)
 
-- `apiClientProvider` - API clientインスタンス
-- `fetchStagesProvider` - APIからステージデータを取得
+### API & ネットワーク
+- `apiClientProvider` - Chopper API clientインスタンス
+
+### データベース
+- `appDatabaseProvider` - SQLiteデータベースインスタンス
+- `tumeKyouenDaoProvider` - ステージデータ操作用DAO
+
+### ステージ管理 (SQLite-first)
+- `fetchStagesProvider` - APIからステージデータを取得してSQLiteに保存
+- `fetchStageProvider` - 個別ステージをSQLite優先で取得 (なければAPI経由)
+- `fetchStageFromLocalProvider` - SQLiteから直接ステージデータを取得 (オフライン用)
 - `currentStageNoProvider` - 現在のステージ番号状態
 - `currentStageProvider` - 現在のステージデータと操作
+
+### クリア状況管理
+- `clearedStagesProvider` - SQLiteからクリア済みステージリストを取得
 
 ## 今後の開発における重要な注意点
 
@@ -221,6 +223,10 @@ flutterfire configure \
 5. **テスト**: 開発環境でのテストには `./scripts/test_dev.sh` を使用
 6. **State Management**: 新機能にはRiverpodパターンに従う
 7. **Localization**: 現在は英語のみ対応だが、i18n基盤は整備済み
+8. **データアーキテクチャ**: 新しいデータ操作はSQLite-firstパターンに従う（API → SQLite → UI）
+9. **クリア状況**: ステージクリア処理は `markCurrentStageCleared()` メソッドを使用
+10. **オフライン対応**: `fetchStageFromLocalProvider` を使用してオフライン専用アクセスを実装可能
+11. **データベース変更**: SQLiteスキーマ変更時は `database.dart` の `_databaseVersion` を更新し、マイグレーション処理を追加
 
 ## カスタムスラッシュコマンド
 
