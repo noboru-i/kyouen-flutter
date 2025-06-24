@@ -77,7 +77,7 @@ jobs:
             .
             !.git
             !.github
-            .env.*
+          include-hidden-files: true
           retention-days: 1
 
   build-ios:
