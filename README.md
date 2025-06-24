@@ -42,8 +42,24 @@ flutter build web --no-tree-shake-icons
 - **API通信**: Chopper + HTTP
 - **ローカルDB**: sqflite (Mobile), sqflite_common_ffi_web (Web)
 - **バックエンド**: Firebase (Auth, Analytics, Crashlytics)
-- **アーキテクチャ**: Feature-based architecture with Clean Architecture
+- **アーキテクチャ**: Feature-based architecture with Clean Architecture, SQLite-first data management
 - **CI/CD**: GitHub Actions
+
+## 主要機能
+
+### パズルゲーム
+- 石を配置して共円（円上に点が配置される状態）を達成するパズル
+- ステージクリア機能とクリア状況の視覚的表示
+- オフライン対応のステージデータ管理
+
+### データ管理
+- **SQLite-first アーキテクチャ**: API データを SQLite に自動保存し、以降のアクセスはローカル DB から読み取り
+- **クリア状況追跡**: SQLite ベースでクリア済みステージを管理
+- **オフライン対応**: 一度取得したステージデータはオフラインでもアクセス可能
+
+### UI/UX
+- レスポンシブデザイン対応
+- モダンなマテリアルデザインとグラデーション
 
 ## コントリビューション
 
