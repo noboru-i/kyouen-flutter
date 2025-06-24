@@ -36,6 +36,13 @@ jobs:
       - name: Install FlutterFire CLI
         run: dart pub global activate flutterfire_cli
       
+      - name: Setup Firebase Authentication
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > $RUNNER_TEMP/firebase-service-account.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> $GITHUB_ENV
+      
       - name: Get dependencies
         run: flutter pub get
       
