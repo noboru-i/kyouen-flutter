@@ -13,14 +13,69 @@ on:
           - prod
 
 jobs:
-  build-ios:
-    name: Build iOS App
-    runs-on: macos-latest
+  prepare:
+    name: Prepare Build Environment
+    runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.4'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+      
+      - name: Configure Firebase for environment
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
+            # Development environment
+            flutterfire configure \
+              --project api-project-732262258565 \
+              --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
+              --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
+              --platforms=android,ios \
+              --yes
+          else
+            # Production environment
+            flutterfire configure \
+              --project my-android-server \
+              --android-package-name hm.orz.chaos114.android.tumekyouen \
+              --ios-bundle-id hm.orz.chaos114.TumeKyouen \
+              --platforms=android,ios \
+              --yes
+          fi
+      
+      - name: Upload prepared source
+        uses: actions/upload-artifact@v4
+        with:
+          name: prepared-source-${{ github.event.inputs.environment }}
+          path: |
+            .
+            !.git
+            !.github
+          retention-days: 1
+
+  build-ios:
+    name: Build iOS App
+    runs-on: macos-latest
+    environment: ${{ github.event.inputs.environment }}
+    needs: prepare
+    
+    steps:
+      - name: Download prepared source
+        uses: actions/download-artifact@v4
+        with:
+          name: prepared-source-${{ github.event.inputs.environment }}
+          path: .
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -57,32 +112,6 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
       
-      - name: Get dependencies
-        run: flutter pub get
-      
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
-      
-      - name: Configure Firebase for environment
-        run: |
-          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            # Development environment
-            flutterfire configure \
-              --project api-project-732262258565 \
-              --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
-              --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
-              --platforms=ios \
-              --yes
-          else
-            # Production environment
-            flutterfire configure \
-              --project my-android-server \
-              --android-package-name hm.orz.chaos114.android.tumekyouen \
-              --ios-bundle-id hm.orz.chaos114.TumeKyouen \
-              --platforms=ios \
-              --yes
-          fi
-      
       - name: Build iOS IPA
         run: |
           if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
@@ -116,15 +145,19 @@ jobs:
     name: Build Android App
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
+    needs: prepare
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Download prepared source
+        uses: actions/download-artifact@v4
+        with:
+          name: prepared-source-${{ github.event.inputs.environment }}
+          path: .
       
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'microsoft'
           java-version: '17'
       
       - name: Setup Flutter
@@ -140,32 +173,6 @@ jobs:
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=keystore.jks" >> android/key.properties
-      
-      - name: Get dependencies
-        run: flutter pub get
-      
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
-      
-      - name: Configure Firebase for environment
-        run: |
-          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            # Development environment
-            flutterfire configure \
-              --project api-project-732262258565 \
-              --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
-              --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
-              --platforms=android \
-              --yes
-          else
-            # Production environment
-            flutterfire configure \
-              --project my-android-server \
-              --android-package-name hm.orz.chaos114.android.tumekyouen \
-              --ios-bundle-id hm.orz.chaos114.TumeKyouen \
-              --platforms=android \
-              --yes
-          fi
       
       - name: Build Android APK
         run: |
