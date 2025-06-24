@@ -28,6 +28,14 @@ jobs:
           flutter-version: '3.32.4'
           channel: 'stable'
       
+      - name: Install Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+      
       - name: Get dependencies
         run: flutter pub get
       
