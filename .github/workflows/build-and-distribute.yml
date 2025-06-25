@@ -131,9 +131,9 @@ jobs:
       - name: Build iOS IPA
         run: |
           if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            flutter build ipa --dart-define-from-file=.env.dev --release
+            flutter build ipa --dart-define-from-file=.env.dev --release --verbose
           else
-            flutter build ipa --dart-define-from-file=.env.prod --release
+            flutter build ipa --dart-define-from-file=.env.prod --release --verbose
           fi
       
       - name: Upload iOS artifact
@@ -185,9 +185,9 @@ jobs:
       - name: Build Android APK
         run: |
           if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            flutter build apk --dart-define-from-file=.env.dev --release
+            flutter build apk --dart-define-from-file=.env.dev --release --verbose
           else
-            flutter build apk --dart-define-from-file=.env.prod --release
+            flutter build apk --dart-define-from-file=.env.prod --release --verbose
           fi
       
       - name: Build Android AAB
