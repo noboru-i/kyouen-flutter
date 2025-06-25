@@ -185,6 +185,19 @@ jobs:
           flutter-version: '3.32.4'
           channel: 'stable'
       
+      - name: Setup Android keystore
+        env:
+          ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          # Decode and save keystore
+          echo "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > android/app/cert/release.keystore
+          
+          # Set environment variables for Gradle
+          echo "STORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=$ANDROID_KEY_PASSWORD" >> $GITHUB_ENV
+      
       - name: Build Android APK
         run: |
           if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
