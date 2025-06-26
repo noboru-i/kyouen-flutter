@@ -1,0 +1,10 @@
+{
+  "name": "app-store-release-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for App Store Connect release preparation",
+  "private": true,
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.10.0"
+  }
+}
