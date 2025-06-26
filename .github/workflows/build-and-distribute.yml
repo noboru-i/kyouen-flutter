@@ -134,9 +134,17 @@ jobs:
       - name: Build iOS IPA
         run: |
           if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            flutter build ipa --dart-define-from-file=.env.dev --release --verbose
+            flutter build ipa --dart-define-from-file=.env.dev \
+                --release \
+                --verbose \
+                --export-options-plist=ios/ExportOptions.plist \
+                --build-number=$((560 + ${{ github.run_number }}))
           else
-            flutter build ipa --dart-define-from-file=.env.prod --release --verbose
+            flutter build ipa --dart-define-from-file=.env.prod \
+                --release \
+                --verbose \
+                --export-options-plist=ios/ExportOptions.plist \
+                --build-number=$((560 + ${{ github.run_number }}))
           fi
       
       - name: Upload iOS artifact
@@ -201,17 +209,27 @@ jobs:
       - name: Build Android APK
         run: |
           if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            flutter build apk --dart-define-from-file=.env.dev --release --verbose
+            flutter build apk --dart-define-from-file=.env.dev \
+                --release \
+                --verbose \
+                --build-number=$((560 + ${{ github.run_number }}))
           else
-            flutter build apk --dart-define-from-file=.env.prod --release --verbose
+            flutter build apk --dart-define-from-file=.env.prod \
+                --release \
+                --verbose \
+                --build-number=$((560 + ${{ github.run_number }}))
           fi
       
       - name: Build Android AAB
         run: |
           if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            flutter build appbundle --dart-define-from-file=.env.dev --release
+            flutter build appbundle --dart-define-from-file=.env.dev \
+                --release \
+                --build-number=$((560 + ${{ github.run_number }}))
           else
-            flutter build appbundle --dart-define-from-file=.env.prod --release
+            flutter build appbundle --dart-define-from-file=.env.prod \
+                --release \
+                --build-number=$((560 + ${{ github.run_number }}))
           fi
       
       - name: Upload Android APK artifact
