@@ -48,6 +48,27 @@ function createAPIClient() {
 
 async function main() {
   try {
+    // Validate required environment variables
+    const requiredEnvVars = {
+      'VERSION_NAME': VERSION_NAME,
+      'APPLE_KEY_ID': API_KEY_ID,
+      'APPLE_ISSUER_ID': ISSUER_ID,
+      'P8_APPSTORECONNECT_API': PRIVATE_KEY
+    };
+
+    const missingVars = [];
+    for (const [name, value] of Object.entries(requiredEnvVars)) {
+      if (!value) {
+        missingVars.push(name);
+      }
+    }
+
+    if (missingVars.length > 0) {
+      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    }
+
+    console.log('Environment variables validation passed');
+
     const api = createAPIClient();
 
     console.log(`Starting preparation for version ${VERSION_NAME}`);
