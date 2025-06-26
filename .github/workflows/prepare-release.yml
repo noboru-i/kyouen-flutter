@@ -1,0 +1,49 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version number for the release'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: .github/scripts
+        run: npm install
+
+      - name: Execute App Store Connect API calls
+        working-directory: .github/scripts
+        env:
+          VERSION_NAME: ${{ github.event.inputs.version_name }}
+        run: node prepare_release.js
+
+      - name: Summary (Success)
+        if: success()
+        run: |
+          echo "## Release Preparation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ✅ Ready for review submission" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The app is now prepared for review submission in App Store Connect." >> $GITHUB_STEP_SUMMARY
+          echo "Please verify the information and submit for review manually." >> $GITHUB_STEP_SUMMARY
+
+      - name: Summary (Failure)
+        if: failure()
+        run: |
+          echo "## Release Preparation Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ❌ Failed to prepare for review" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please check the logs above for detailed error information." >> $GITHUB_STEP_SUMMARY
