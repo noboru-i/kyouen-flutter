@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.util.Base64
 
 plugins {
     id("com.android.application")
@@ -12,11 +13,21 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-fun getProperty(name: String): String {
-    val properties = Properties()
-    file("$rootDir/../.android/flutter_build.gradle").takeIf { it.exists() }?.inputStream()
-        ?.use { properties.load(it) }
-    return properties.getProperty(name) ?: ""
+// Parse dart-defines from Flutter build
+val dartDefines = mutableMapOf<String, String>()
+if (project.hasProperty("dart-defines")) {
+    val defines = project.property("dart-defines") as String
+    defines.split(",").forEach { define ->
+        try {
+            val decoded = String(Base64.getDecoder().decode(define))
+            val pair = decoded.split("=", limit = 2)
+            if (pair.size == 2) {
+                dartDefines[pair[0]] = pair[1]
+            }
+        } catch (e: Exception) {
+            // Skip invalid entries
+        }
+    }
 }
 
 android {
@@ -34,7 +45,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = getProperty("ANDROID_APPLICATION_ID").takeIf { it.isNotEmpty() }
+        applicationId = dartDefines["ANDROID_APPLICATION_ID"]?.takeIf { it.isNotEmpty() }
             ?: "hm.orz.chaos114.android.tumekyouen"
 
         minSdk = 24
