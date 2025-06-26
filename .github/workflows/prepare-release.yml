@@ -29,6 +29,9 @@ jobs:
         working-directory: .github/scripts
         env:
           VERSION_NAME: ${{ github.event.inputs.version_name }}
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+          P8_APPSTORECONNECT_API: ${{ secrets.P8_APPSTORECONNECT_API }}
         run: node prepare_release.js
 
       - name: Summary (Success)
