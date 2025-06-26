@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -8,6 +10,13 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+fun getProperty(name: String): String {
+    val properties = Properties()
+    file("$rootDir/../.android/flutter_build.gradle").takeIf { it.exists() }?.inputStream()
+        ?.use { properties.load(it) }
+    return properties.getProperty(name) ?: ""
 }
 
 android {
@@ -25,7 +34,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "hm.orz.chaos114.android.tumekyouen.dev"
+        applicationId = getProperty("ANDROID_APPLICATION_ID").takeIf { it.isNotEmpty() }
+            ?: "hm.orz.chaos114.android.tumekyouen"
 
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
