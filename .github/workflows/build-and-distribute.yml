@@ -1,5 +1,7 @@
 name: Build and Distribute
 
+run-name: Build and Distribute @${{ github.event.inputs.environment }}
+
 on:
   workflow_dispatch:
     inputs:
