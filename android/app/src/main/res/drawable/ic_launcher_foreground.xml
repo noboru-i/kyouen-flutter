@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Board background -->
+    <path
+        android:fillColor="#F4E4BC"
+        android:pathData="M28,28h52v52h-52z" />
+    
+    <!-- Board border -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M28,28h52v2h-52z" />
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M28,78h52v2h-52z" />
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M28,28h2v52h-2z" />
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M78,28h2v52h-2z" />
+    
+    <!-- Grid lines -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M40,32v44M54,32v44M68,32v44M32,40h44M32,54h44M32,68h44" />
+    
+    <!-- Black stone -->
+    <path
+        android:fillColor="#1C1C1C"
+        android:pathData="M40,40m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path
+        android:fillColor="#4A4A4A"
+        android:pathData="M40,40m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    
+    <!-- White stone -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,68m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path
+        android:fillColor="#F0F0F0"
+        android:pathData="M68,68m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    
+    <!-- Stone shadows for depth -->
+    <path
+        android:fillColor="#00000030"
+        android:pathData="M41,41m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path
+        android:fillColor="#00000020"
+        android:pathData="M69,69m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+</vector>
