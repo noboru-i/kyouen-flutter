@@ -5,14 +5,28 @@ import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
 import 'package:kyouen_flutter/src/features/title/title_page.dart';
 
 // Mock for testing
-class MockClearedStagesService extends ClearedStagesService {
-  // ignore: null_check_always_fails
-  MockClearedStagesService() : super(null!);
-
+class MockClearedStagesService implements ClearedStagesService {
   @override
   Future<Map<String, int>> getStageCount() async {
     // Return mock data for testing
     return {'count': 10, 'clear_count': 3};
+  }
+
+  @override
+  Future<void> markStageCleared(int stageNo) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<Set<int>> getClearedStages() async {
+    // Mock implementation - return empty set
+    return <int>{};
+  }
+
+  @override
+  Future<bool> isStageCleared(int stageNo) async {
+    // Mock implementation - return false
+    return false;
   }
 }
 
