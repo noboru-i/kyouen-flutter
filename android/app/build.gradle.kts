@@ -52,6 +52,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Set app name from dart-defines
+        resValue("string", "app_name", dartDefines["APP_NAME"] ?: "詰め共円")
     }
 
     signingConfigs {
