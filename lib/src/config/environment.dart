@@ -32,9 +32,11 @@ class Environment {
   /// Whether this is production environment
   static bool get isProduction => environmentType == 'prod';
 
-  /// App name with environment prefix
-  static String get appName {
-    const baseAppName = '詰め共円';
-    return isDevelopment ? 'DEV $baseAppName' : baseAppName;
-  }
+  /// App name
+  /// Default: 詰め共円 (production)
+  /// Dev: DEV 詰め共円 (example)
+  static const appName = String.fromEnvironment(
+    'APP_NAME',
+    defaultValue: '詰め共円',
+  );
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
+import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
-import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
 
 class TitlePage extends ConsumerWidget {
   const TitlePage({super.key});
@@ -50,7 +50,9 @@ class TitlePage extends ConsumerWidget {
                       Text(
                         Environment.appName,
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        style: Theme.of(
+                          context,
+                        ).textTheme.displayLarge?.copyWith(
                           color: const Color(0xFF2C3E50),
                           fontWeight: FontWeight.bold,
                         ),
@@ -59,9 +61,8 @@ class TitlePage extends ConsumerWidget {
                       Text(
                         '詰め共円パズルゲーム',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: const Color(0xFF7F8C8D),
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: const Color(0xFF7F8C8D)),
                       ),
                       const SizedBox(height: 16),
                       // Stage Count Display
@@ -85,7 +86,10 @@ class TitlePage extends ConsumerWidget {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.restorablePushNamed(context, StagePage.routeName);
+                      Navigator.restorablePushNamed(
+                        context,
+                        StagePage.routeName,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF27AE60),
@@ -105,7 +109,7 @@ class TitlePage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Login Button  
+                // Login Button
                 Container(
                   height: 56,
                   decoration: BoxDecoration(
@@ -120,7 +124,10 @@ class TitlePage extends ConsumerWidget {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.restorablePushNamed(context, SignInPage.routeName);
+                      Navigator.restorablePushNamed(
+                        context,
+                        SignInPage.routeName,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -168,13 +175,13 @@ class _StageCountDisplay extends ConsumerWidget {
             ),
             child: Text(
               'ステージ情報を読み込み中...',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF7F8C8D),
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7F8C8D)),
             ),
           );
         }
-        
+
         if (snapshot.hasError) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -183,22 +190,21 @@ class _StageCountDisplay extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
-                width: 1,
               ),
             ),
             child: Text(
               'ステージ情報取得エラー',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFFE74C3C),
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFFE74C3C)),
             ),
           );
         }
-        
+
         final stageCount = snapshot.data ?? {};
         final clearedCount = stageCount['clear_count'] ?? 0;
         final totalCount = stageCount['count'] ?? 0;
-        
+
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -206,7 +212,6 @@ class _StageCountDisplay extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFF3498DB).withValues(alpha: 0.3),
-              width: 1,
             ),
           ),
           child: Text(
