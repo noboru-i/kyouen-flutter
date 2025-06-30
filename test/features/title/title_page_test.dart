@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kyouen_flutter/src/features/title/title_page.dart';
 import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
+import 'package:kyouen_flutter/src/features/title/title_page.dart';
 
 // Mock for testing
 class MockClearedStagesService extends ClearedStagesService {
+  // ignore: null_check_always_fails
   MockClearedStagesService() : super(null!);
-  
+
   @override
   Future<Map<String, int>> getStageCount() async {
     // Return mock data for testing
-    return {
-      'count': 10,
-      'clear_count': 3,
-    };
+    return {'count': 10, 'clear_count': 3};
   }
 }
 
 void main() {
   group('TitlePage Stage Count Display', () {
-    testWidgets('should display stage count correctly', (WidgetTester tester) async {
+    testWidgets('should display stage count correctly', (
+      WidgetTester tester,
+    ) async {
       // Create override for the service provider
       final container = ProviderContainer(
         overrides: [
-          clearedStagesServiceProvider.overrideWithValue(MockClearedStagesService()),
+          clearedStagesServiceProvider.overrideWithValue(
+            MockClearedStagesService(),
+          ),
         ],
       );
 
@@ -32,9 +34,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
-            home: TitlePage(),
-          ),
+          child: const MaterialApp(home: TitlePage()),
         ),
       );
 
@@ -43,25 +43,27 @@ void main() {
 
       // Verify that stage count is displayed
       expect(find.text('クリアステージ数: 3 / 10'), findsOneWidget);
-      
+
       // Verify that the main UI elements are present
       expect(find.text('スタート'), findsOneWidget);
       expect(find.text('ログイン'), findsOneWidget);
     });
 
-    testWidgets('should show loading state initially', (WidgetTester tester) async {
+    testWidgets('should show loading state initially', (
+      WidgetTester tester,
+    ) async {
       final container = ProviderContainer(
         overrides: [
-          clearedStagesServiceProvider.overrideWithValue(MockClearedStagesService()),
+          clearedStagesServiceProvider.overrideWithValue(
+            MockClearedStagesService(),
+          ),
         ],
       );
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
-            home: TitlePage(),
-          ),
+          child: const MaterialApp(home: TitlePage()),
         ),
       );
 
