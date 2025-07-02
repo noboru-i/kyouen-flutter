@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
+import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 
 class StagePage extends ConsumerWidget {
@@ -36,7 +36,7 @@ class _Header extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
     final currentStageNo = ref.watch(currentStageNoProvider);
-    final clearedStages = ref.watch(clearedStagesProvider);
+    final clearedStages = ref.watch(clearedStageNumbersProvider);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
     
     // Check if current stage is cleared

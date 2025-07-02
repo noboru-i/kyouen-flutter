@@ -18,6 +18,12 @@ Future<StageRepository> stageRepository(Ref ref) async {
   return StageRepository(apiClient, dao);
 }
 
+@riverpod
+Future<Set<int>> clearedStageNumbers(Ref ref) async {
+  final repository = await ref.watch(stageRepositoryProvider.future);
+  return repository.getClearedStageNumbers();
+}
+
 class StageRepository {
   const StageRepository(this._apiClient, this._dao);
 
@@ -130,5 +136,21 @@ class StageRepository {
 
   Future<List<TumeKyouen>> getAllClearedStages() {
     return _dao.selectAllClearStage();
+  }
+
+  // Cleared stages management methods
+  Future<Set<int>> getClearedStageNumbers() async {
+    final clearedStages = await _dao.selectAllClearStage();
+    return clearedStages.map((stage) => stage.stageNo).toSet();
+  }
+
+  Future<bool> isStageCleared(int stageNo) async {
+    final cleared = await getClearedStageNumbers();
+    return cleared.contains(stageNo);
+  }
+
+  Future<void> markStageCleared(int stageNo) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _dao.clearStage(stageNo, now);
   }
 }

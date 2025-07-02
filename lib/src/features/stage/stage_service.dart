@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
-import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
 import 'package:kyouen_flutter/src/data/local/database.dart';
 import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
+import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stage_service.g.dart';
@@ -157,7 +157,7 @@ class CurrentStage extends _$CurrentStage {
     await dao.clearStage(currentStageNo, DateTime.now().millisecondsSinceEpoch);
     
     // Invalidate the cleared stages provider to refresh UI
-    ref.invalidate(clearedStagesProvider);
+    ref.invalidate(clearedStageNumbersProvider);
   }
 }
 
