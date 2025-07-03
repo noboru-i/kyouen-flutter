@@ -18,11 +18,7 @@ class StagePage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _Header(),
-            Expanded(child: _Body()),
-            _Footer(),
-          ],
+          children: [_Header(), Expanded(child: _Body()), _Footer()],
         ),
       ),
     );
@@ -38,14 +34,14 @@ class _Header extends ConsumerWidget {
     final currentStageNo = ref.watch(currentStageNoProvider);
     final clearedStages = ref.watch(clearedStageNumbersProvider);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
-    
+
     // Check if current stage is cleared
     final isCleared = clearedStages.when(
       data: (cleared) => cleared.contains(currentStageNo),
       loading: () => false,
       error: (_, _) => false,
     );
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
@@ -70,7 +66,10 @@ class _Header extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
-                    color: isCleared ? const Color(0xFF2E7D32) : null, // Dark green for cleared
+                    color:
+                        isCleared
+                            ? const Color(0xFF2E7D32)
+                            : null, // Dark green for cleared
                   ),
                 ),
                 if (isCleared) ...[
@@ -108,7 +107,10 @@ class _Footer extends ConsumerWidget {
     final isEnabled =
         currentStage.asData?.value.stage
             .split('')
-            .where((element) => element == '2')
+            .where(
+              (element) =>
+                  StoneState.fromString(element) == StoneState.white,
+            )
             .length ==
         4;
     return Padding(
@@ -122,7 +124,9 @@ class _Footer extends ConsumerWidget {
                   if (isKyouen) {
                     debugPrint('KYOUEN!');
                     // Mark stage as cleared
-                    await ref.read(currentStageProvider.notifier).markCurrentStageCleared();
+                    await ref
+                        .read(currentStageProvider.notifier)
+                        .markCurrentStageCleared();
                     if (context.mounted) {
                       await _showKyouenDialog(context);
                     }
@@ -157,11 +161,7 @@ class _Footer extends ConsumerWidget {
           content: const Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.check_circle,
-                color: Color(0xFF4CAF50),
-                size: 48,
-              ),
+              Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 48),
               SizedBox(height: 16),
               Text(
                 'おめでとうございます！\nステージクリア！',
@@ -216,7 +216,7 @@ class _Body extends ConsumerWidget {
     final currentStage = ref.watch(currentStageProvider);
     final screenWidth = MediaQuery.of(context).size.width;
     final maxBoardSize = screenWidth * 0.9;
-    
+
     return currentStage.when(
       data: (data) {
         return Center(
@@ -256,15 +256,15 @@ class _Body extends ConsumerWidget {
                     children:
                         data.stage.split('').indexed.map((element) {
                           final (index, state) = element;
-                          final stateEnum = switch (state) {
-                            '0' => StoneState.none,
-                            '1' => StoneState.black,
-                            '2' => StoneState.white,
-                            String() => StoneState.none,
-                          };
+                          final stateEnum = StoneState.fromString(
+                            state,
+                          );
                           return GestureDetector(
                             onTap: () => _onTapStone(ref, index),
-                            child: _Stone(state: stateEnum, key: ValueKey(index)),
+                            child: _Stone(
+                              state: stateEnum,
+                              key: ValueKey(index),
+                            ),
                           );
                         }).toList(),
                   ),
@@ -360,10 +360,7 @@ class _Stone extends StatelessWidget {
             ),
           ),
           // Stone
-          Padding(
-            padding: const EdgeInsets.all(4),
-            child: _buildStone(),
-          ),
+          Padding(padding: const EdgeInsets.all(4), child: _buildStone()),
         ],
       ),
     );
@@ -426,5 +423,3 @@ class _Stone extends StatelessWidget {
     );
   }
 }
-
-enum StoneState { none, black, white }
