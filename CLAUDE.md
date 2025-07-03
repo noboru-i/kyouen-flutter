@@ -207,7 +207,6 @@ flutterfire configure \
 ### ステージ管理 (SQLite-first)
 - `fetchStagesProvider` - APIからステージデータを取得してSQLiteに保存
 - `fetchStageProvider` - 個別ステージをSQLite優先で取得 (なければAPI経由)
-- `fetchStageFromLocalProvider` - SQLiteから直接ステージデータを取得 (オフライン用)
 - `currentStageNoProvider` - 現在のステージ番号状態
 - `currentStageProvider` - 現在のステージデータと操作
 
@@ -225,8 +224,7 @@ flutterfire configure \
 7. **Localization**: 現在は英語のみ対応だが、i18n基盤は整備済み
 8. **データアーキテクチャ**: 新しいデータ操作はSQLite-firstパターンに従う（API → SQLite → UI）
 9. **クリア状況**: ステージクリア処理は `markCurrentStageCleared()` メソッドを使用
-10. **オフライン対応**: `fetchStageFromLocalProvider` を使用してオフライン専用アクセスを実装可能
-11. **データベース変更**: SQLiteスキーマ変更時は `database.dart` の `_databaseVersion` を更新し、マイグレーション処理を追加
+10. **データベース変更**: SQLiteスキーマ変更時は `database.dart` の `_databaseVersion` を更新し、マイグレーション処理を追加
 
 ## カスタムスラッシュコマンド
 
