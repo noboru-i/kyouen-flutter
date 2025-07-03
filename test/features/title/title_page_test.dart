@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kyouen_flutter/src/data/local/cleared_stages_service.dart';
+import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/title/title_page.dart';
 
 // Mock for testing
-class MockClearedStagesService implements ClearedStagesService {
+class MockStageRepository implements StageRepository {
   @override
   Future<Map<String, int>> getStageCount() async {
     // Return mock data for testing
@@ -18,7 +18,7 @@ class MockClearedStagesService implements ClearedStagesService {
   }
 
   @override
-  Future<Set<int>> getClearedStages() async {
+  Future<Set<int>> getClearedStageNumbers() async {
     // Mock implementation - return empty set
     return <int>{};
   }
@@ -28,6 +28,10 @@ class MockClearedStagesService implements ClearedStagesService {
     // Mock implementation - return false
     return false;
   }
+
+  // Add other required methods as no-op implementations
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }
 
 void main() {
@@ -35,11 +39,11 @@ void main() {
     testWidgets('should display stage count correctly', (
       WidgetTester tester,
     ) async {
-      // Create override for the service provider
+      // Create override for the repository provider
       final container = ProviderContainer(
         overrides: [
-          clearedStagesServiceProvider.overrideWithValue(
-            MockClearedStagesService(),
+          stageRepositoryProvider.overrideWith(
+            (ref) => Future.value(MockStageRepository()),
           ),
         ],
       );
@@ -68,8 +72,8 @@ void main() {
     ) async {
       final container = ProviderContainer(
         overrides: [
-          clearedStagesServiceProvider.overrideWithValue(
-            MockClearedStagesService(),
+          stageRepositoryProvider.overrideWith(
+            (ref) => Future.value(MockStageRepository()),
           ),
         ],
       );
