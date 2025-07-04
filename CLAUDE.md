@@ -236,6 +236,8 @@ flutterfire configure \
 9. **クリア状況**: ステージクリア処理は `markCurrentStageCleared()` メソッドを使用
 10. **データベース変更**: SQLiteスキーマ変更時は `database.dart` の `_databaseVersion` を更新し、マイグレーション処理を追加
 11. **共通Widget**: 複数画面で使用するWidgetは `lib/src/widgets/common/` に配置し、一貫性のあるデザインを保つ
+12. **WidgetRef受け渡し禁止**: WidgetRefをコンストラクタ引数として他のWidgetに渡すことを禁止。代わりにConsumerWidgetまたはConsumerを使用してWidget内部でWidgetRefを取得する
+13. **要素間マージンはSizedBox使用**: Widget間のマージンにはContainerのmarginプロパティではなく、SizedBoxを使用する。外側の余白にはPaddingを使用する
 
 ## カスタムスラッシュコマンド
 

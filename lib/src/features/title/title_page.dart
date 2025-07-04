@@ -23,73 +23,34 @@ class TitlePage extends ConsumerWidget {
               children: [
                 const Spacer(flex: 2),
                 // App Title
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        Environment.appName,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.displayLarge?.copyWith(
-                          color: const Color(0xFF2C3E50),
-                          fontWeight: FontWeight.bold,
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        Text(
+                          Environment.appName,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displayLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '詰め共円パズルゲーム',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(color: const Color(0xFF7F8C8D)),
-                      ),
-                      const SizedBox(height: 16),
-                      // Stage Count Display
-                      _StageCountDisplay(),
-                    ],
+                        const SizedBox(height: 16),
+                        _StageCountDisplay(),
+                      ],
+                    ),
                   ),
                 ),
                 const Spacer(),
                 // Start Button
-                Container(
+                SizedBox(
                   height: 56,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ElevatedButton(
+                  child: FilledButton(
                     onPressed: () {
                       Navigator.restorablePushNamed(
                         context,
                         StagePage.routeName,
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B7355),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                    ),
                     child: const Text(
                       'スタート',
                       style: TextStyle(
@@ -101,37 +62,15 @@ class TitlePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 // Login Button
-                Container(
+                SizedBox(
                   height: 56,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ElevatedButton(
+                  child: FilledButton.tonal(
                     onPressed: () {
                       Navigator.restorablePushNamed(
                         context,
                         SignInPage.routeName,
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF8B7355),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                        side: const BorderSide(
-                          color: Color(0xFF8B7355),
-                          width: 2,
-                        ),
-                      ),
-                    ),
                     child: const Text(
                       'ログイン',
                       style: TextStyle(
