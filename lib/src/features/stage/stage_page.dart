@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
-import 'package:kyouen_flutter/src/features/common/background_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 
 class StagePage extends ConsumerWidget {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
-import 'package:kyouen_flutter/src/features/common/background_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 
 class SignInPage extends ConsumerWidget {
   const SignInPage({super.key});
