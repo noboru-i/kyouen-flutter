@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
+import 'package:kyouen_flutter/src/features/common/background_widget.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 
 class StagePage extends ConsumerWidget {
@@ -15,10 +16,12 @@ class StagePage extends ConsumerWidget {
     ref.watch(currentStageNoProvider);
 
     return const Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [_Header(), Expanded(child: _Body()), _Footer()],
+      body: BackgroundWidget(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [_Header(), Expanded(child: _Body()), _Footer()],
+          ),
         ),
       ),
     );

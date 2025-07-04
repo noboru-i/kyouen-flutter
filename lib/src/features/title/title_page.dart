@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
+import 'package:kyouen_flutter/src/features/common/background_widget.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 
@@ -13,17 +14,7 @@ class TitlePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF4A90E2), // Light blue
-              Color(0xFF357ABD), // Darker blue
-            ],
-          ),
-        ),
+      body: BackgroundWidget(
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -92,7 +83,7 @@ class TitlePage extends ConsumerWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF27AE60),
+                      backgroundColor: const Color(0xFF8B7355),
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -131,12 +122,12 @@ class TitlePage extends ConsumerWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF4A90E2),
+                      foregroundColor: const Color(0xFF8B7355),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28),
                         side: const BorderSide(
-                          color: Color(0xFF4A90E2),
+                          color: Color(0xFF8B7355),
                           width: 2,
                         ),
                       ),
@@ -164,98 +155,110 @@ class _StageCountDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stageRepositoryAsync = ref.watch(stageRepositoryProvider);
-    
+
     return stageRepositoryAsync.when(
-      loading: () => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF95A5A6).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          'ステージ情報を読み込み中...',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7F8C8D)),
-        ),
-      ),
-      error: (error, _) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE74C3C).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
-          ),
-        ),
-        child: Text(
-          'ステージ情報取得エラー',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: const Color(0xFFE74C3C)),
-        ),
-      ),
-      data: (repository) => FutureBuilder<Map<String, int>>(
-        future: repository.getStageCount(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF95A5A6).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'ステージ情報を読み込み中...',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7F8C8D)),
-              ),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE74C3C).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
-                ),
-              ),
-              child: Text(
-                'ステージ情報取得エラー',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: const Color(0xFFE74C3C)),
-              ),
-            );
-          }
-
-          final stageCount = snapshot.data ?? {};
-          final clearedCount = stageCount['clear_count'] ?? 0;
-          final totalCount = stageCount['count'] ?? 0;
-
-          return Container(
+      loading:
+          () => Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF3498DB).withValues(alpha: 0.1),
+              color: const Color(0xFF95A5A6).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              'ステージ情報を読み込み中...',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF7F8C8D)),
+            ),
+          ),
+      error:
+          (error, _) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE74C3C).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF3498DB).withValues(alpha: 0.3),
+                color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
               ),
             ),
             child: Text(
-              'クリアステージ数: $clearedCount / $totalCount',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF2C3E50),
-                fontWeight: FontWeight.w500,
-              ),
+              'ステージ情報取得エラー',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFFE74C3C)),
             ),
-          );
-        },
-      ),
+          ),
+      data:
+          (repository) => FutureBuilder<Map<String, int>>(
+            future: repository.getStageCount(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF95A5A6).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'ステージ情報を読み込み中...',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFF7F8C8D),
+                    ),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE74C3C).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(
+                    'ステージ情報取得エラー',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFFE74C3C),
+                    ),
+                  ),
+                );
+              }
+
+              final stageCount = snapshot.data ?? {};
+              final clearedCount = stageCount['clear_count'] ?? 0;
+              final totalCount = stageCount['count'] ?? 0;
+
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF8B7355).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF8B7355).withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Text(
+                  'クリアステージ数: $clearedCount / $totalCount',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: const Color(0xFF2C3E50),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              );
+            },
+          ),
     );
   }
 }

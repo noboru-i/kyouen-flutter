@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
+import 'package:kyouen_flutter/src/features/common/background_widget.dart';
 
 class SignInPage extends ConsumerWidget {
   const SignInPage({super.key});
@@ -34,17 +35,7 @@ class _SignInView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF4A90E2), // Light blue
-            Color(0xFF357ABD), // Darker blue
-          ],
-        ),
-      ),
+    return BackgroundWidget(
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -276,17 +267,7 @@ class _LogoutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF4A90E2), // Light blue
-            Color(0xFF357ABD), // Darker blue
-          ],
-        ),
-      ),
+    return BackgroundWidget(
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
