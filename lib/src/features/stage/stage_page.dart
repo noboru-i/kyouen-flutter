@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
+import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
@@ -15,10 +16,12 @@ class StagePage extends ConsumerWidget {
     ref.watch(currentStageNoProvider);
 
     return const Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [_Header(), Expanded(child: _Body()), _Footer()],
+      body: BackgroundWidget(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [_Header(), Expanded(child: _Body()), _Footer()],
+          ),
         ),
       ),
     );
@@ -108,8 +111,7 @@ class _Footer extends ConsumerWidget {
         currentStage.asData?.value.stage
             .split('')
             .where(
-              (element) =>
-                  StoneState.fromString(element) == StoneState.white,
+              (element) => StoneState.fromString(element) == StoneState.white,
             )
             .length ==
         4;
@@ -256,9 +258,7 @@ class _Body extends ConsumerWidget {
                     children:
                         data.stage.split('').indexed.map((element) {
                           final (index, state) = element;
-                          final stateEnum = StoneState.fromString(
-                            state,
-                          );
+                          final stateEnum = StoneState.fromString(state);
                           return GestureDetector(
                             onTap: () => _onTapStone(ref, index),
                             child: _Stone(

@@ -56,7 +56,10 @@ lib/
     │   ├── stage/             # ゲームステージロジック
     │   └── title/             # タイトル画面
     ├── localization/          # i18n対応 (英語)
-    └── settings/              # アプリ設定
+    ├── settings/              # アプリ設定
+    └── widgets/               # 共通Widgetコンポーネント
+        └── common/            # アプリ全体で使用される共通Widget
+            └── background_widget.dart # モノトーングラデーション背景Widget
 ```
 
 ### アーキテクチャパターン
@@ -213,6 +216,13 @@ flutterfire configure \
 ### クリア状況管理
 - `clearedStagesProvider` - SQLiteからクリア済みステージリストを取得
 
+## UI・Widget構成
+
+### 共通Widgetコンポーネント
+- **BackgroundWidget** (`lib/src/widgets/common/background_widget.dart`)
+  - アプリ全体で統一されたモノトーングラデーション背景を提供
+  - 全ページで使用される
+
 ## 今後の開発における重要な注意点
 
 1. **生成コード**: API entitiesまたはprovidersを変更した後は必ず`dart run build_runner build`を実行
@@ -225,6 +235,7 @@ flutterfire configure \
 8. **データアーキテクチャ**: 新しいデータ操作はSQLite-firstパターンに従う（API → SQLite → UI）
 9. **クリア状況**: ステージクリア処理は `markCurrentStageCleared()` メソッドを使用
 10. **データベース変更**: SQLiteスキーマ変更時は `database.dart` の `_databaseVersion` を更新し、マイグレーション処理を追加
+11. **共通Widget**: 複数画面で使用するWidgetは `lib/src/widgets/common/` に配置し、一貫性のあるデザインを保つ
 
 ## カスタムスラッシュコマンド
 

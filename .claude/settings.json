@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"$TOOL_INPUT\" | jq -r '.file_path | select(endswith(\".dart\"))' | xargs -r dart format"
+            "command": "jq -r '.tool_input.file_path | select(endswith(\".dart\"))' | xargs -r dart format"
           }
         ]
       }
