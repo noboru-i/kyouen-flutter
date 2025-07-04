@@ -111,8 +111,7 @@ class _Footer extends ConsumerWidget {
         currentStage.asData?.value.stage
             .split('')
             .where(
-              (element) =>
-                  StoneState.fromString(element) == StoneState.white,
+              (element) => StoneState.fromString(element) == StoneState.white,
             )
             .length ==
         4;
@@ -259,9 +258,7 @@ class _Body extends ConsumerWidget {
                     children:
                         data.stage.split('').indexed.map((element) {
                           final (index, state) = element;
-                          final stateEnum = StoneState.fromString(
-                            state,
-                          );
+                          final stateEnum = StoneState.fromString(state);
                           return GestureDetector(
                             onTap: () => _onTapStone(ref, index),
                             child: _Stone(
