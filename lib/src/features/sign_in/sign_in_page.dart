@@ -18,7 +18,7 @@ class SignInPage extends ConsumerWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return _SignInView(ref: ref);
+            return const _SignInView();
           }
 
           return _LogoutView(user: snapshot.data!);
@@ -28,13 +28,11 @@ class SignInPage extends ConsumerWidget {
   }
 }
 
-class _SignInView extends StatelessWidget {
-  const _SignInView({required this.ref});
-
-  final WidgetRef ref;
+class _SignInView extends ConsumerWidget {
+  const _SignInView();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return BackgroundWidget(
       child: SafeArea(
         child: Padding(
@@ -54,10 +52,7 @@ class _SignInView extends StatelessWidget {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
                 ),
               ),
@@ -78,15 +73,13 @@ class _SignInView extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.login,
-                      size: 48,
-                      color: Color(0xFF4A90E2),
-                    ),
+                    const Icon(Icons.login, size: 48, color: Color(0xFF4A90E2)),
                     const SizedBox(height: 16),
                     Text(
                       'ログイン',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineMedium?.copyWith(
                         color: const Color(0xFF2C3E50),
                         fontWeight: FontWeight.bold,
                       ),
@@ -117,7 +110,7 @@ class _SignInView extends StatelessWidget {
                   ],
                 ),
                 child: ElevatedButton(
-                  onPressed: _signInWithTwitter,
+                  onPressed: () => _signInWithTwitter(ref),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1DA1F2), // Twitter blue
                     foregroundColor: Colors.white,
@@ -156,7 +149,7 @@ class _SignInView extends StatelessWidget {
                   ],
                 ),
                 child: ElevatedButton(
-                  onPressed: _signInWithApple,
+                  onPressed: () => _signInWithApple(ref),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
@@ -189,7 +182,7 @@ class _SignInView extends StatelessWidget {
     );
   }
 
-  Future<void> _signInWithTwitter() async {
+  Future<void> _signInWithTwitter(WidgetRef ref) async {
     await FirebaseAuth.instance.signOut();
     final twitterProvider = TwitterAuthProvider();
 
@@ -205,13 +198,13 @@ class _SignInView extends StatelessWidget {
         );
       }
 
-      await _callLoginApi(userCredential.user);
+      await _callLoginApi(userCredential.user, ref);
     } on Exception catch (e) {
       debugPrint('Twitter sign-in failed: $e');
     }
   }
 
-  Future<void> _signInWithApple() async {
+  Future<void> _signInWithApple(WidgetRef ref) async {
     final appleProvider = AppleAuthProvider();
 
     try {
@@ -226,13 +219,13 @@ class _SignInView extends StatelessWidget {
         );
       }
 
-      await _callLoginApi(userCredential.user);
+      await _callLoginApi(userCredential.user, ref);
     } on Exception catch (e) {
       debugPrint('Apple sign-in failed: $e');
     }
   }
 
-  Future<void> _callLoginApi(User? user) async {
+  Future<void> _callLoginApi(User? user, WidgetRef ref) async {
     if (user == null) {
       return;
     }
@@ -286,10 +279,7 @@ class _LogoutView extends StatelessWidget {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
                 ),
               ),
@@ -318,7 +308,9 @@ class _LogoutView extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       'ログイン済み',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineMedium?.copyWith(
                         color: const Color(0xFF2C3E50),
                         fontWeight: FontWeight.bold,
                       ),
