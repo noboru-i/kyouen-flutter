@@ -7,6 +7,7 @@ import 'package:kyouen_flutter/src/features/title/title_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/settings/settings_controller.dart';
 import 'package:kyouen_flutter/src/settings/settings_view.dart';
+import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.settingsController});
@@ -28,8 +29,7 @@ class MyApp extends StatelessWidget {
           ],
           supportedLocales: const [Locale('en', '')],
           onGenerateTitle: (BuildContext context) => Environment.appName,
-          theme: ThemeData(),
-          darkTheme: ThemeData.dark(),
+          theme: AppTheme.lightTheme,
           themeMode: settingsController.themeMode,
           onGenerateRoute: (RouteSettings routeSettings) {
             return MaterialPageRoute<void>(
