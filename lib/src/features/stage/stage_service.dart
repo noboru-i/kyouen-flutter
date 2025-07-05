@@ -6,8 +6,11 @@ import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:kyouen_flutter/src/data/local/database.dart';
 import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
+import 'package:kyouen_flutter/src/data/local/preference_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'stage_service.g.dart';
 
 part 'stage_service.g.dart';
 
@@ -104,19 +107,69 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
   return apiStage;
 }
 
+/// Provider to get the initial stage number from preferences
+final initialStageNoProvider = FutureProvider<int>((ref) async {
+  try {
+    final prefService = await ref.watch(preferenceServiceProvider.future);
+    return prefService.getLastStageNo();
+  } catch (e) {
+    // Return default value if preferences fail
+    return 1;
+  }
+});
+
 @riverpod
 class CurrentStageNo extends _$CurrentStageNo {
   @override
   int build() {
+    // Start with default value of 1
+    // We'll update this asynchronously when preferences are loaded
     return 1;
   }
 
+  /// Initialize from preferences (call this when the app starts)
+  Future<void> initializeFromPreferences() async {
+    try {
+      final prefService = await ref.read(preferenceServiceProvider.future);
+      final lastStageNo = prefService.getLastStageNo();
+      if (lastStageNo != state) {
+        state = lastStageNo;
+      }
+    } catch (e) {
+      // Keep default value if preferences fail
+    }
+  }
+
+  /// Save the current stage number to preferences
+  Future<void> _saveStageNo(int stageNo) async {
+    try {
+      final prefService = await ref.read(preferenceServiceProvider.future);
+      await prefService.setLastStageNo(stageNo);
+    } catch (e) {
+      // Ignore save errors to not break the app
+    }
+  }
+
   void next() {
-    state = state + 1;
+    final newStageNo = state + 1;
+    state = newStageNo;
+    _saveStageNo(newStageNo);
   }
 
   void prev() {
-    state = state - 1;
+    final newStageNo = state - 1;
+    if (newStageNo >= 1) {
+      state = newStageNo;
+      _saveStageNo(newStageNo);
+    }
+  }
+
+  /// Set the current stage number directly (used for navigation)
+  void setStageNo(int stageNo) {
+    if (stageNo >= 1) {
+      state = stageNo;
+      _saveStageNo(stageNo);
+    }
   }
 }
 
@@ -125,7 +178,21 @@ class CurrentStage extends _$CurrentStage {
   @override
   Future<StageResponse> build() async {
     final currentStageNo = ref.watch(currentStageNoProvider);
+    
+    // Save the current stage number when it's accessed (matching Android behavior)
+    _saveCurrentStageNo(currentStageNo);
+    
     return ref.watch(fetchStageProvider(stageNo: currentStageNo).future);
+  }
+
+  /// Save the current stage number to preferences (matches Android implementation)
+  Future<void> _saveCurrentStageNo(int stageNo) async {
+    try {
+      final prefService = await ref.read(preferenceServiceProvider.future);
+      await prefService.setLastStageNo(stageNo);
+    } catch (e) {
+      // Ignore save errors to not break the app
+    }
   }
 
   void toggleSelect(int index) {
