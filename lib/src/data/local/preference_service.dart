@@ -1,8 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-part 'preference_service.g.dart';
 
 /// Service to manage local preferences using SharedPreferences
 class PreferenceService {
@@ -25,14 +22,12 @@ class PreferenceService {
 }
 
 /// Provider for SharedPreferences instance
-@riverpod
-Future<SharedPreferences> sharedPreferences(Ref ref) async {
+final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
   return await SharedPreferences.getInstance();
-}
+});
 
 /// Provider for PreferenceService
-@riverpod
-Future<PreferenceService> preferenceService(Ref ref) async {
+final preferenceServiceProvider = FutureProvider<PreferenceService>((ref) async {
   final prefs = await ref.watch(sharedPreferencesProvider.future);
   return PreferenceService(prefs);
-}
+});

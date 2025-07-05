@@ -45,5 +45,25 @@ void main() {
       
       expect(newPreferenceService.getLastStageNo(), testStageNo);
     });
+
+    test('setLastStageNo should handle multiple values correctly', () async {
+      final testCases = [1, 5, 10, 25, 50, 100];
+      
+      for (final stageNo in testCases) {
+        await preferenceService.setLastStageNo(stageNo);
+        expect(preferenceService.getLastStageNo(), stageNo);
+      }
+    });
+
+    test('setLastStageNo should persist across multiple operations', () async {
+      const stageNo = 42;
+      
+      await preferenceService.setLastStageNo(stageNo);
+      
+      // Perform multiple reads
+      for (int i = 0; i < 10; i++) {
+        expect(preferenceService.getLastStageNo(), stageNo);
+      }
+    });
   });
 }

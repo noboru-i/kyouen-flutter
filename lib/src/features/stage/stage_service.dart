@@ -12,6 +12,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stage_service.g.dart';
 
+part 'stage_service.g.dart';
+
 enum StoneState {
   none('0'), // 空
   black('1'), // 配置可能
@@ -105,27 +107,36 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
   return apiStage;
 }
 
+/// Provider to get the initial stage number from preferences
+final initialStageNoProvider = FutureProvider<int>((ref) async {
+  try {
+    final prefService = await ref.watch(preferenceServiceProvider.future);
+    return prefService.getLastStageNo();
+  } catch (e) {
+    // Return default value if preferences fail
+    return 1;
+  }
+});
+
 @riverpod
 class CurrentStageNo extends _$CurrentStageNo {
   @override
   int build() {
-    // Initialize with default value and load from preferences asynchronously
-    _initializeFromPreferences();
-    return 1; // Default value
+    // Start with default value of 1
+    // We'll update this asynchronously when preferences are loaded
+    return 1;
   }
 
-  /// Initialize stage number from preferences
-  Future<void> _initializeFromPreferences() async {
+  /// Initialize from preferences (call this when the app starts)
+  Future<void> initializeFromPreferences() async {
     try {
       final prefService = await ref.read(preferenceServiceProvider.future);
       final lastStageNo = prefService.getLastStageNo();
-      // Only update if it's different from the current state
       if (lastStageNo != state) {
         state = lastStageNo;
       }
     } catch (e) {
-      // If loading fails, keep default value of 1
-      // This ensures the app continues to work even if preferences fail
+      // Keep default value if preferences fail
     }
   }
 

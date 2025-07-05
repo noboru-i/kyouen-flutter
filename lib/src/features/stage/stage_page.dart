@@ -12,8 +12,18 @@ class StagePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // initialize and keep instance
-    // TODO: デフォルト値の設定
+    // Initialize stage number from preferences when page loads
+    ref.listen(initialStageNoProvider, (previous, next) {
+      next.whenData((stageNo) {
+        // Only update if it's different from current state
+        final currentStageNo = ref.read(currentStageNoProvider);
+        if (currentStageNo != stageNo) {
+          ref.read(currentStageNoProvider.notifier).setStageNo(stageNo);
+        }
+      });
+    });
+
+    // Keep the stage provider active
     ref.watch(currentStageNoProvider);
 
     return Scaffold(
