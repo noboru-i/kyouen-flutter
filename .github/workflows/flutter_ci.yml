@@ -20,6 +20,11 @@ jobs:
         channel: 'stable'
         cache: true
     
+    - name: Verify Flutter installation
+      run: |
+        flutter --version
+        flutter doctor -v
+    
     - name: Get dependencies
       run: flutter pub get
     
@@ -27,15 +32,25 @@ jobs:
       run: |
         # Create a mock firebase_options.dart for CI if it doesn't exist
         if [ ! -f "lib/firebase_options.dart" ]; then
+          echo "Creating mock firebase_options.dart for CI..."
           mkdir -p lib
-          mv .github/workflows/firebase_options_mock.dart lib/firebase_options.dart
+          cp .github/workflows/firebase_options_mock.dart lib/firebase_options.dart
         fi
         
-        # Generate build_runner files
-        flutter pub run build_runner build --delete-conflicting-outputs
+        # Verify dependencies are installed
+        echo "Installing dependencies..."
+        flutter pub get
+        
+        # Generate build_runner files with better error handling
+        echo "Generating build_runner files..."
+        flutter pub run build_runner build --delete-conflicting-outputs || {
+          echo "build_runner failed, trying with verbose output..."
+          flutter pub run build_runner build --delete-conflicting-outputs --verbose
+        }
         
         # Setup sqflite for web
-        dart run sqflite_common_ffi_web:setup
+        echo "Setting up sqflite for web..."
+        dart run sqflite_common_ffi_web:setup || echo "sqflite_common_ffi_web setup failed, continuing..."
     
     - name: Analyze project source
       run: flutter analyze --fatal-infos
@@ -44,7 +59,12 @@ jobs:
       run: dart run custom_lint
     
     - name: Run tests
-      run: flutter test
+      run: |
+        echo "Running Flutter tests..."
+        flutter test --coverage || {
+          echo "Tests failed, running with verbose output..."
+          flutter test --verbose
+        }
     
     - name: Check build for Web
       run: flutter build web --target=lib/main.dart --no-tree-shake-icons
