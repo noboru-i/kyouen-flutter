@@ -7,6 +7,9 @@ import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
 
+// State for controlling kyouen overlay visibility
+final showKyouenOverlayProvider = StateProvider<bool>((ref) => false);
+
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
 
@@ -68,6 +71,8 @@ class _Header extends ConsumerWidget {
               onPressed:
                   currentStageNo > 1
                       ? () async {
+                        ref.read(showKyouenOverlayProvider.notifier).state =
+                            false;
                         await ref.read(currentStageNoProvider.notifier).prev();
                       }
                       : null,
@@ -106,6 +111,7 @@ class _Header extends ConsumerWidget {
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
               onPressed: () async {
+                ref.read(showKyouenOverlayProvider.notifier).state = false;
                 await ref.read(currentStageNoProvider.notifier).next();
               },
               child: Text(isSmallScreen ? '次' : '次へ'),
@@ -141,19 +147,23 @@ class _Footer extends ConsumerWidget {
                       ref.read(currentStageProvider.notifier).isKyouen();
                   if (isKyouen) {
                     debugPrint('KYOUEN!');
+
+                    // Show kyouen overlay
+                    ref.read(showKyouenOverlayProvider.notifier).state = true;
+
                     // Mark stage as cleared
                     await ref
                         .read(currentStageProvider.notifier)
                         .markCurrentStageCleared();
 
-                    final kyouenData =
-                        ref.read(currentStageProvider.notifier).getKyouenData();
-
-                    if (context.mounted && kyouenData != null) {
+                    if (context.mounted) {
                       await showKyouenSuccessDialog(
                         context: context,
                         onClose: () {
                           Navigator.of(context).pop();
+                          // Hide overlay and go to next stage
+                          ref.read(showKyouenOverlayProvider.notifier).state =
+                              false;
                         },
                       );
                       await ref.read(currentStageNoProvider.notifier).next();
@@ -200,11 +210,10 @@ class _Body extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
+    final showOverlay = ref.watch(showKyouenOverlayProvider);
 
     return currentStage.when(
       data: (data) {
-        final kyouenData =
-            ref.read(currentStageProvider.notifier).getKyouenData();
         final boardSize = data.size;
         return Stack(
           children: [
@@ -212,14 +221,23 @@ class _Body extends ConsumerWidget {
               stageData: data,
               onTapStone: (index) => _onTapStone(ref, index),
             ),
-            if (kyouenData != null) ...[
-              KyouenAnswerOverlayWidget(
-                kyouenData: kyouenData,
-                boardSize: boardSize,
-                isVisible: true,
-                strokeColor: const Color(0xFF4CAF50),
-                strokeWidth: 4,
-                animationDuration: const Duration(milliseconds: 1200),
+            if (showOverlay) ...[
+              Consumer(
+                builder: (context, ref, child) {
+                  final kyouenData =
+                      ref.read(currentStageProvider.notifier).getKyouenData();
+                  if (kyouenData != null) {
+                    return KyouenAnswerOverlayWidget(
+                      kyouenData: kyouenData,
+                      boardSize: boardSize,
+                      isVisible: true,
+                      strokeColor: const Color(0xFF4CAF50),
+                      strokeWidth: 4,
+                      animationDuration: const Duration(milliseconds: 1200),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
             ],
           ],
