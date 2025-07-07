@@ -4,6 +4,8 @@ import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/stage/widgets/stage_board.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
 
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
@@ -143,10 +145,19 @@ class _Footer extends ConsumerWidget {
                     await ref
                         .read(currentStageProvider.notifier)
                         .markCurrentStageCleared();
-                    if (context.mounted) {
-                      await _showKyouenDialog(context);
+
+                    final kyouenData =
+                        ref.read(currentStageProvider.notifier).getKyouenData();
+
+                    if (context.mounted && kyouenData != null) {
+                      await showKyouenSuccessDialog(
+                        context: context,
+                        onClose: () {
+                          Navigator.of(context).pop();
+                        },
+                      );
+                      await ref.read(currentStageNoProvider.notifier).next();
                     }
-                    await ref.read(currentStageNoProvider.notifier).next();
                   } else {
                     debugPrint('NOT KYOUEN!');
                     if (context.mounted) {
@@ -158,34 +169,6 @@ class _Footer extends ConsumerWidget {
                 : null,
         child: const Text('共円！！'),
       ),
-    );
-  }
-
-  Future<void> _showKyouenDialog(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: const Center(child: Text('共円！！')),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(height: 16),
-              Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 48),
-              SizedBox(height: 16),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('次のステージへ'),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -220,9 +203,26 @@ class _Body extends ConsumerWidget {
 
     return currentStage.when(
       data: (data) {
-        return StageBoard(
-          stageData: data,
-          onTapStone: (index) => _onTapStone(ref, index),
+        final kyouenData =
+            ref.read(currentStageProvider.notifier).getKyouenData();
+        final boardSize = data.size;
+        return Stack(
+          children: [
+            StageBoard(
+              stageData: data,
+              onTapStone: (index) => _onTapStone(ref, index),
+            ),
+            if (kyouenData != null) ...[
+              KyouenAnswerOverlayWidget(
+                kyouenData: kyouenData,
+                boardSize: boardSize,
+                isVisible: true,
+                strokeColor: const Color(0xFF4CAF50),
+                strokeWidth: 4,
+                animationDuration: const Duration(milliseconds: 1200),
+              ),
+            ],
+          ],
         );
       },
       error: (error, stackTrace) {
