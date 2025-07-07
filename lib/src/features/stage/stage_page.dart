@@ -63,9 +63,12 @@ class _Header extends ConsumerWidget {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed: () async {
-                await ref.read(currentStageNoProvider.notifier).prev();
-              },
+              onPressed:
+                  currentStageNo > 1
+                      ? () async {
+                        await ref.read(currentStageNoProvider.notifier).prev();
+                      }
+                      : null,
               child: Text(isSmallScreen ? '前' : '前へ'),
             ),
           ),
