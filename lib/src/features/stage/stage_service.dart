@@ -6,6 +6,7 @@ import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:kyouen_flutter/src/data/local/database.dart';
 import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
+import 'package:kyouen_flutter/src/data/local/last_stage_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -105,18 +106,47 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
 }
 
 @riverpod
+LastStageService lastStageService(Ref ref) {
+  return LastStageService();
+}
+
+@riverpod
 class CurrentStageNo extends _$CurrentStageNo {
   @override
-  int build() {
-    return 1;
+  Future<int> build() async {
+    final lastStageService = ref.read(lastStageServiceProvider);
+    final lastStageNo = await lastStageService.getLastStageNo();
+    return lastStageNo ?? 1;
   }
 
-  void next() {
-    state = state + 1;
+  Future<void> _saveCurrentStageNo(int stageNo) async {
+    final lastStageService = ref.read(lastStageServiceProvider);
+    await lastStageService.saveLastStageNo(stageNo);
   }
 
-  void prev() {
-    state = state - 1;
+  Future<void> next() async {
+    final currentState = state;
+    if (currentState is AsyncData<int>) {
+      final newValue = currentState.value + 1;
+      state = AsyncData(newValue);
+      await _saveCurrentStageNo(newValue);
+    }
+  }
+
+  Future<void> prev() async {
+    final currentState = state;
+    if (currentState is AsyncData<int> && currentState.value > 1) {
+      final newValue = currentState.value - 1;
+      state = AsyncData(newValue);
+      await _saveCurrentStageNo(newValue);
+    }
+  }
+
+  Future<void> setStageNo(int stageNo) async {
+    if (stageNo > 0) {
+      state = AsyncData(stageNo);
+      await _saveCurrentStageNo(stageNo);
+    }
   }
 }
 
@@ -124,7 +154,12 @@ class CurrentStageNo extends _$CurrentStageNo {
 class CurrentStage extends _$CurrentStage {
   @override
   Future<StageResponse> build() async {
-    final currentStageNo = ref.watch(currentStageNoProvider);
+    final currentStageNoAsync = ref.watch(currentStageNoProvider);
+    final currentStageNo = currentStageNoAsync.when(
+      data: (stageNo) => stageNo,
+      loading: () => 1,
+      error: (_, _) => 1,
+    );
     return ref.watch(fetchStageProvider(stageNo: currentStageNo).future);
   }
 
@@ -162,7 +197,12 @@ class CurrentStage extends _$CurrentStage {
   }
 
   Future<void> markCurrentStageCleared() async {
-    final currentStageNo = ref.read(currentStageNoProvider);
+    final currentStageNoAsync = ref.read(currentStageNoProvider);
+    final currentStageNo = currentStageNoAsync.when(
+      data: (stageNo) => stageNo,
+      loading: () => 1,
+      error: (_, _) => 1,
+    );
 
     // Since stage data is now always in SQLite (from fetchStage),
     // we only need to update the clear flag
