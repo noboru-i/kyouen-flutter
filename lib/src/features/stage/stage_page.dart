@@ -13,7 +13,6 @@ class StagePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // initialize and keep instance
-    // TODO: デフォルト値の設定
     ref.watch(currentStageNoProvider);
 
     return Scaffold(
@@ -36,9 +35,19 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
-    final currentStageNo = ref.watch(currentStageNoProvider);
+    final currentStageNoAsync = ref.watch(currentStageNoProvider);
     final clearedStages = ref.watch(clearedStageNumbersProvider);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
+
+    // Extract current stage number from AsyncValue
+    final currentStageNo = currentStageNoAsync.when(
+      data: (stageNo) => stageNo,
+      loading: () => null,
+      error: (_, _) => null,
+    );
+    if (currentStageNo == null) {
+      return const SizedBox.shrink(); // or some loading indicator
+    }
 
     // Check if current stage is cleared
     final isCleared = clearedStages.when(
@@ -54,8 +63,8 @@ class _Header extends ConsumerWidget {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed: () {
-                ref.read(currentStageNoProvider.notifier).prev();
+              onPressed: () async {
+                await ref.read(currentStageNoProvider.notifier).prev();
               },
               child: Text(isSmallScreen ? '前' : '前へ'),
             ),
@@ -91,8 +100,8 @@ class _Header extends ConsumerWidget {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed: () {
-                ref.read(currentStageNoProvider.notifier).next();
+              onPressed: () async {
+                await ref.read(currentStageNoProvider.notifier).next();
               },
               child: Text(isSmallScreen ? '次' : '次へ'),
             ),
@@ -134,7 +143,7 @@ class _Footer extends ConsumerWidget {
                     if (context.mounted) {
                       await _showKyouenDialog(context);
                     }
-                    ref.read(currentStageNoProvider.notifier).next();
+                    await ref.read(currentStageNoProvider.notifier).next();
                   } else {
                     debugPrint('NOT KYOUEN!');
                     if (context.mounted) {
