@@ -8,7 +8,12 @@ import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.d
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
 
 // State for controlling kyouen overlay visibility
-final showKyouenOverlayProvider = StateProvider<bool>((ref) => false);
+// Automatically resets when currentStageNoProvider changes
+final showKyouenOverlayProvider = StateProvider<bool>((ref) {
+  // Watch currentStageNoProvider to trigger reset when stage changes
+  ref.watch(currentStageNoProvider);
+  return false;
+});
 
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
@@ -71,8 +76,6 @@ class _Header extends ConsumerWidget {
               onPressed:
                   currentStageNo > 1
                       ? () async {
-                        ref.read(showKyouenOverlayProvider.notifier).state =
-                            false;
                         await ref.read(currentStageNoProvider.notifier).prev();
                       }
                       : null,
@@ -111,7 +114,6 @@ class _Header extends ConsumerWidget {
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
               onPressed: () async {
-                ref.read(showKyouenOverlayProvider.notifier).state = false;
                 await ref.read(currentStageNoProvider.notifier).next();
               },
               child: Text(isSmallScreen ? '次' : '次へ'),
@@ -161,9 +163,6 @@ class _Footer extends ConsumerWidget {
                         context: context,
                         onClose: () {
                           Navigator.of(context).pop();
-                          // Hide overlay and go to next stage
-                          ref.read(showKyouenOverlayProvider.notifier).state =
-                              false;
                         },
                       );
                       await ref.read(currentStageNoProvider.notifier).next();
