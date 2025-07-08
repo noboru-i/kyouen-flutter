@@ -196,6 +196,11 @@ class CurrentStage extends _$CurrentStage {
     return kyouenStage.hasKyouen() != null;
   }
 
+  KyouenData? getKyouenData() {
+    final kyouenStage = Kyouen(stonesFromString(state.asData!.value.stage));
+    return kyouenStage.hasKyouen();
+  }
+
   Future<void> markCurrentStageCleared() async {
     final currentStageNoAsync = ref.read(currentStageNoProvider);
     final currentStageNo = currentStageNoAsync.when(

@@ -4,6 +4,16 @@ import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/stage/widgets/stage_board.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
+
+// State for controlling kyouen overlay visibility
+// Automatically resets when currentStageNoProvider changes
+final showKyouenOverlayProvider = StateProvider<bool>((ref) {
+  // Watch currentStageNoProvider to trigger reset when stage changes
+  ref.watch(currentStageNoProvider);
+  return false;
+});
 
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
@@ -139,14 +149,24 @@ class _Footer extends ConsumerWidget {
                       ref.read(currentStageProvider.notifier).isKyouen();
                   if (isKyouen) {
                     debugPrint('KYOUEN!');
+
+                    // Show kyouen overlay
+                    ref.read(showKyouenOverlayProvider.notifier).state = true;
+
                     // Mark stage as cleared
                     await ref
                         .read(currentStageProvider.notifier)
                         .markCurrentStageCleared();
+
                     if (context.mounted) {
-                      await _showKyouenDialog(context);
+                      await showKyouenSuccessDialog(
+                        context: context,
+                        onClose: () {
+                          Navigator.of(context).pop();
+                        },
+                      );
+                      await ref.read(currentStageNoProvider.notifier).next();
                     }
-                    await ref.read(currentStageNoProvider.notifier).next();
                   } else {
                     debugPrint('NOT KYOUEN!');
                     if (context.mounted) {
@@ -158,34 +178,6 @@ class _Footer extends ConsumerWidget {
                 : null,
         child: const Text('共円！！'),
       ),
-    );
-  }
-
-  Future<void> _showKyouenDialog(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: const Center(child: Text('共円！！')),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(height: 16),
-              Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 48),
-              SizedBox(height: 16),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('次のステージへ'),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -217,12 +209,34 @@ class _Body extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(currentStageProvider);
+    final showOverlay = ref.watch(showKyouenOverlayProvider);
 
     return currentStage.when(
       data: (data) {
-        return StageBoard(
-          stageData: data,
-          onTapStone: (index) => _onTapStone(ref, index),
+        final boardSize = data.size;
+        return Stack(
+          children: [
+            StageBoard(
+              stageData: data,
+              onTapStone: (index) => _onTapStone(ref, index),
+            ),
+            if (showOverlay) ...[
+              Consumer(
+                builder: (context, ref, child) {
+                  final kyouenData =
+                      ref.read(currentStageProvider.notifier).getKyouenData();
+                  if (kyouenData != null) {
+                    return KyouenAnswerOverlayWidget(
+                      kyouenData: kyouenData,
+                      boardSize: boardSize,
+                      animationDuration: const Duration(milliseconds: 1200),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ],
         );
       },
       error: (error, stackTrace) {
