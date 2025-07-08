@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:kyouen/kyouen.dart';
 
@@ -175,9 +176,22 @@ class KyouenAnswerPainter extends CustomPainter {
 
     final centerX = center.x * cellSize + cellSize / 2;
     final centerY = center.y * cellSize + cellSize / 2;
-    final drawRadius = radius * cellSize * animationValue;
+    final drawRadius = radius * cellSize;
 
-    canvas.drawCircle(Offset(centerX, centerY), drawRadius, paint);
+    // 円弧の長さをアニメーションで調整（大きさは固定）
+    final sweepAngle = 2 * math.pi * animationValue; // 0から2πまで
+    final rect = Rect.fromCircle(
+      center: Offset(centerX, centerY),
+      radius: drawRadius,
+    );
+
+    canvas.drawArc(
+      rect,
+      -math.pi / 2, // 上から開始（-π/2）
+      sweepAngle,
+      false,
+      paint,
+    );
   }
 
   @override
