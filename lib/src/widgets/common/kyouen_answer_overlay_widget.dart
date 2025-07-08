@@ -7,17 +7,11 @@ class KyouenAnswerOverlayWidget extends StatefulWidget {
     super.key,
     required this.kyouenData,
     required this.boardSize,
-    required this.isVisible,
-    this.strokeWidth = 3.0,
-    this.strokeColor = Colors.grey,
     this.animationDuration = const Duration(milliseconds: 800),
   });
 
   final KyouenData kyouenData;
   final int boardSize;
-  final bool isVisible;
-  final double strokeWidth;
-  final Color strokeColor;
   final Duration animationDuration;
 
   @override
@@ -52,16 +46,12 @@ class _KyouenAnswerOverlayWidgetState extends State<KyouenAnswerOverlayWidget>
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.isVisible) {
-      return const SizedBox.shrink();
-    }
-
     return Center(
       child: AspectRatio(
         aspectRatio: 1,
         child: Card(
           color: Colors.transparent,
-          elevation: 8,
+          elevation: 0,
           child: AnimatedBuilder(
             animation: _animation,
             builder: (context, child) {
@@ -69,8 +59,6 @@ class _KyouenAnswerOverlayWidgetState extends State<KyouenAnswerOverlayWidget>
                 painter: KyouenAnswerPainter(
                   kyouenData: widget.kyouenData,
                   boardSize: widget.boardSize,
-                  strokeWidth: widget.strokeWidth,
-                  strokeColor: widget.strokeColor,
                   animationValue: _animation.value,
                 ),
                 child: Container(),
@@ -87,24 +75,20 @@ class KyouenAnswerPainter extends CustomPainter {
   const KyouenAnswerPainter({
     required this.kyouenData,
     required this.boardSize,
-    required this.strokeWidth,
-    required this.strokeColor,
     required this.animationValue,
   });
 
   final KyouenData kyouenData;
   final int boardSize;
-  final double strokeWidth;
-  final Color strokeColor;
   final double animationValue;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint =
         Paint()
-          ..color = strokeColor.withValues(alpha: animationValue)
+          ..color = const Color(0xFFFF6B35)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth;
+          ..strokeWidth = 4;
 
     final cellSize = size.width / boardSize;
 

@@ -229,9 +229,6 @@ class _Body extends ConsumerWidget {
                     return KyouenAnswerOverlayWidget(
                       kyouenData: kyouenData,
                       boardSize: boardSize,
-                      isVisible: true,
-                      strokeColor: const Color(0xFFFF6B35),
-                      strokeWidth: 4,
                       animationDuration: const Duration(milliseconds: 1200),
                     );
                   }
