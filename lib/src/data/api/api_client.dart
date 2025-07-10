@@ -10,6 +10,7 @@ import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
 import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/recent_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/api/firebase_auth_interceptor.dart';
 import 'package:kyouen_flutter/src/data/api/json_serializable_converter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -56,7 +57,10 @@ ApiClient apiClient(Ref ref) {
     baseUrl: Uri.parse(Environment.apiBaseUrl),
     services: [ApiClient.create()],
     converter: JsonSerializableConverter(),
-    interceptors: [if (kDebugMode) HttpLoggingInterceptor()],
+    interceptors: [
+      FirebaseAuthInterceptor(),
+      if (kDebugMode) HttpLoggingInterceptor(),
+    ],
   );
   return ApiClient.create(client);
 }

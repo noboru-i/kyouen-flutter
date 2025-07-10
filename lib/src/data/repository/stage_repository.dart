@@ -83,9 +83,12 @@ class StageRepository {
     throw Exception('Failed to create stage: ${response.error}');
   }
 
-  Future<void> clearStage(int stageNo) async {
+  Future<void> clearStage(int stageNo, String userStage) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final clearStage = ClearStage(clearDate: DateTime.now().toIso8601String());
+    final clearStage = ClearStage(
+      stage: userStage,
+      clearDate: DateTime.now().toIso8601String(),
+    );
 
     await _apiClient.clearStage(stageNo, clearStage);
 
