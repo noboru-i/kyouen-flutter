@@ -180,7 +180,7 @@ class WebTitlePage extends ConsumerWidget {
   }
 
   Widget _buildFooter() {
-    return Center(
+    return const Center(
       child: Text(
         'Copyright 2013-2024 noboru All Rights Reserved.',
         style: TextStyle(fontSize: 12, color: Colors.black45),
@@ -246,7 +246,7 @@ class _ActivitiesDisplay extends ConsumerWidget {
     return activitiesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) {
-        print('Error fetching activities: $error');
+        // Error fetching activities: $error
         return Text(
           'エラーが発生しました',
           style: TextStyle(fontSize: 14, color: Colors.red.shade700),
@@ -323,7 +323,7 @@ class _WebStageCountDisplay extends ConsumerWidget {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.grey.shade300),
             ),
-            child: Text(
+            child: const Text(
               'ステージ情報を読み込み中...',
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
@@ -356,7 +356,7 @@ class _WebStageCountDisplay extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.grey.shade300),
                   ),
-                  child: Text(
+                  child: const Text(
                     'ステージ情報を読み込み中...',
                     style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
