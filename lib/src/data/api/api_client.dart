@@ -2,11 +2,13 @@ import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
+import 'package:kyouen_flutter/src/data/api/entity/activity_user.dart';
 import 'package:kyouen_flutter/src/data/api/entity/clear_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
 import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
+import 'package:kyouen_flutter/src/data/api/entity/recent_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:kyouen_flutter/src/data/api/json_serializable_converter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -40,6 +42,12 @@ abstract class ApiClient extends ChopperService {
   Future<Response<List<ClearedStage>>> syncStages(
     @Body() List<ClearedStage> clearedStages,
   );
+
+  @GET(path: '/recent_stages')
+  Future<Response<List<RecentStage>>> getRecentStages();
+
+  @GET(path: '/activities')
+  Future<Response<List<ActivityUser>>> getActivities();
 }
 
 @riverpod

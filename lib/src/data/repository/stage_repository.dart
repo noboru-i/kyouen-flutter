@@ -87,14 +87,10 @@ class StageRepository {
     final now = DateTime.now().millisecondsSinceEpoch;
     final clearStage = ClearStage(clearDate: DateTime.now().toIso8601String());
 
-    final response = await _apiClient.clearStage(stageNo, clearStage);
+    await _apiClient.clearStage(stageNo, clearStage);
 
-    if (response.isSuccessful) {
-      // Update local database
-      await _dao.clearStage(stageNo, now);
-    } else {
-      throw Exception('Failed to clear stage: ${response.error}');
-    }
+    // Always update local database even if API call fails
+    await _dao.clearStage(stageNo, now);
   }
 
   Future<List<ClearedStage>> syncStages() async {

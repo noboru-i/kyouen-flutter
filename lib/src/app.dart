@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/title/title_page.dart';
+import 'package:kyouen_flutter/src/features/web_title/web_title_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/settings/settings_controller.dart';
 import 'package:kyouen_flutter/src/settings/settings_view.dart';
@@ -37,7 +39,11 @@ class MyApp extends StatelessWidget {
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
                   case TitlePage.routeName:
-                    return const TitlePage();
+                    if (kIsWeb) {
+                      return const WebTitlePage();
+                    } else {
+                      return const TitlePage();
+                    }
                   case StagePage.routeName:
                     return const StagePage();
                   case SignInPage.routeName:
