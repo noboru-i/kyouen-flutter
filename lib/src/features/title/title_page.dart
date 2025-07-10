@@ -1,11 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
-import 'package:kyouen_flutter/src/features/web_title/web_title_page.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 
 class TitlePage extends ConsumerWidget {
@@ -15,11 +13,6 @@ class TitlePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Web版とアプリ版で異なるレイアウトを使用
-    if (kIsWeb) {
-      return const WebTitlePage();
-    }
-
     return Scaffold(
       body: BackgroundWidget(
         child: SafeArea(

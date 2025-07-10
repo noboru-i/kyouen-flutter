@@ -209,10 +209,8 @@ class CurrentStage extends _$CurrentStage {
       error: (_, _) => 1,
     );
 
-    // Since stage data is now always in SQLite (from fetchStage),
-    // we only need to update the clear flag
-    final dao = await ref.read(tumeKyouenDaoProvider.future);
-    await dao.clearStage(currentStageNo, DateTime.now().millisecondsSinceEpoch);
+    final stageRepository = await ref.read(stageRepositoryProvider.future);
+    await stageRepository.clearStage(currentStageNo);
 
     // Invalidate the cleared stages provider to refresh UI
     ref.invalidate(clearedStageNumbersProvider);

@@ -1,28 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
+import 'package:kyouen_flutter/src/data/repository/web_title_repository.dart';
 import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
+import 'package:kyouen_flutter/src/features/web_title/views/my_app_bar.dart';
+import 'package:kyouen_flutter/src/features/web_title/views/my_drawer.dart';
 
 class WebTitlePage extends ConsumerWidget {
   const WebTitlePage({super.key});
+
+  // route name is the same as TitlePage
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 800),
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
+      drawer: const MyDrawer(),
+      appBar: const MyAppBar(),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 800),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
 
-              // Main Title
-              Center(
-                child: Text(
+                // Main Title
+                const Text(
                   '共円',
                   style: TextStyle(
                     fontSize: 48,
@@ -30,45 +36,48 @@ class WebTitlePage extends ConsumerWidget {
                     color: Colors.black87,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Subtitle
-              Center(
-                child: Text(
-                  '4つの石を通る円のこと',
+                // Subtitle
+                const Text(
+                  '共円とは、４つの石を通る円のことです。\nこのページでは、盤上に置かれた石から共円を指摘する、「詰め共円」が多数登録されています。',
                   style: TextStyle(fontSize: 18, color: Colors.black54),
                 ),
-              ),
 
-              const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-              // Stage Count Display
-              Center(child: _WebStageCountDisplay()),
+                // Stage Count Display
+                Center(child: _WebStageCountDisplay()),
 
-              const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-              // Navigation Links
-              _buildNavigationSection(context),
+                // Navigation Links
+                _buildNavigationSection(context),
 
-              const SizedBox(height: 60),
+                const SizedBox(height: 60),
 
-              // Latest Registrations Section
-              _buildLatestRegistrationsSection(),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: [
+                    // Latest Registrations Section
+                    _buildLatestRegistrationsSection(),
 
-              const SizedBox(height: 40),
+                    // Activity Section
+                    _buildActivitySection(),
+                  ],
+                ),
 
-              // Activity Section
-              _buildActivitySection(),
+                const SizedBox(height: 40),
 
-              const SizedBox(height: 40),
+                // Footer
+                _buildFooter(),
 
-              // Footer
-              _buildFooter(),
-
-              const SizedBox(height: 40),
-            ],
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
@@ -83,16 +92,6 @@ class WebTitlePage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'ゲームを始める',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-
             // Start Game Button
             SizedBox(
               height: 48,
@@ -140,7 +139,7 @@ class WebTitlePage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               '最新の登録',
               style: TextStyle(
                 fontSize: 20,
@@ -149,10 +148,7 @@ class WebTitlePage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              '最新の登録情報はこちらに表示されます。',
-              style: TextStyle(fontSize: 14, color: Colors.black54),
-            ),
+            _RecentStagesDisplay(),
           ],
         ),
       ),
@@ -167,7 +163,7 @@ class WebTitlePage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'アクティビティ',
               style: TextStyle(
                 fontSize: 20,
@@ -176,10 +172,7 @@ class WebTitlePage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'アクティビティ情報はこちらに表示されます。',
-              style: TextStyle(fontSize: 14, color: Colors.black54),
-            ),
+            _ActivitiesDisplay(),
           ],
         ),
       ),
@@ -192,6 +185,126 @@ class WebTitlePage extends ConsumerWidget {
         'Copyright 2013-2024 noboru All Rights Reserved.',
         style: TextStyle(fontSize: 12, color: Colors.black45),
       ),
+    );
+  }
+}
+
+class _RecentStagesDisplay extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recentStagesAsync = ref.watch(recentStagesProvider);
+
+    return recentStagesAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error:
+          (error, _) => Text(
+            'エラーが発生しました',
+            style: TextStyle(fontSize: 14, color: Colors.red.shade700),
+          ),
+      data:
+          (stages) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:
+                stages
+                    .take(5)
+                    .map(
+                      (stage) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${stage.stageNo}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${stage.creatorName} - ${stage.registeredDate}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    .toList(),
+          ),
+    );
+  }
+}
+
+class _ActivitiesDisplay extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activitiesAsync = ref.watch(activitiesProvider);
+
+    return activitiesAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) {
+        print('Error fetching activities: $error');
+        return Text(
+          'エラーが発生しました',
+          style: TextStyle(fontSize: 14, color: Colors.red.shade700),
+        );
+      },
+      data:
+          (activities) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:
+                activities
+                    .take(5)
+                    .map(
+                      (activity) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.network(
+                                activity.profileImageUrl,
+                                width: 32,
+                                height: 32,
+                                errorBuilder:
+                                    (context, error, stackTrace) => Container(
+                                      width: 32,
+                                      height: 32,
+                                      color: Colors.grey.shade300,
+                                      child: const Icon(Icons.person, size: 16),
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    activity.screenName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${activity.clearedStages.length}ステージクリア',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    .toList(),
+          ),
     );
   }
 }
