@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
-import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
+import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 
@@ -68,7 +68,7 @@ class TitlePage extends ConsumerWidget {
                     onPressed: () {
                       Navigator.restorablePushNamed(
                         context,
-                        SignInPage.routeName,
+                        AccountPage.routeName,
                       );
                     },
                     child: const Text(

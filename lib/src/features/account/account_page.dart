@@ -1,21 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kyouen_flutter/src/data/api/api_client.dart';
-import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
+import 'package:kyouen_flutter/src/features/account/account_service.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 
-class SignInPage extends ConsumerWidget {
-  const SignInPage({super.key});
+class AccountPage extends ConsumerWidget {
+  const AccountPage({super.key});
 
-  static const routeName = '/sign_in';
+  static const routeName = '/account';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ログイン')),
+      appBar: AppBar(title: const Text('アカウント')),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -46,7 +44,7 @@ class _SignInView extends ConsumerWidget {
             SizedBox(
               height: 56,
               child: FilledButton(
-                onPressed: () => _signInWithTwitter(ref),
+                onPressed: () => _signInWithTwitter(context, ref),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppTheme.twitterBlue,
                   foregroundColor: Colors.white,
@@ -72,7 +70,7 @@ class _SignInView extends ConsumerWidget {
             SizedBox(
               height: 56,
               child: FilledButton(
-                onPressed: () => _signInWithApple(ref),
+                onPressed: () => _signInWithApple(context, ref),
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
@@ -100,86 +98,38 @@ class _SignInView extends ConsumerWidget {
     );
   }
 
-  Future<void> _signInWithTwitter(WidgetRef ref) async {
-    await FirebaseAuth.instance.signOut();
-    final twitterProvider = TwitterAuthProvider();
-
+  Future<void> _signInWithTwitter(BuildContext context, WidgetRef ref) async {
     try {
-      UserCredential userCredential;
-      if (kIsWeb) {
-        userCredential = await FirebaseAuth.instance.signInWithPopup(
-          twitterProvider,
-        );
-      } else {
-        userCredential = await FirebaseAuth.instance.signInWithProvider(
-          twitterProvider,
-        );
-      }
-
-      await _callLoginApi(userCredential.user, ref);
+      await ref.read(accountServiceProvider.notifier).signInWithTwitter();
     } on Exception catch (e) {
-      debugPrint('Twitter sign-in failed: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Twitter sign-in failed: $e')));
+      }
     }
   }
 
-  Future<void> _signInWithApple(WidgetRef ref) async {
-    final appleProvider = AppleAuthProvider();
-
+  Future<void> _signInWithApple(BuildContext context, WidgetRef ref) async {
     try {
-      UserCredential userCredential;
-      if (kIsWeb) {
-        userCredential = await FirebaseAuth.instance.signInWithPopup(
-          appleProvider,
-        );
-      } else {
-        userCredential = await FirebaseAuth.instance.signInWithProvider(
-          appleProvider,
-        );
-      }
-
-      await _callLoginApi(userCredential.user, ref);
+      await ref.read(accountServiceProvider.notifier).signInWithApple();
     } on Exception catch (e) {
-      debugPrint('Apple sign-in failed: $e');
-    }
-  }
-
-  Future<void> _callLoginApi(User? user, WidgetRef ref) async {
-    if (user == null) {
-      return;
-    }
-
-    try {
-      // keep instance before awaiting
-      final apiClient = ref.read(apiClientProvider);
-
-      final idToken = await user.getIdToken();
-      if (idToken == null) {
-        debugPrint('ID token is null');
-        return;
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Apple sign-in failed: $e')));
       }
-
-      final loginRequest = LoginRequest(token: idToken);
-
-      final response = await apiClient.login(loginRequest);
-
-      if (response.isSuccessful && response.body != null) {
-        debugPrint('Login successful: ${response.body!.screenName}');
-      } else {
-        debugPrint('Login failed: ${response.error}');
-      }
-    } on Exception catch (e) {
-      debugPrint('Login API call failed: $e');
     }
   }
 }
 
-class _LogoutView extends StatelessWidget {
+class _LogoutView extends ConsumerWidget {
   const _LogoutView({required this.user});
 
   final User user;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return BackgroundWidget(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -214,7 +164,7 @@ class _LogoutView extends StatelessWidget {
               height: 56,
               child: FilledButton.tonal(
                 onPressed: () {
-                  FirebaseAuth.instance.signOut();
+                  ref.read(accountServiceProvider.notifier).signOut();
                 },
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -232,10 +182,102 @@ class _LogoutView extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            // Delete Account button
+            SizedBox(
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () => _showDeleteAccountDialog(context, ref),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.delete_forever, size: 20),
+                    SizedBox(width: 12),
+                    Text(
+                      'アカウント削除',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const Spacer(flex: 2),
           ],
         ),
       ),
     );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
+    showDialog<void>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('アカウント削除'),
+            content: const Text(
+              'アカウントを削除してもよろしいですか？この操作は元に戻すことができず、すべてのデータが永久に削除されます。',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('キャンセル'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await _deleteAccount(context, ref);
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('削除'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _deleteAccount(BuildContext context, WidgetRef ref) async {
+    try {
+      // ignore: unawaited_futures
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder:
+            (context) => const AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('アカウントを削除中...'),
+                ],
+              ),
+            ),
+      );
+
+      await ref.read(accountServiceProvider.notifier).deleteAccount();
+
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('アカウントが正常に削除されました')));
+        // After account deletion, user is automatically signed out
+        // The StreamBuilder will detect the auth state change and show sign-in view
+      }
+    } on Exception catch (e) {
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('アカウント削除に失敗しました: $e')));
+      }
+    }
   }
 }

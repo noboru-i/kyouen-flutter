@@ -6,17 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/firebase_options.dart';
 import 'package:kyouen_flutter/src/app.dart';
-import 'package:kyouen_flutter/src/settings/settings_controller.dart';
-import 'package:kyouen_flutter/src/settings/settings_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _setupFirebase();
 
-  final settingsController = SettingsController(SettingsService());
-  await settingsController.loadSettings();
-
-  runApp(ProviderScope(child: MyApp(settingsController: settingsController)));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 Future<void> _setupFirebase() async {

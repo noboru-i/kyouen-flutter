@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/data/repository/web_title_repository.dart';
-import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
+import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/web_title/views/my_app_bar.dart';
 import 'package:kyouen_flutter/src/features/web_title/views/my_drawer.dart';
@@ -117,7 +117,7 @@ class WebTitlePage extends ConsumerWidget {
               height: 48,
               child: OutlinedButton(
                 onPressed: () {
-                  Navigator.restorablePushNamed(context, SignInPage.routeName);
+                  Navigator.restorablePushNamed(context, AccountPage.routeName);
                 },
                 child: const Text(
                   'ログイン',
