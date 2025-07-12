@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
-import 'package:kyouen_flutter/src/features/title/title_page.dart';
+import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});

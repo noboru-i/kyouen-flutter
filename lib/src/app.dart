@@ -4,8 +4,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
-import 'package:kyouen_flutter/src/features/title/title_page.dart';
-import 'package:kyouen_flutter/src/features/web_title/web_title_page.dart';
+import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
+import 'package:kyouen_flutter/src/features/title/web_title_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 

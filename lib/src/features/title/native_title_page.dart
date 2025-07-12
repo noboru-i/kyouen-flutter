@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
-import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
+import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 
 class TitlePage extends ConsumerWidget {
@@ -61,25 +61,8 @@ class TitlePage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Login Button
-                SizedBox(
-                  height: 56,
-                  child: FilledButton.tonal(
-                    onPressed: () {
-                      Navigator.restorablePushNamed(
-                        context,
-                        AccountPage.routeName,
-                      );
-                    },
-                    child: const Text(
-                      'ログイン',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
+                // Account Button (changes based on auth state)
+                const AccountButton(),
                 const Spacer(flex: 2),
               ],
             ),

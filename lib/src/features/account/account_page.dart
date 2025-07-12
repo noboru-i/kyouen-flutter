@@ -261,6 +261,7 @@ class _LogoutView extends ConsumerWidget {
             ),
       );
 
+      // TODO: うまく画面制御できていない気もするが、削除処理自体は動いているので放置
       await ref.read(accountServiceProvider.notifier).deleteAccount();
 
       if (context.mounted) {
