@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/data/repository/web_title_repository.dart';
-import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
-import 'package:kyouen_flutter/src/features/web_title/views/my_app_bar.dart';
-import 'package:kyouen_flutter/src/features/web_title/views/my_drawer.dart';
+import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
+import 'package:kyouen_flutter/src/features/title/views/my_app_bar.dart';
+import 'package:kyouen_flutter/src/features/title/views/my_drawer.dart';
 
 class WebTitlePage extends ConsumerWidget {
   const WebTitlePage({super.key});
@@ -112,19 +112,8 @@ class WebTitlePage extends ConsumerWidget {
 
             const SizedBox(height: 12),
 
-            // Login Button
-            SizedBox(
-              height: 48,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.restorablePushNamed(context, SignInPage.routeName);
-                },
-                child: const Text(
-                  'ログイン',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
+            // Account Button (changes based on auth state)
+            const OutlinedAccountButton(),
           ],
         ),
       ),

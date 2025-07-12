@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
+import 'package:kyouen_flutter/src/features/account/account_page.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppBar({super.key});
@@ -17,7 +17,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
             if (!snapshot.hasData) {
               return TextButton(
                 onPressed: () {
-                  Navigator.restorablePushNamed(context, SignInPage.routeName);
+                  Navigator.restorablePushNamed(context, AccountPage.routeName);
                 },
                 child: const Text('ログイン'),
               );
