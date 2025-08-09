@@ -9,6 +9,7 @@ import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
 import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/recent_stage.dart';
+import 'package:kyouen_flutter/src/data/api/entity/resource_error.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:kyouen_flutter/src/data/api/firebase_auth_interceptor.dart';
 import 'package:kyouen_flutter/src/data/api/json_serializable_converter.dart';
@@ -59,7 +60,14 @@ ApiClient apiClient(Ref ref) {
   final client = ChopperClient(
     baseUrl: Uri.parse(Environment.apiBaseUrl),
     services: [ApiClient.create()],
-    converter: JsonSerializableConverter(),
+    converter: const JsonSerializableConverter({
+      ActivityUser: ActivityUser.fromJson,
+      ClearedStage: ClearedStage.fromJson,
+      LoginResponse: LoginResponse.fromJson,
+      RecentStage: RecentStage.fromJson,
+      StageResponse: StageResponse.fromJson,
+      ResourceError: ResourceError.fromJson,
+    }),
     interceptors: [
       FirebaseAuthInterceptor(),
       if (kDebugMode) HttpLoggingInterceptor(),

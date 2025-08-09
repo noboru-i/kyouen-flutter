@@ -185,11 +185,12 @@ class _RecentStagesDisplay extends ConsumerWidget {
 
     return recentStagesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error:
-          (error, _) => Text(
-            'エラーが発生しました',
-            style: TextStyle(fontSize: 14, color: Colors.red.shade700),
-          ),
+      error: (error, trace) {
+        return Text(
+          'エラーが発生しました',
+          style: TextStyle(fontSize: 14, color: Colors.red.shade700),
+        );
+      },
       data:
           (stages) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +211,7 @@ class _RecentStagesDisplay extends ConsumerWidget {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                '${stage.creatorName} - ${stage.registeredDate}',
+                                '${stage.creator} - ${stage.registDate}',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.black54,
@@ -255,7 +256,7 @@ class _ActivitiesDisplay extends ConsumerWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(16),
                               child: Image.network(
-                                activity.profileImageUrl,
+                                activity.image,
                                 width: 32,
                                 height: 32,
                                 errorBuilder:
