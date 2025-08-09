@@ -186,9 +186,6 @@ class _RecentStagesDisplay extends ConsumerWidget {
     return recentStagesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, trace) {
-        // Error fetching recent stages: $error
-        print('Error fetching recent stages: $error');
-        print('Stack trace: $trace');
         return Text(
           'エラーが発生しました',
           style: TextStyle(fontSize: 14, color: Colors.red.shade700),

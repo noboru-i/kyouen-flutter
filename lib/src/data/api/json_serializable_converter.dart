@@ -62,7 +62,7 @@ class JsonSerializableConverter extends JsonConverter {
     final jsonRes = await super.convertError<dynamic, dynamic>(response);
 
     return jsonRes.copyWith<ResourceError>(
-      body: ResourceError.fromJsonFactory(jsonRes.body as Map<String, dynamic>),
+      body: ResourceError.fromJson(jsonRes.body as Map<String, dynamic>),
     );
   }
 }

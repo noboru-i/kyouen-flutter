@@ -66,7 +66,7 @@ ApiClient apiClient(Ref ref) {
       LoginResponse: LoginResponse.fromJson,
       RecentStage: RecentStage.fromJson,
       StageResponse: StageResponse.fromJson,
-      ResourceError: ResourceError.fromJsonFactory,
+      ResourceError: ResourceError.fromJson,
     }),
     interceptors: [
       FirebaseAuthInterceptor(),

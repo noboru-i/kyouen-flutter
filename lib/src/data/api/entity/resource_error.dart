@@ -4,12 +4,13 @@ part 'resource_error.g.dart';
 
 @JsonSerializable()
 class ResourceError {
-  final String type;
-  final String message;
-
   ResourceError(this.type, this.message);
 
-  static const fromJsonFactory = _$ResourceErrorFromJson;
+  static const ResourceError Function(Map<String, dynamic>) fromJson =
+      _$ResourceErrorFromJson;
+
+  final String type;
+  final String message;
 
   Map<String, dynamic> toJson() => _$ResourceErrorToJson(this);
 }
