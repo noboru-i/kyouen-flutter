@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kyouen_flutter/src/features/sign_in/sign_in_page.dart';
-import 'package:kyouen_flutter/src/features/title/title_page.dart';
+import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
@@ -43,7 +43,7 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(Icons.settings),
             title: const Text('設定'),
             onTap: () {
-              Navigator.restorablePushNamed(context, SignInPage.routeName);
+              Navigator.restorablePushNamed(context, AccountPage.routeName);
             },
           ),
         ],

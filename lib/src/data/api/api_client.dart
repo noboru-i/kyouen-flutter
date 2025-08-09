@@ -49,6 +49,9 @@ abstract class ApiClient extends ChopperService {
 
   @GET(path: '/activities')
   Future<Response<List<ActivityUser>>> getActivities();
+
+  @DELETE(path: '/users/delete-account')
+  Future<Response<void>> deleteAccount();
 }
 
 @riverpod

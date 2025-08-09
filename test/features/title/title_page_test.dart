@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
-import 'package:kyouen_flutter/src/features/title/title_page.dart';
+import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 
 // Mock for testing
 class MockStageRepository implements StageRepository {
