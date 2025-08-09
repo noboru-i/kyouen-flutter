@@ -1,76 +1,68 @@
-import 'dart:convert';
+import 'dart:async';
 
 import 'package:chopper/chopper.dart';
-import 'package:kyouen_flutter/src/data/api/entity/activity_user.dart';
-import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
-import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
-import 'package:kyouen_flutter/src/data/api/entity/recent_stage.dart';
-import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/api/entity/resource_error.dart';
+
+// copy from https://github.com/lejard-h/chopper/blob/415c04f3d190c70eac47f87c3afdcd5fdecdbc98/example/bin/main_json_serializable.dart#L74-L128
+
+typedef JsonFactory<T> = T Function(Map<String, dynamic> json);
 
 class JsonSerializableConverter extends JsonConverter {
+  const JsonSerializableConverter(this.factories);
+
+  final Map<Type, JsonFactory<dynamic>> factories;
+
+  T? _decodeMap<T>(Map<String, dynamic> values) {
+    /// Get jsonFactory using Type parameters
+    /// if not found or invalid, throw error or return null
+    final jsonFactory = factories[T];
+    if (jsonFactory == null || jsonFactory is! JsonFactory<T>) {
+      /// throw serializer not found error;
+      return null;
+    }
+
+    return jsonFactory(values);
+  }
+
+  List<T> _decodeList<T>(Iterable<dynamic> values) =>
+      values.where((v) => v != null).map<T>((v) => _decode<T>(v) as T).toList();
+
+  dynamic _decode<T>(dynamic entity) {
+    if (entity is Iterable) {
+      return _decodeList<T>(entity as List);
+    } else if (entity is Map) {
+      return _decodeMap<T>(entity as Map<String, dynamic>);
+    }
+
+    return entity;
+  }
+
   @override
-  Response<BodyType> convertResponse<BodyType, InnerType>(
+  FutureOr<Response<ResultType>> convertResponse<ResultType, Item>(
     Response<dynamic> response,
-  ) {
-    return response.copyWith<BodyType>(
-      body: fromJsonData<BodyType, InnerType>(
-        response.body as String,
-        response.base.request!.url.path,
-      ),
+  ) async {
+    // use [JsonConverter] to decode json
+    final jsonRes = await super.convertResponse<dynamic, dynamic>(response);
+
+    return jsonRes.copyWith<ResultType>(
+      body: _decode<Item>(jsonRes.body) as ResultType?,
     );
   }
 
-  T fromJsonData<T, InnerType>(String jsonData, String url) {
-    final jsonMap = jsonDecode(jsonData);
+  @override
+  // all objects should implements toJson method
+  // ignore: unnecessary_overrides
+  Request convertRequest(Request request) => super.convertRequest(request);
 
-    if (jsonMap is List) {
-      return _convertList<T, InnerType>(jsonMap);
-    } else if (jsonMap is Map<String, dynamic>) {
-      return _convertSingle<T>(jsonMap, url);
-    }
+  @override
+  FutureOr<Response<dynamic>> convertError<ResultType, Item>(
+    Response<dynamic> response,
+  ) async {
+    // use [JsonConverter] to decode json
+    final jsonRes = await super.convertError<dynamic, dynamic>(response);
 
-    return jsonMap as T;
-  }
-
-  T _convertList<T, InnerType>(List<dynamic> jsonList) {
-    if (InnerType == StageResponse) {
-      return jsonList
-              .map(
-                (item) => StageResponse.fromJson(item as Map<String, dynamic>),
-              )
-              .toList()
-          as T;
-    } else if (InnerType == ClearedStage) {
-      return jsonList
-              .map(
-                (item) => ClearedStage.fromJson(item as Map<String, dynamic>),
-              )
-              .toList()
-          as T;
-    } else if (InnerType == RecentStage) {
-      return jsonList
-              .map((item) => RecentStage.fromJson(item as Map<String, dynamic>))
-              .toList()
-          as T;
-    } else if (InnerType == ActivityUser) {
-      return jsonList
-              .map(
-                (item) => ActivityUser.fromJson(item as Map<String, dynamic>),
-              )
-              .toList()
-          as T;
-    }
-
-    return jsonList as T;
-  }
-
-  T _convertSingle<T>(Map<String, dynamic> jsonMap, String url) {
-    if (T == LoginResponse || url.contains('/users/login')) {
-      return LoginResponse.fromJson(jsonMap) as T;
-    } else if (T == StageResponse || url.contains('/stages')) {
-      return StageResponse.fromJson(jsonMap) as T;
-    }
-
-    return jsonMap as T;
+    return jsonRes.copyWith<ResourceError>(
+      body: ResourceError.fromJsonFactory(jsonRes.body as Map<String, dynamic>),
+    );
   }
 }
