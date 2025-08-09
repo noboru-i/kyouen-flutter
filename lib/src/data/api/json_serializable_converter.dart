@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:chopper/chopper.dart';
+import 'package:kyouen_flutter/src/data/api/entity/activity_user.dart';
 import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_response.dart';
+import 'package:kyouen_flutter/src/data/api/entity/recent_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 
 class JsonSerializableConverter extends JsonConverter {
@@ -42,6 +44,18 @@ class JsonSerializableConverter extends JsonConverter {
       return jsonList
               .map(
                 (item) => ClearedStage.fromJson(item as Map<String, dynamic>),
+              )
+              .toList()
+          as T;
+    } else if (InnerType == RecentStage) {
+      return jsonList
+              .map((item) => RecentStage.fromJson(item as Map<String, dynamic>))
+              .toList()
+          as T;
+    } else if (InnerType == ActivityUser) {
+      return jsonList
+              .map(
+                (item) => ActivityUser.fromJson(item as Map<String, dynamic>),
               )
               .toList()
           as T;

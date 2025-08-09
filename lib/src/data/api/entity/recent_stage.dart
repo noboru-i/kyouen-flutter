@@ -8,9 +8,9 @@ abstract class RecentStage with _$RecentStage {
   const factory RecentStage({
     required int stageNo,
     required int size,
-    required String stageDefinition,
-    required String creatorName,
-    required String registeredDate,
+    required String stage,
+    required String creator,
+    required String registDate,
   }) = _RecentStage;
 
   factory RecentStage.fromJson(Map<String, dynamic> json) =>

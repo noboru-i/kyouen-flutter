@@ -167,9 +167,15 @@ flutterfire configure \
 ## コード生成設定
 
 ### build.yaml
-- **json_serializable**: API entities用にsnake_case field namingで設定
+- **json_serializable**: API entities用にsnake_case field namingで設定 (`field_rename: snake`)
 - **freezed**: API entities用のimmutable data classを生成
 - **対象ディレクトリ**: `lib/src/data/**/*.dart`
+
+### JSON フィールド命名規則
+- **重要**: `build.yaml`で`field_rename: snake`が設定されているため、通常は`@JsonKey`アノテーションは不要
+- Dartのフィールド名（camelCase）は自動的にJSON（snake_case）に変換される
+- 例: `stageNo` → `stage_no`, `screenName` → `screen_name`
+- APIスペックと異なる場合のみ`@JsonKey(name: 'custom_name')`を使用
 
 ### 生成ファイル (gitignore対象)
 - `*.g.dart` - JSON serialization
