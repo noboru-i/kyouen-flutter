@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/local/dao/tume_kyouen_dao.dart';
 import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
 import 'package:path/path.dart';

@@ -1,6 +1,5 @@
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/api/entity/activity_user.dart';
 import 'package:kyouen_flutter/src/data/api/entity/clear_stage.dart';
