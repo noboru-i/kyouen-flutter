@@ -29,6 +29,7 @@ class AccountService extends _$AccountService {
         );
       }
 
+      if (!ref.mounted) return;
       await _callLoginApi(userCredential.user);
     } on Exception catch (e) {
       logger.e('Twitter sign-in failed: $e');
@@ -52,6 +53,7 @@ class AccountService extends _$AccountService {
         );
       }
 
+      if (!ref.mounted) return;
       await _callLoginApi(userCredential.user);
     } on Exception catch (e) {
       logger.e('Apple sign-in failed: $e');
@@ -89,13 +91,14 @@ class AccountService extends _$AccountService {
     }
 
     try {
-      final apiClient = ref.read(apiClientProvider);
-
       final idToken = await user.getIdToken();
       if (idToken == null) {
         logger.w('ID token is null');
         return;
       }
+
+      if (!ref.mounted) return;
+      final apiClient = ref.read(apiClientProvider);
 
       final loginRequest = LoginRequest(token: idToken);
 
