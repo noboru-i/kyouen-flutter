@@ -32,7 +32,7 @@ jobs:
         fi
         
         # Generate build_runner files
-        flutter pub run build_runner build --delete-conflicting-outputs
+        dart run build_runner build --delete-conflicting-outputs
         
         # Setup sqflite for web
         dart run sqflite_common_ffi_web:setup
