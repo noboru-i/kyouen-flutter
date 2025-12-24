@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
@@ -15,7 +14,8 @@ part 'stage_service.g.dart';
 enum StoneState {
   none('0'), // 空
   black('1'), // 配置可能
-  white('2'); // 石配置済み
+  white('2')
+  ; // 石配置済み
 
   const StoneState(this.value);
 
@@ -47,19 +47,18 @@ Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
   // Save all stages to SQLite for future offline access
   if (apiStages.isNotEmpty) {
     final dao = await ref.watch(tumeKyouenDaoProvider.future);
-    final tumeKyouens =
-        apiStages
-            .map(
-              (apiStage) => TumeKyouen(
-                stageNo: apiStage.stageNo,
-                size: apiStage.size,
-                stage: apiStage.stage,
-                creator: apiStage.creator,
-                clearFlag: TumeKyouen.notCleared,
-                clearDate: 0,
-              ),
-            )
-            .toList();
+    final tumeKyouens = apiStages
+        .map(
+          (apiStage) => TumeKyouen(
+            stageNo: apiStage.stageNo,
+            size: apiStage.size,
+            stage: apiStage.stage,
+            creator: apiStage.creator,
+            clearFlag: TumeKyouen.notCleared,
+            clearDate: 0,
+          ),
+        )
+        .toList();
 
     // Insert with REPLACE to handle duplicates
     await dao.insertAll(tumeKyouens);
@@ -171,8 +170,9 @@ class CurrentStage extends _$CurrentStage {
     if (currentState == StoneState.none) {
       return;
     }
-    final newState =
-        currentState == StoneState.black ? StoneState.white : StoneState.black;
+    final newState = currentState == StoneState.black
+        ? StoneState.white
+        : StoneState.black;
     stageAsList[index] = newState.value;
     state = AsyncData(currentStage.copyWith(stage: stageAsList.join()));
   }

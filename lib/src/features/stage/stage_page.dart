@@ -7,13 +7,24 @@ import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
 
-// State for controlling kyouen overlay visibility
+// Notifier for controlling kyouen overlay visibility
 // Automatically resets when currentStageNoProvider changes
-final showKyouenOverlayProvider = StateProvider<bool>((ref) {
-  // Watch currentStageNoProvider to trigger reset when stage changes
-  ref.watch(currentStageNoProvider);
-  return false;
-});
+class ShowKyouenOverlayNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    // Watch currentStageNoProvider to trigger reset when stage changes
+    ref.watch(currentStageNoProvider);
+    return false;
+  }
+
+  void show() => state = true;
+  void hide() => state = false;
+}
+
+final showKyouenOverlayProvider =
+    NotifierProvider<ShowKyouenOverlayNotifier, bool>(
+      ShowKyouenOverlayNotifier.new,
+    );
 
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
@@ -31,7 +42,11 @@ class StagePage extends ConsumerWidget {
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [_Header(), Expanded(child: _Body()), _Footer()],
+            children: [
+              _Header(),
+              Expanded(child: _Body()),
+              _Footer(),
+            ],
           ),
         ),
       ),
@@ -73,12 +88,11 @@ class _Header extends ConsumerWidget {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed:
-                  currentStageNo > 1
-                      ? () async {
-                        await ref.read(currentStageNoProvider.notifier).prev();
-                      }
-                      : null,
+              onPressed: currentStageNo > 1
+                  ? () async {
+                      await ref.read(currentStageNoProvider.notifier).prev();
+                    }
+                  : null,
               child: Text(isSmallScreen ? '前' : '前へ'),
             ),
           ),
@@ -93,10 +107,9 @@ class _Header extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.bold,
-                    color:
-                        isCleared
-                            ? const Color(0xFF2E7D32)
-                            : null, // Dark green for cleared
+                    color: isCleared
+                        ? const Color(0xFF2E7D32)
+                        : null, // Dark green for cleared
                   ),
                 ),
                 if (isCleared) ...[
@@ -142,40 +155,40 @@ class _Footer extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: FilledButton(
-        onPressed:
-            hasFourWhiteStones
-                ? () async {
-                  final isKyouen =
-                      ref.read(currentStageProvider.notifier).isKyouen();
-                  if (isKyouen) {
-                    debugPrint('KYOUEN!');
+        onPressed: hasFourWhiteStones
+            ? () async {
+                final isKyouen = ref
+                    .read(currentStageProvider.notifier)
+                    .isKyouen();
+                if (isKyouen) {
+                  debugPrint('KYOUEN!');
 
-                    // Show kyouen overlay
-                    ref.read(showKyouenOverlayProvider.notifier).state = true;
+                  // Show kyouen overlay
+                  ref.read(showKyouenOverlayProvider.notifier).show();
 
-                    // Mark stage as cleared
-                    await ref
-                        .read(currentStageProvider.notifier)
-                        .markCurrentStageCleared();
+                  // Mark stage as cleared
+                  await ref
+                      .read(currentStageProvider.notifier)
+                      .markCurrentStageCleared();
 
-                    if (context.mounted) {
-                      await showKyouenSuccessDialog(
-                        context: context,
-                        onClose: () {
-                          Navigator.of(context).pop();
-                        },
-                      );
-                      await ref.read(currentStageNoProvider.notifier).next();
-                    }
-                  } else {
-                    debugPrint('NOT KYOUEN!');
-                    if (context.mounted) {
-                      await _showNotKyouenDialog(context);
-                    }
-                    ref.read(currentStageProvider.notifier).reset();
+                  if (context.mounted) {
+                    await showKyouenSuccessDialog(
+                      context: context,
+                      onClose: () {
+                        Navigator.of(context).pop();
+                      },
+                    );
+                    await ref.read(currentStageNoProvider.notifier).next();
                   }
+                } else {
+                  debugPrint('NOT KYOUEN!');
+                  if (context.mounted) {
+                    await _showNotKyouenDialog(context);
+                  }
+                  ref.read(currentStageProvider.notifier).reset();
                 }
-                : null,
+              }
+            : null,
         child: const Text('共円！！'),
       ),
     );
@@ -223,8 +236,9 @@ class _Body extends ConsumerWidget {
             if (showOverlay) ...[
               Consumer(
                 builder: (context, ref, child) {
-                  final kyouenData =
-                      ref.read(currentStageProvider.notifier).getKyouenData();
+                  final kyouenData = ref
+                      .read(currentStageProvider.notifier)
+                      .getKyouenData();
                   if (kyouenData != null) {
                     return KyouenAnswerOverlayWidget(
                       kyouenData: kyouenData,

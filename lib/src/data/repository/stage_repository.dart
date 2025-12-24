@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/clear_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
@@ -41,19 +40,18 @@ class StageRepository {
 
     if (response.isSuccessful && response.body != null) {
       // Save to local database
-      final tumeKyouens =
-          response.body!
-              .map(
-                (stage) => TumeKyouen(
-                  stageNo: stage.stageNo,
-                  size: stage.size,
-                  stage: stage.stage,
-                  creator: stage.creator,
-                  clearFlag: TumeKyouen.notCleared,
-                  clearDate: 0,
-                ),
-              )
-              .toList();
+      final tumeKyouens = response.body!
+          .map(
+            (stage) => TumeKyouen(
+              stageNo: stage.stageNo,
+              size: stage.size,
+              stage: stage.stage,
+              creator: stage.creator,
+              clearFlag: TumeKyouen.notCleared,
+              clearDate: 0,
+            ),
+          )
+          .toList();
 
       await _dao.insertAll(tumeKyouens);
       return response.body!;
@@ -98,18 +96,16 @@ class StageRepository {
 
   Future<List<ClearedStage>> syncStages() async {
     final clearedStages = await _dao.selectAllClearStage();
-    final clearedStageRequests =
-        clearedStages
-            .map(
-              (stage) => ClearedStage(
-                stageNo: stage.stageNo,
-                clearDate:
-                    DateTime.fromMillisecondsSinceEpoch(
-                      stage.clearDate,
-                    ).toIso8601String(),
-              ),
-            )
-            .toList();
+    final clearedStageRequests = clearedStages
+        .map(
+          (stage) => ClearedStage(
+            stageNo: stage.stageNo,
+            clearDate: DateTime.fromMillisecondsSinceEpoch(
+              stage.clearDate,
+            ).toIso8601String(),
+          ),
+        )
+        .toList();
 
     final response = await _apiClient.syncStages(clearedStageRequests);
 
