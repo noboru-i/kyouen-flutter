@@ -91,7 +91,7 @@
 ## 技術的な注意点
 
 ### 現在の技術構成
-- Flutter 3.32.4
+- Flutter 3.38.5
 - Riverpod（状態管理）
 - Chopper（API通信）
 - Firebase（認証・分析）

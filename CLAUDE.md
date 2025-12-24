@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 依存関係とTechnology Stack
 
 ### Core Dependencies (pubspec.yaml)
-- **Flutter**: ^3.32.4 (SDK >=3.7.0 <4.0.0)
+- **Flutter**: ^3.38.5 (SDK >=3.10.4 <4.0.0)
 - **State Management**: flutter_riverpod ^2.6.1, riverpod_annotation ^2.3.5
 - **API Client**: chopper ^8.1.0, http ^1.4.0 (最近dio+retrofitから移行)
 - **Serialization**: json_annotation ^4.9.0, freezed_annotation ^3.0.0

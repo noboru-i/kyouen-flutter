@@ -24,52 +24,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup Flutter and Firebase
+        uses: ./.github/actions/setup-flutter-firebase
         with:
-          flutter-version: '3.32.4'
-          channel: 'stable'
-      
-      - name: Install Firebase CLI
-        run: |
-          curl -sL https://firebase.tools | bash
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-      
-      - name: Install FlutterFire CLI
-        run: dart pub global activate flutterfire_cli
-      
-      - name: Setup Firebase Authentication
-        env:
-          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-        run: |
-          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > $RUNNER_TEMP/firebase-service-account.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> $GITHUB_ENV
-      
-      - name: Get dependencies
-        run: flutter pub get
-      
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
-      
-      - name: Configure Firebase for environment
-        run: |
-          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            # Development environment
-            flutterfire configure \
-              --project api-project-732262258565 \
-              --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
-              --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
-              --platforms=android,ios \
-              --yes
-          else
-            # Production environment
-            flutterfire configure \
-              --project my-android-server \
-              --android-package-name hm.orz.chaos114.android.tumekyouen \
-              --ios-bundle-id hm.orz.chaos114.TumeKyouen \
-              --platforms=android,ios \
-              --yes
-          fi
+          environment: ${{ github.event.inputs.environment }}
+          firebase-service-account-key: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
       
       - name: Upload prepared source
         uses: actions/upload-artifact@v4
@@ -98,7 +57,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.4'
+          flutter-version-file: 'pubspec.yaml'
           channel: 'stable'
       
       - name: Set script permissions
@@ -192,7 +151,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.4'
+          flutter-version-file: 'pubspec.yaml'
           channel: 'stable'
       
       - name: Setup Android keystore
@@ -254,3 +213,34 @@ jobs:
           groups: testers
           file: build/app/outputs/flutter-apk/app-release.apk
           releaseNotes: "Build from GitHub Actions - Android ${{ github.event.inputs.environment }}"
+
+  deploy-web:
+    name: Deploy Web App
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    needs: prepare
+    if: ${{ github.event.inputs.environment == 'dev' }}
+    
+    steps:
+      - name: Download prepared source
+        uses: actions/download-artifact@v4
+        with:
+          name: prepared-source-${{ github.event.inputs.environment }}
+          path: .
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: 'pubspec.yaml'
+          channel: 'stable'
+      
+      - name: Build web app
+        run: flutter build web --release --dart-define-from-file=.env.${{ github.event.inputs.environment }}
+      
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_API_PROJECT_732262258565 }}
+          channelId: live
+          projectId: api-project-732262258565

@@ -1,0 +1,67 @@
+name: 'Setup Flutter and Firebase'
+description: 'Setup Flutter, Firebase CLI, and prepare Firebase configuration'
+
+inputs:
+  environment:
+    description: 'Target environment (dev or prod)'
+    required: true
+    default: 'dev'
+  firebase-service-account-key:
+    description: 'Firebase service account key JSON'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version-file: 'pubspec.yaml'
+        channel: 'stable'
+    
+    - name: Install Firebase CLI
+      shell: bash
+      run: |
+        curl -sL https://firebase.tools | bash
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    
+    - name: Install FlutterFire CLI
+      shell: bash
+      run: dart pub global activate flutterfire_cli
+    
+    - name: Setup Firebase Authentication
+      shell: bash
+      env:
+        FIREBASE_SERVICE_ACCOUNT_KEY: ${{ inputs.firebase-service-account-key }}
+      run: |
+        echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > $RUNNER_TEMP/firebase-service-account.json
+        echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> $GITHUB_ENV
+    
+    - name: Get dependencies
+      shell: bash
+      run: flutter pub get
+    
+    - name: Generate code
+      shell: bash
+      run: dart run build_runner build --delete-conflicting-outputs
+    
+    - name: Configure Firebase for environment
+      shell: bash
+      run: |
+        if [ "${{ inputs.environment }}" = "dev" ]; then
+          # Development environment
+          flutterfire configure \
+            --project api-project-732262258565 \
+            --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
+            --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
+            --platforms=android,ios,web \
+            --yes
+        else
+          # Production environment
+          flutterfire configure \
+            --project my-android-server \
+            --android-package-name hm.orz.chaos114.android.tumekyouen \
+            --ios-bundle-id hm.orz.chaos114.TumeKyouen \
+            --platforms=android,ios,web \
+            --yes
+        fi
