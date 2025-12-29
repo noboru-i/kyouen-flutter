@@ -61,7 +61,10 @@ jobs:
           channel: 'stable'
       
       - name: Set script permissions
-        run: chmod +x ios/scripts/extract_dart_defines.sh
+        run: chmod +x ios/scripts/extract_dart_defines.sh ios/scripts/generate_provisioning_config.sh
+      
+      - name: Generate provisioning profile configuration
+        run: ios/scripts/generate_provisioning_config.sh ${{ github.event.inputs.environment }}
       
       - name: Install Apple Certificate and provisioning profile
         env:

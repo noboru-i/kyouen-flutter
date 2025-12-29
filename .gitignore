@@ -40,6 +40,9 @@ migrate_working_dir/
 # Dart defines generated file
 **/ios/Flutter/Dart-Defines.xcconfig
 
+# Auto-generated provisioning profile configuration
+**/ios/Flutter/ProvisioningProfile.xcconfig
+
 # Symbolication related
 app.*.symbols
 
