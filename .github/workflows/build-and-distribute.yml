@@ -61,7 +61,10 @@ jobs:
           channel: 'stable'
       
       - name: Set script permissions
-        run: chmod +x ios/scripts/extract_dart_defines.sh
+        run: chmod +x ios/scripts/extract_dart_defines.sh ios/scripts/generate_provisioning_config.sh
+      
+      - name: Generate provisioning profile configuration
+        run: ios/scripts/generate_provisioning_config.sh ${{ github.event.inputs.environment }}
       
       - name: Install Apple Certificate and provisioning profile
         env:
@@ -90,7 +93,9 @@ jobs:
 
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          # Extract UUID from provisioning profile and use it as filename
+          PP_UUID=$(security cms -D -i $PP_PATH | grep -A1 UUID | grep string | sed -e 's/<[^>]*>//g' | tr -d '\t ')
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
       
       - name: Build iOS IPA
         run: |
@@ -98,13 +103,13 @@ jobs:
             flutter build ipa --dart-define-from-file=.env.dev \
                 --release \
                 --verbose \
-                --export-options-plist=ios/ExportOptions.plist \
+                --export-options-plist=ios/ExportOptions.dev.plist \
                 --build-number=$((560 + ${{ github.run_number }}))
           else
             flutter build ipa --dart-define-from-file=.env.prod \
                 --release \
                 --verbose \
-                --export-options-plist=ios/ExportOptions.plist \
+                --export-options-plist=ios/ExportOptions.prod.plist \
                 --build-number=$((560 + ${{ github.run_number }}))
           fi
       
@@ -127,7 +132,7 @@ jobs:
         if: ${{ always() }}
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
-          rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+          rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
 
   build-android:
     name: Build Android App

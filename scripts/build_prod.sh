@@ -3,6 +3,10 @@
 # Production environment build script
 echo "Building for production environment..."
 
+# Generate provisioning profile configuration for prod
+echo "Generating provisioning profile configuration..."
+ios/scripts/generate_provisioning_config.sh prod
+
 # Configure Firebase for production environment
 echo "Configuring Firebase for production environment..."
 flutterfire configure \

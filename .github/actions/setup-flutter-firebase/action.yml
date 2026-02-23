@@ -45,6 +45,10 @@ runs:
       shell: bash
       run: dart run build_runner build --delete-conflicting-outputs
     
+    - name: Setup sqflite for web
+      shell: bash
+      run: dart run sqflite_common_ffi_web:setup
+
     - name: Configure Firebase for environment
       shell: bash
       run: |

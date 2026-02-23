@@ -40,6 +40,9 @@ migrate_working_dir/
 # Dart defines generated file
 **/ios/Flutter/Dart-Defines.xcconfig
 
+# Auto-generated provisioning profile configuration
+**/ios/Flutter/ProvisioningProfile.xcconfig
+
 # Symbolication related
 app.*.symbols
 
@@ -57,6 +60,7 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 ios/firebase_app_id_file.json
 .firebase/
+firebase.json
 
 # certificates
 android/app/cert/release.keystore

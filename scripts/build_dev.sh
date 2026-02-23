@@ -3,6 +3,10 @@
 # Development environment build script
 echo "Building for development environment..."
 
+# Generate provisioning profile configuration for dev
+echo "Generating provisioning profile configuration..."
+ios/scripts/generate_provisioning_config.sh dev
+
 # Configure Firebase for development environment
 echo "Configuring Firebase for development environment..."
 flutterfire configure \
