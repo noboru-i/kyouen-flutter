@@ -21,9 +21,7 @@ runs:
     
     - name: Install Firebase CLI
       shell: bash
-      run: |
-        curl -sL https://firebase.tools | bash
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+      run: npm install -g firebase-tools@15.7.0
     
     - name: Install FlutterFire CLI
       shell: bash
