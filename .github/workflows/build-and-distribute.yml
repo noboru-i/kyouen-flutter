@@ -60,6 +60,9 @@ jobs:
           flutter-version-file: 'pubspec.yaml'
           channel: 'stable'
       
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+      
       - name: Set script permissions
         run: chmod +x ios/scripts/extract_dart_defines.sh ios/scripts/generate_provisioning_config.sh
       
