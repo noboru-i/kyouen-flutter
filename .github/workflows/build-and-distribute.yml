@@ -122,14 +122,19 @@ jobs:
           name: ios-app-${{ github.event.inputs.environment }}
           path: build/ios/ipa/*.ipa
       
+      - name: Install Firebase CLI
+        run: curl -sL https://firebase.tools | bash
+
       - name: Distribute to Firebase App Distribution (iOS)
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-          groups: testers
-          file: build/ios/ipa/*.ipa
-          releaseNotes: "Build from GitHub Actions - iOS ${{ github.event.inputs.environment }}"
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > $RUNNER_TEMP/firebase-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json
+          firebase appdistribution:distribute build/ios/ipa/*.ipa \
+            --app ${{ secrets.FIREBASE_IOS_APP_ID }} \
+            --groups testers \
+            --release-notes "Build from GitHub Actions - iOS ${{ github.event.inputs.environment }}"
       
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
@@ -213,14 +218,19 @@ jobs:
           name: android-aab-${{ github.event.inputs.environment }}
           path: build/app/outputs/bundle/release/app-release.aab
       
+      - name: Install Firebase CLI
+        run: curl -sL https://firebase.tools | bash
+
       - name: Distribute APK to Firebase App Distribution (Android)
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-          groups: testers
-          file: build/app/outputs/flutter-apk/app-release.apk
-          releaseNotes: "Build from GitHub Actions - Android ${{ github.event.inputs.environment }}"
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > $RUNNER_TEMP/firebase-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json
+          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+            --app ${{ secrets.FIREBASE_ANDROID_APP_ID }} \
+            --groups testers \
+            --release-notes "Build from GitHub Actions - Android ${{ github.event.inputs.environment }}"
 
   deploy-web:
     name: Deploy Web App
