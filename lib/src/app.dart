@@ -12,12 +12,9 @@ import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  static final navigatorKey = GlobalKey<NavigatorState>();
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: navigatorKey,
       restorationScopeId: 'app',
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -44,22 +41,7 @@ class MyApp extends StatelessWidget {
               case AccountPage.routeName:
                 return const AccountPage();
               default:
-                if (routeSettings.name?.startsWith('/link') ?? false) {
-                  // Firebase auth redirect (e.g. Twitter login callback).
-                  // Replace the stack so that back button returns to TitlePage.
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                      AccountPage.routeName,
-                      (route) => route.settings.name == TitlePage.routeName,
-                    );
-                  });
-                  return const SizedBox.shrink();
-                }
-                if (kIsWeb) {
-                  return const WebTitlePage();
-                } else {
-                  return const TitlePage();
-                }
+                throw Exception();
             }
           },
         );
