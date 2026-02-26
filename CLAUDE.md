@@ -10,22 +10,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **プロジェクトタイプ**: Flutter mobile/webアプリケーション
 - **メイン言語**: Dart with Flutter framework
 - **アーキテクチャパターン**: Feature-based architecture with Riverpod state management
-- **現在のステータス**: 最近dio+retrofitからhttp+Chopperに移行完了
 
 ## 依存関係とTechnology Stack
 
 ### Core Dependencies (pubspec.yaml)
-- **Flutter**: ^3.38.5 (SDK >=3.10.4 <4.0.0)
-- **State Management**: flutter_riverpod ^2.6.1, riverpod_annotation ^2.3.5
-- **API Client**: chopper ^8.1.0, http ^1.4.0 (最近dio+retrofitから移行)
-- **Serialization**: json_annotation ^4.9.0, freezed_annotation ^3.0.0
-- **Firebase**: firebase_core ^3.14.0, firebase_auth ^5.6.0, firebase_analytics ^11.5.0, firebase_crashlytics ^4.3.7, firebase_performance ^0.10.1
-- **Game Logic**: kyouen ^0.0.1 (パズルロジック用カスタムパッケージ)
+- **State Management**: flutter_riverpod, riverpod_annotation
+- **API Client**: chopper, http
+- **Serialization**: json_annotation, freezed_annotation
+- **Firebase**: firebase_core, firebase_auth, firebase_analytics, firebase_crashlytics, firebase_performance
+- **Local Storage**: sqflite, sqflite_common_ffi_web, shared_preferences
+- **Game Logic**: kyouen (パズルロジック用カスタムパッケージ)
+- **Localization**: flutter_localizations
 - **Logging**: logger
 
 ### Dev Dependencies
-- **Code Generation**: build_runner ^2.4.13, chopper_generator ^8.1.0, freezed ^3.0.6, json_serializable ^6.8.0, riverpod_generator ^2.6.5
-- **Linting**: flutter_lints ^5.0.0, custom_lint ^0.7.5, pedantic_mono ^1.28.0, riverpod_lint ^2.6.5
+- **Code Generation**: build_runner, chopper_generator, freezed, json_serializable, riverpod_generator
+- **Linting**: flutter_lints, custom_lint, pedantic_mono, riverpod_lint
+- **Icons**: flutter_launcher_icons
 
 ## プロジェクトアーキテクチャ
 
@@ -40,30 +41,49 @@ lib/
     │   └── environment.dart     # 環境設定
     ├── data/
     │   ├── api/
-    │   │   ├── api_client.dart         # Chopper API client
-    │   │   ├── api_client.chopper.dart # 生成されたChopperコード
+    │   │   ├── api_client.dart              # Chopper API client
+    │   │   ├── firebase_auth_interceptor.dart # Firebase認証インターセプター
     │   │   ├── json_serializable_converter.dart # カスタムJSON converter
-    │   │   └── entity/          # API data models (Freezed使用)
-    │   └── local/              # SQLite関連
-    │       ├── database.dart           # SQLiteデータベース設定
-    │       ├── cleared_stages_service.dart # クリア状況管理
-    │       ├── dao/                    # Data Access Object層
-    │       │   └── tume_kyouen_dao.dart
-    │       └── entity/                 # ローカルデータモデル
-    │           └── tume_kyouen.dart
+    │   │   └── entity/                      # API data models (Freezed使用)
+    │   ├── local/                           # SQLite関連
+    │   │   ├── database.dart                # SQLiteデータベース設定
+    │   │   ├── last_stage_service.dart      # 最後のステージ管理
+    │   │   ├── dao/                         # Data Access Object層
+    │   │   │   └── tume_kyouen_dao.dart
+    │   │   └── entity/                      # ローカルデータモデル
+    │   │       └── tume_kyouen.dart
+    │   └── repository/                      # リポジトリ層
+    │       ├── stage_repository.dart        # ステージデータ管理
+    │       └── web_title_repository.dart    # Webタイトルデータ管理
     ├── features/               # Feature-based構成
-    │   ├── sign_in/           # ユーザー認証
+    │   ├── account/           # アカウント管理
+    │   │   ├── account_page.dart
+    │   │   └── account_service.dart
     │   ├── stage/             # ゲームステージロジック
+    │   │   ├── stage_page.dart
+    │   │   ├── stage_service.dart
+    │   │   └── widgets/
+    │   │       └── stage_board.dart
     │   └── title/             # タイトル画面
+    │       ├── native_title_page.dart       # ネイティブ向けタイトル画面
+    │       ├── web_title_page.dart          # Web向けタイトル画面
+    │       └── views/
+    │           ├── account_button.dart
+    │           ├── my_app_bar.dart
+    │           └── my_drawer.dart
     ├── localization/          # i18n対応 (英語)
-    ├── settings/              # アプリ設定
     └── widgets/               # 共通Widgetコンポーネント
-        └── common/            # アプリ全体で使用される共通Widget
-            └── background_widget.dart # モノトーングラデーション背景Widget
+        ├── common/            # アプリ全体で使用される共通Widget
+        │   ├── background_widget.dart           # モノトーングラデーション背景Widget
+        │   ├── circle_overlay_widget.dart       # 円オーバーレイWidget
+        │   ├── kyouen_answer_overlay_widget.dart # 共円解答オーバーレイWidget
+        │   └── kyouen_success_dialog.dart       # 共円成功ダイアログ
+        └── theme/
+            └── app_theme.dart                   # アプリテーマ定義
 ```
 
 ### アーキテクチャパターン
-- **Feature-based architecture**: 機能別にコードを整理 (sign_in, stage, title)
+- **Feature-based architecture**: 機能別にコードを整理 (account, stage, title)
 - **Riverpod for state management**: dependency injectionと状態管理にproviderを使用
 - **Repository pattern**: ChopperによるAPI clientの抽象化
 - **Clean architecture**: data, domain, presentation layerの分離
@@ -88,100 +108,25 @@ lib/
 
 ## 開発用コマンド
 
-### アプリの実行
+Makefileにまとめられています。`make help` で一覧を確認できます。
+
+コード生成のwatch modeのみMakefileに含まれていません:
 ```bash
-# 開発環境
-./scripts/run_dev.sh
-# または手動で:
-flutter run --dart-define-from-file=.env.dev
-
-# 本番環境
-./scripts/run_prod.sh
-# または手動で:
-flutter run --dart-define-from-file=.env.prod
-```
-
-### アプリのビルド
-```bash
-# 開発用ビルド
-./scripts/build_dev.sh
-
-# 本番用ビルド
-./scripts/build_prod.sh
-```
-
-### テスト
-```bash
-# 開発環境でのテスト実行
-./scripts/test_dev.sh
-
-# 標準Flutter test
-flutter test
-```
-
-### コード生成
-```bash
-# 全コード生成 (Riverpod, Freezed, JSON, Chopper)
-dart run build_runner build
-
-# 開発用watch mode
 dart run build_runner watch
-
-# クリーンして再ビルド
-dart run build_runner build --delete-conflicting-outputs
-```
-
-### Linting
-```bash
-# Linter実行
-flutter analyze
-
-# Custom lint
-dart run custom_lint
 ```
 
 ## Firebase設定
 
-### 自動設定
-スクリプトが適切な環境用にFirebaseを自動設定:
+`make run-dev` / `make build-dev` などのMakefileターゲットがFirebaseの設定を自動で行います:
 - 開発環境: プロジェクト api-project-732262258565 を使用
 - 本番環境: プロジェクト my-android-server を使用
 
-### 手動Firebase設定 (必要な場合)
-```bash
-# 開発環境
-flutterfire configure \
-  --project api-project-732262258565 \
-  --android-package-name hm.orz.chaos114.android.tumekyouen.dev \
-  --ios-bundle-id hm.orz.chaos114.TumeKyouen.dev \
-  --platforms=android,ios,web
-
-# 本番環境
-flutterfire configure \
-  --project my-android-server \
-  --android-package-name hm.orz.chaos114.android.tumekyouen \
-  --ios-bundle-id hm.orz.chaos114.TumeKyouen \
-  --platforms=android,ios,web
-```
-
 ## コード生成設定
 
-### build.yaml
-- **json_serializable**: API entities用にsnake_case field namingで設定 (`field_rename: snake`)
-- **freezed**: API entities用のimmutable data classを生成
-- **対象ディレクトリ**: `lib/src/data/**/*.dart`
+`make gen` でコード生成を実行します（対象: `lib/src/data/**/*.dart`）。
 
-### JSON フィールド命名規則
-- **重要**: `build.yaml`で`field_rename: snake`が設定されているため、通常は`@JsonKey`アノテーションは不要
-- Dartのフィールド名（camelCase）は自動的にJSON（snake_case）に変換される
-- 例: `stageNo` → `stage_no`, `screenName` → `screen_name`
-- APIスペックと異なる場合のみ`@JsonKey(name: 'custom_name')`を使用
-
-### 生成ファイル (gitignore対象)
-- `*.g.dart` - JSON serialization
-- `*.freezed.dart` - Freezed immutable classes
-- `*.chopper.dart` - Chopper API client
-- `firebase_options.dart` - Firebase設定
+- **JSON命名規則**: `build.yaml` で `field_rename: snake` が設定済みのため、通常 `@JsonKey` は不要。Dartのcamelケース（`stageNo`）は自動的にsnake_case（`stage_no`）に変換される。APIスペックと異なる場合のみ `@JsonKey(name: 'custom_name')` を使用。
+- **生成ファイル** (gitignore対象): `*.g.dart`, `*.freezed.dart`, `*.chopper.dart`, `firebase_options.dart`
 
 ## Linting設定 (analysis_options.yaml)
 
@@ -231,11 +176,11 @@ flutterfire configure \
 
 ## 今後の開発における重要な注意点
 
-1. **生成コード**: API entitiesまたはprovidersを変更した後は必ず`dart run build_runner build`を実行
+1. **生成コード**: API entitiesまたはprovidersを変更した後は必ず`make gen`を実行
 2. **環境**: 適切なFirebase設定を確保するため、実行/ビルドにはスクリプトを使用
 3. **API Client**: カスタムJsonSerializableConverterがURLパターンに基づいて型変換を処理
 4. **Firebase**: 設定ファイルは自動生成されgitignore対象
-5. **テスト**: 開発環境でのテストには `./scripts/test_dev.sh` を使用
+5. **テスト**: 開発環境でのテストには `make test` を使用
 6. **State Management**: 新機能にはRiverpodパターンに従う
 7. **Localization**: 現在は英語のみ対応だが、i18n基盤は整備済み
 8. **データアーキテクチャ**: 新しいデータ操作はSQLite-firstパターンに従う（API → SQLite → UI）
@@ -249,25 +194,5 @@ flutterfire configure \
 
 プロジェクト用のカスタムスラッシュコマンドが `.claude/commands/` ディレクトリで定義されています：
 
-### /ship
+### /create-pr
 新しいブランチを作成し、変更をコミット・プッシュしてPRを作成するワークフローを実行します。
-
-```
-/ship <branch-name> <commit-message>
-```
-
-例：
-```
-/ship feature/new-stage-ui "新しいステージUI画面の追加"
-```
-
-実行内容：
-1. 新しいブランチを作成してチェックアウト
-2. 変更をステージングしてコミット
-3. リモートブランチにプッシュ
-4. PRを作成（mainブランチに対して）
-
-## ブランチ情報
-- **現在のブランチ**: migrate-to-chopper
-- **最近の作業**: dio+retrofitからhttp+ChopperへのAPI client移行
-- **ステータス**: 移行完了、統合準備完了
