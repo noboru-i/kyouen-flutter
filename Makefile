@@ -1,4 +1,4 @@
-.PHONY: help run-dev run-prod build-dev build-prod test gen analyze lint
+.PHONY: help run-dev run-prod build-dev build-prod test gen analyze
 
 help:
 	@echo "Usage: make <target>"
@@ -17,7 +17,6 @@ help:
 	@echo "Code:"
 	@echo "  gen         コード生成 (Riverpod, Freezed, JSON, Chopper)"
 	@echo "  analyze     flutter analyze 実行"
-	@echo "  lint        custom_lint 実行"
 
 run-dev:
 	flutterfire configure \
@@ -65,6 +64,3 @@ gen:
 
 analyze:
 	flutter analyze
-
-lint:
-	dart analyze
