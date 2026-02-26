@@ -50,7 +50,6 @@ flutter:
   generate: true
 
   assets:
-    - assets/images/
     - assets/icons/
 
 flutter_launcher_icons:
