@@ -25,6 +25,14 @@ class OptionsPage extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.description_outlined),
+            title: const Text('ライセンス'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              showLicensePage(context: context);
+            },
+          ),
         ],
       ),
     );

@@ -57,6 +57,13 @@ class MyDrawer extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.description_outlined),
+            title: const Text('ライセンス'),
+            onTap: () {
+              showLicensePage(context: context);
+            },
+          ),
         ],
       ),
     );
