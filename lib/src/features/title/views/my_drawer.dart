@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -44,6 +45,16 @@ class MyDrawer extends StatelessWidget {
             title: const Text('設定'),
             onTap: () {
               Navigator.restorablePushNamed(context, AccountPage.routeName);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('プライバシーポリシー'),
+            onTap: () {
+              Navigator.restorablePushNamed(
+                context,
+                PrivacyPolicyPage.routeName,
+              );
             },
           ),
         ],

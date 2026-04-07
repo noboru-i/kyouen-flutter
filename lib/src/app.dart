@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/features/options/options_page.dart';
+import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 import 'package:kyouen_flutter/src/features/title/web_title_page.dart';
@@ -40,6 +42,10 @@ class MyApp extends StatelessWidget {
                 return const StagePage();
               case AccountPage.routeName:
                 return const AccountPage();
+              case OptionsPage.routeName:
+                return const OptionsPage();
+              case PrivacyPolicyPage.routeName:
+                return const PrivacyPolicyPage();
               default:
                 throw Exception();
             }
