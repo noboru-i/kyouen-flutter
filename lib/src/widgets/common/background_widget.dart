@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// アプリ全体で共通のダークグラデーション背景。
+/// サブページ (アカウント・オプション・ステージ等) で使用する装飾円なし版。
+/// タイトル画面は native_title_page.dart の _TitleBackground (装飾円付き) を使用。
 class BackgroundWidget extends StatelessWidget {
   const BackgroundWidget({super.key, required this.child});
 
@@ -13,8 +16,8 @@ class BackgroundWidget extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFFE5E5E5), // Light gray
-            Color(0xFFC0C0C0), // Darker gray
+            Color(0xFF1C2334), // ダークネイビー
+            Color(0xFF0D1117), // 深夜ブラック
           ],
         ),
       ),

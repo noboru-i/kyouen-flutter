@@ -1,13 +1,16 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:kyouen/kyouen.dart';
+
+const _kAccent = Color(0xFFFF6B35);
 
 class KyouenAnswerOverlayWidget extends StatefulWidget {
   const KyouenAnswerOverlayWidget({
     super.key,
     required this.kyouenData,
     required this.boardSize,
-    this.animationDuration = const Duration(milliseconds: 800),
+    this.animationDuration = const Duration(milliseconds: 500),
   });
 
   final KyouenData kyouenData;
@@ -49,22 +52,18 @@ class _KyouenAnswerOverlayWidgetState extends State<KyouenAnswerOverlayWidget>
     return Center(
       child: AspectRatio(
         aspectRatio: 1,
-        child: Card(
-          color: Colors.transparent,
-          elevation: 0,
-          child: AnimatedBuilder(
-            animation: _animation,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: KyouenAnswerPainter(
-                  kyouenData: widget.kyouenData,
-                  boardSize: widget.boardSize,
-                  animationValue: _animation.value,
-                ),
-                child: Container(),
-              );
-            },
-          ),
+        child: AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return CustomPaint(
+              painter: KyouenAnswerPainter(
+                kyouenData: widget.kyouenData,
+                boardSize: widget.boardSize,
+                animationValue: _animation.value,
+              ),
+              child: Container(),
+            );
+          },
         ),
       ),
     );
@@ -84,24 +83,22 @@ class KyouenAnswerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = const Color(0xFFFF6B35)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 4;
+    // 暗めのオーバーレイで盤面を少し沈め、円を浮き立たせる
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = Colors.black.withValues(alpha: 0.18 * animationValue),
+    );
 
     final cellSize = size.width / boardSize;
 
     if (kyouenData.isLineKyouen) {
-      // 直線の場合
-      _drawLine(canvas, size, paint, cellSize);
+      _drawLine(canvas, size, cellSize);
     } else {
-      // 円の場合
-      _drawCircle(canvas, size, paint, cellSize);
+      _drawCircle(canvas, size, cellSize);
     }
   }
 
-  void _drawLine(Canvas canvas, Size size, Paint paint, double cellSize) {
+  void _drawLine(Canvas canvas, Size size, double cellSize) {
     final line = kyouenData.line;
     if (line == null) {
       return;
@@ -113,19 +110,16 @@ class KyouenAnswerPainter extends CustomPainter {
     double stopY;
 
     if (line.a == 0) {
-      // x軸と平行な場合
       startX = 0;
       startY = line.getY(0) * cellSize + cellSize / 2;
       stopX = size.width;
       stopY = line.getY(0) * cellSize + cellSize / 2;
     } else if (line.b == 0) {
-      // y軸と平行な場合
       startX = line.getX(0) * cellSize + cellSize / 2;
       startY = 0;
       stopX = line.getX(0) * cellSize + cellSize / 2;
       stopY = size.height;
     } else {
-      // 一般的な場合
       if (-line.c / line.b > 0) {
         startX = 0;
         startY = line.getY(-0.5) * cellSize + cellSize / 2;
@@ -139,18 +133,34 @@ class KyouenAnswerPainter extends CustomPainter {
       }
     }
 
-    // アニメーションに応じて線の長さを調整
     final animatedEndX = startX + (stopX - startX) * animationValue;
     final animatedEndY = startY + (stopY - startY) * animationValue;
+    final start = Offset(startX, startY);
+    final end = Offset(animatedEndX, animatedEndY);
 
-    canvas.drawLine(
-      Offset(startX, startY),
-      Offset(animatedEndX, animatedEndY),
-      paint,
-    );
+    canvas
+      // グロー層
+      ..drawLine(
+        start,
+        end,
+        Paint()
+          ..color = _kAccent.withValues(alpha: 0.35)
+          ..strokeWidth = 14
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+      )
+      // 本線
+      ..drawLine(
+        start,
+        end,
+        Paint()
+          ..color = _kAccent
+          ..strokeWidth = 4
+          ..strokeCap = StrokeCap.round,
+      );
   }
 
-  void _drawCircle(Canvas canvas, Size size, Paint paint, double cellSize) {
+  void _drawCircle(Canvas canvas, Size size, double cellSize) {
     final center = kyouenData.center;
     final radius = kyouenData.radius;
 
@@ -161,21 +171,38 @@ class KyouenAnswerPainter extends CustomPainter {
     final centerX = center.x * cellSize + cellSize / 2;
     final centerY = center.y * cellSize + cellSize / 2;
     final drawRadius = radius * cellSize;
-
-    // 円弧の長さをアニメーションで調整（大きさは固定）
-    final sweepAngle = 2 * math.pi * animationValue; // 0から2πまで
+    final sweepAngle = 2 * math.pi * animationValue;
     final rect = Rect.fromCircle(
       center: Offset(centerX, centerY),
       radius: drawRadius,
     );
 
-    canvas.drawArc(
-      rect,
-      -math.pi / 2, // 上から開始（-π/2）
-      sweepAngle,
-      false,
-      paint,
-    );
+    canvas
+      // グロー層
+      ..drawArc(
+        rect,
+        -math.pi / 2,
+        sweepAngle,
+        false,
+        Paint()
+          ..color = _kAccent.withValues(alpha: 0.35)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 14
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+      )
+      // 本線
+      ..drawArc(
+        rect,
+        -math.pi / 2,
+        sweepAngle,
+        false,
+        Paint()
+          ..color = _kAccent
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4
+          ..strokeCap = StrokeCap.round,
+      );
   }
 
   @override

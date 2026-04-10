@@ -166,10 +166,13 @@ class _Footer extends ConsumerWidget {
                   // Show kyouen overlay
                   ref.read(showKyouenOverlayProvider.notifier).show();
 
-                  // Mark stage as cleared
-                  await ref
-                      .read(currentStageProvider.notifier)
-                      .markCurrentStageCleared();
+                  // オーバーレイアニメーション(500ms)完了を待ちつつ、DB書き込みを並列実行
+                  await Future.wait([
+                    Future<void>.delayed(const Duration(milliseconds: 600)),
+                    ref
+                        .read(currentStageProvider.notifier)
+                        .markCurrentStageCleared(),
+                  ]);
 
                   if (context.mounted) {
                     await showKyouenSuccessDialog(
@@ -243,7 +246,6 @@ class _Body extends ConsumerWidget {
                     return KyouenAnswerOverlayWidget(
                       kyouenData: kyouenData,
                       boardSize: boardSize,
-                      animationDuration: const Duration(milliseconds: 1200),
                     );
                   }
                   return const SizedBox.shrink();

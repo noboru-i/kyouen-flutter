@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('en', '')],
       onGenerateTitle: (BuildContext context) => Environment.appName,
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.darkTheme,
       onGenerateRoute: (RouteSettings routeSettings) {
         return MaterialPageRoute<void>(
           settings: routeSettings,
