@@ -10,6 +10,13 @@
 
 詳細な開発コマンドやアーキテクチャについては、[CLAUDE.md](./CLAUDE.md)を参照してください。
 
+### Claude Code スキルのセットアップ
+
+以下のスキルはgitignore対象のため、別PCでセットアップする際は個別にインストールが必要です。
+
+- **playwright-cli**: ブラウザ自動操作スキル
+  インストール方法は https://github.com/microsoft/playwright-cli を参照してください。
+
 ### クイックスタート
 
 ```bash

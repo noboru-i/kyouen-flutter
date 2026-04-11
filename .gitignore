@@ -74,3 +74,7 @@ android/app/cert/release.keystore
 # Web SQLite files
 web/sqflite_sw.js
 web/sqlite3.wasm
+
+# Playwright CLI temporary files
+.playwright-cli/
+.claude/skills/playwright-cli/
