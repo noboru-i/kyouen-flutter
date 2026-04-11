@@ -8,7 +8,8 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       foregroundColor: Colors.white,
       actions: [
         StreamBuilder<User?>(
@@ -19,6 +20,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () {
                   Navigator.restorablePushNamed(context, AccountPage.routeName);
                 },
+                style: TextButton.styleFrom(foregroundColor: Colors.white),
                 child: const Text('ログイン'),
               );
             }
@@ -27,6 +29,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () {
                 FirebaseAuth.instance.signOut();
               },
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
               child: const Text('ログアウト'),
             );
           },

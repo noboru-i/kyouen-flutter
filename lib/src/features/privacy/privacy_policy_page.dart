@@ -9,12 +9,15 @@ class PrivacyPolicyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Privacy Policy'),
-      ),
-      body: BackgroundWidget(
-        child: FutureBuilder<String>(
+    return BackgroundWidget(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text('Privacy Policy'),
+        ),
+        body: FutureBuilder<String>(
           future: rootBundle.loadString('assets/privacy_policy.md'),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

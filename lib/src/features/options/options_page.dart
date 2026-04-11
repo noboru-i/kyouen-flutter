@@ -9,12 +9,15 @@ class OptionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('オプション'),
-      ),
-      body: BackgroundWidget(
-        child: ListView(
+    return BackgroundWidget(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text('オプション'),
+        ),
+        body: ListView(
           children: [
             ListTile(
               leading: const Icon(Icons.privacy_tip_outlined),

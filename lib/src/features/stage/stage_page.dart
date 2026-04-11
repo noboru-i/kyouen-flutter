@@ -36,10 +36,11 @@ class StagePage extends ConsumerWidget {
     // initialize and keep instance
     ref.watch(currentStageNoProvider);
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: const BackgroundWidget(
-        child: SafeArea(
+    return BackgroundWidget(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+        body: const SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

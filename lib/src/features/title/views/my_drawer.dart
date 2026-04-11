@@ -10,6 +10,7 @@ class MyDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: const Color(0xFF1C2334),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -17,39 +18,57 @@ class MyDrawer extends StatelessWidget {
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Container();
+                return const SizedBox(height: 16);
               }
 
               final user = snapshot.data!;
               return UserAccountsDrawerHeader(
-                decoration: const BoxDecoration(color: Colors.blue),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF1C2334), Color(0xFF0D1117)],
+                  ),
+                ),
                 currentAccountPicture: CircleAvatar(
                   backgroundImage: NetworkImage(
                     user.photoURL ?? 'https://via.placeholder.com/150',
                   ),
                 ),
-                accountName: Text(user.displayName ?? 'ゲスト'),
-                accountEmail: Text(user.email ?? ''),
+                accountName: Text(
+                  user.displayName ?? 'ゲスト',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                accountEmail: Text(
+                  user.email ?? '',
+                  style: const TextStyle(color: Colors.white70),
+                ),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('ホーム'),
+            leading: const Icon(Icons.home, color: Colors.white70),
+            title: const Text('ホーム', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.restorablePushNamed(context, TitlePage.routeName);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('設定'),
+            leading: const Icon(Icons.settings, color: Colors.white70),
+            title: const Text('設定', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.restorablePushNamed(context, AccountPage.routeName);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('プライバシーポリシー'),
+            leading: const Icon(
+              Icons.privacy_tip_outlined,
+              color: Colors.white70,
+            ),
+            title: const Text(
+              'プライバシーポリシー',
+              style: TextStyle(color: Colors.white),
+            ),
             onTap: () {
               Navigator.restorablePushNamed(
                 context,
@@ -58,8 +77,14 @@ class MyDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.description_outlined),
-            title: const Text('ライセンス'),
+            leading: const Icon(
+              Icons.description_outlined,
+              color: Colors.white70,
+            ),
+            title: const Text(
+              'ライセンス',
+              style: TextStyle(color: Colors.white),
+            ),
             onTap: () {
               showLicensePage(context: context);
             },
