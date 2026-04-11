@@ -56,11 +56,13 @@ void main() {
         ),
       );
 
-      // Wait for async operations to complete
+      // Advance past the 500ms Future.delayed timer in _KyouenDiagramState
+      await tester.pump(const Duration(milliseconds: 600));
+      // Wait for async operations (FutureBuilder) to complete
       await tester.pumpAndSettle();
 
       // Verify that stage count is displayed
-      expect(find.text('クリアステージ数: 3 / 10'), findsOneWidget);
+      expect(find.text('3 / 10 ステージクリア'), findsOneWidget);
 
       // Verify that the main UI elements are present
       expect(find.text('スタート'), findsOneWidget);
@@ -85,8 +87,12 @@ void main() {
         ),
       );
 
-      // Before pumpAndSettle, should show loading state
-      expect(find.text('ステージ情報を読み込み中...'), findsOneWidget);
+      // Before async operations complete, should show loading state
+      expect(find.text('読み込み中...'), findsOneWidget);
+
+      // Clean up: advance past the 500ms Future.delayed timer in _KyouenDiagramState
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
     });
   });
 }

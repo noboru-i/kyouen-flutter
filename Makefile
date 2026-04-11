@@ -57,7 +57,7 @@ build-prod:
 	flutter build web --dart-define-from-file=.env.prod
 
 test:
-	flutter test test/environment_test.dart --dart-define-from-file=.env.prod
+	flutter test --dart-define-from-file=.env.prod
 
 gen:
 	dart run build_runner build --delete-conflicting-outputs
