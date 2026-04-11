@@ -1,6 +1,7 @@
 import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,13 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:kyouen_flutter/firebase_options.dart';
 import 'package:kyouen_flutter/src/app.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
+
+/// バックグラウンド・終了状態でのFCMメッセージハンドラー
+/// トップレベル関数である必要がある
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,4 +73,16 @@ Future<void> _setupFirebase() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
+  await _setupMessaging();
+}
+
+Future<void> _setupMessaging() async {
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  final messaging = FirebaseMessaging.instance;
+  final settings = await messaging.requestPermission();
+  if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+      settings.authorizationStatus == AuthorizationStatus.provisional) {
+    await messaging.subscribeToTopic('stage_added');
+  }
 }
