@@ -73,7 +73,9 @@ Future<void> _setupFirebase() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
-  await _setupMessaging();
+  if (!kIsWeb) {
+    await _setupMessaging();
+  }
 }
 
 Future<void> _setupMessaging() async {
