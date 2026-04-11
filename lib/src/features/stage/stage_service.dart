@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen/kyouen.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
@@ -10,6 +11,10 @@ import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stage_service.g.dart';
+
+/// ディープリンク/URLパラメーターから読み取った初期ステージ番号。
+/// アプリ起動時に ProviderScope.overrides で上書きされる。
+final initialDeepLinkStageNoProvider = Provider<int?>((ref) => null);
 
 enum StoneState {
   none('0'), // 空
@@ -113,6 +118,10 @@ LastStageService lastStageService(Ref ref) {
 class CurrentStageNo extends _$CurrentStageNo {
   @override
   Future<int> build() async {
+    final deepLinkStageNo = ref.read(initialDeepLinkStageNoProvider);
+    if (deepLinkStageNo != null) {
+      return deepLinkStageNo;
+    }
     final lastStageService = ref.read(lastStageServiceProvider);
     final lastStageNo = await lastStageService.getLastStageNo();
     return lastStageNo ?? 1;

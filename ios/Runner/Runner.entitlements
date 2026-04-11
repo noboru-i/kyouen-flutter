@@ -8,5 +8,10 @@
 	<array>
 		<string>Default</string>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:kyouen.app</string>
+		<string>applinks:api-project-732262258565.web.app</string>
+	</array>
 </dict>
 </plist>

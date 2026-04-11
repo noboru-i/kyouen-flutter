@@ -45,6 +45,9 @@ build-dev:
 	  --platforms=android,ios,web \
 	  --yes
 	flutter build web --dart-define-from-file=.env.dev
+	mkdir -p build/web/.well-known
+	cp web/.well-known/dev/assetlinks.json build/web/.well-known/assetlinks.json
+	cp web/.well-known/dev/apple-app-site-association build/web/.well-known/apple-app-site-association
 
 build-prod:
 	ios/scripts/generate_provisioning_config.sh prod
@@ -55,6 +58,9 @@ build-prod:
 	  --platforms=android,ios,web \
 	  --yes
 	flutter build web --dart-define-from-file=.env.prod
+	mkdir -p build/web/.well-known
+	cp web/.well-known/prod/assetlinks.json build/web/.well-known/assetlinks.json
+	cp web/.well-known/prod/apple-app-site-association build/web/.well-known/apple-app-site-association
 
 test:
 	flutter test --dart-define-from-file=.env.prod

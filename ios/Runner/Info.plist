@@ -32,6 +32,16 @@
 				<string>app-1-732262258565-ios-480016d65249c8aec956ec</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>kyouen</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kyouen</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>

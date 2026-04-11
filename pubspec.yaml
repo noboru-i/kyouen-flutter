@@ -9,6 +9,7 @@ environment:
   flutter: 3.41.6
 
 dependencies:
+  app_links: ^6.3.4
   chopper: ^8.5.1
   firebase_analytics: ^12.2.0
   firebase_auth: ^6.3.0
@@ -20,6 +21,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^3.3.1
+  flutter_web_plugins:
+    sdk: flutter
   freezed_annotation: ^3.1.0
   http: ^1.6.0
   json_annotation: ^4.11.0
