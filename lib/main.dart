@@ -5,7 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:kyouen_flutter/firebase_options.dart';
 import 'package:kyouen_flutter/src/app.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
