@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/data/repository/web_title_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
+import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
 import 'package:kyouen_flutter/src/features/title/views/my_app_bar.dart';
 import 'package:kyouen_flutter/src/features/title/views/my_drawer.dart';
@@ -335,6 +336,9 @@ class _WebStageCountDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stageRepositoryAsync = ref.watch(stageRepositoryProvider);
+    final totalAsync = ref.watch(totalStageCountProvider);
+
+    final totalCount = totalAsync.asData?.value ?? 0;
 
     return stageRepositoryAsync.when(
       loading: () => Container(
@@ -366,7 +370,8 @@ class _WebStageCountDisplay extends ConsumerWidget {
       data: (repository) => FutureBuilder<Map<String, int>>(
         future: repository.getStageCount(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              totalCount == 0) {
             return Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 20,
@@ -411,7 +416,6 @@ class _WebStageCountDisplay extends ConsumerWidget {
 
           final stageCount = snapshot.data ?? {};
           final clearedCount = stageCount['clear_count'] ?? 0;
-          final totalCount = stageCount['count'] ?? 0;
 
           return Container(
             padding: const EdgeInsets.symmetric(

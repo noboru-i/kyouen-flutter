@@ -6,6 +6,7 @@ import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/options/options_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
+import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
 
 const _kBgTop = Color(0xFF1C2334);
@@ -335,6 +336,9 @@ class _StageProgressDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stageRepositoryAsync = ref.watch(stageRepositoryProvider);
+    final totalAsync = ref.watch(totalStageCountProvider);
+
+    final total = totalAsync.asData?.value ?? 0;
 
     return stageRepositoryAsync.when(
       loading: () => const _ProgressView(cleared: 0, total: 0, isLoading: true),
@@ -343,10 +347,10 @@ class _StageProgressDisplay extends ConsumerWidget {
         future: repository.getStageCount(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const _ProgressView(
+            return _ProgressView(
               cleared: 0,
-              total: 0,
-              isLoading: true,
+              total: total,
+              isLoading: total == 0,
             );
           }
           if (snapshot.hasError) {
@@ -355,7 +359,6 @@ class _StageProgressDisplay extends ConsumerWidget {
 
           final stageCount = snapshot.data!;
           final cleared = stageCount['clear_count'] ?? 0;
-          final total = stageCount['count'] ?? 0;
 
           return _ProgressView(cleared: cleared, total: total);
         },

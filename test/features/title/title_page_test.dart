@@ -3,6 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
+import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
+
+// totalStageCountProvider のモック（常に 10 を返す）
+class MockTotalStageCount extends TotalStageCount {
+  @override
+  Future<int> build() async => 10;
+}
 
 // Mock for testing
 class MockStageRepository implements StageRepository {
@@ -45,6 +52,7 @@ void main() {
           stageRepositoryProvider.overrideWith(
             (ref) => Future.value(MockStageRepository()),
           ),
+          totalStageCountProvider.overrideWith(MockTotalStageCount.new),
         ],
       );
 
@@ -77,6 +85,7 @@ void main() {
           stageRepositoryProvider.overrideWith(
             (ref) => Future.value(MockStageRepository()),
           ),
+          totalStageCountProvider.overrideWith(MockTotalStageCount.new),
         ],
       );
 

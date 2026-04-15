@@ -10,6 +10,7 @@ import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/recent_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/resource_error.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/api/entity/statics.dart';
 import 'package:kyouen_flutter/src/data/api/firebase_auth_interceptor.dart';
 import 'package:kyouen_flutter/src/data/api/json_serializable_converter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -52,6 +53,9 @@ abstract class ApiClient extends ChopperService {
 
   @DELETE(path: '/users/delete-account')
   Future<Response<void>> deleteAccount();
+
+  @GET(path: '/statics')
+  Future<Response<Statics>> getStatics();
 }
 
 @riverpod
@@ -66,6 +70,7 @@ ApiClient apiClient(Ref ref) {
       RecentStage: RecentStage.fromJson,
       StageResponse: StageResponse.fromJson,
       ResourceError: ResourceError.fromJson,
+      Statics: Statics.fromJson,
     }),
     interceptors: [
       FirebaseAuthInterceptor(),
