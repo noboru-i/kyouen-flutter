@@ -243,28 +243,30 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     needs: prepare
-    if: ${{ github.event.inputs.environment == 'dev' }}
-    
+
     steps:
       - name: Download prepared source
         uses: actions/download-artifact@v4
         with:
           name: prepared-source-${{ github.event.inputs.environment }}
           path: .
-      
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version-file: 'pubspec.yaml'
           channel: 'stable'
-      
+
       - name: Build web app
         run: flutter build web --release --dart-define-from-file=.env.${{ github.event.inputs.environment }}
-      
+
+      - name: Set Firebase Hosting config for environment
+        run: cp firebase.${{ github.event.inputs.environment }}.json firebase.json
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_API_PROJECT_732262258565 }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           channelId: live
-          projectId: api-project-732262258565
+          projectId: ${{ github.event.inputs.environment == 'dev' && 'api-project-732262258565' || 'my-android-server' }}
