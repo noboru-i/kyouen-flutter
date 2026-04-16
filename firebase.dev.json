@@ -10,7 +10,7 @@
       {
         "source": "/v2/**",
         "run": {
-          "serviceId": "kyouen-server-dev-732262258565",
+          "serviceId": "kyouen-server-dev",
           "region": "asia-northeast1"
         }
       },

@@ -10,7 +10,7 @@
       {
         "source": "/v2/**",
         "run": {
-          "serviceId": "my-android-server",
+          "serviceId": "kyouen-server-prod",
           "region": "asia-northeast1"
         }
       },
