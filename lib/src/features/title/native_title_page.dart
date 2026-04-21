@@ -335,34 +335,18 @@ class _StageProgressDisplay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stageRepositoryAsync = ref.watch(stageRepositoryProvider);
+    final stageCountAsync = ref.watch(stageCountProvider);
     final totalAsync = ref.watch(totalStageCountProvider);
 
     final total = totalAsync.asData?.value ?? 0;
 
-    return stageRepositoryAsync.when(
+    return stageCountAsync.when(
       loading: () => const _ProgressView(cleared: 0, total: 0, isLoading: true),
-      error: (error, stackTrace) => const SizedBox.shrink(),
-      data: (repository) => FutureBuilder<Map<String, int>>(
-        future: repository.getStageCount(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return _ProgressView(
-              cleared: 0,
-              total: total,
-              isLoading: total == 0,
-            );
-          }
-          if (snapshot.hasError) {
-            return const SizedBox.shrink();
-          }
-
-          final stageCount = snapshot.data!;
-          final cleared = stageCount['clear_count'] ?? 0;
-
-          return _ProgressView(cleared: cleared, total: total);
-        },
-      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (stageCount) {
+        final cleared = stageCount['clear_count'] ?? 0;
+        return _ProgressView(cleared: cleared, total: total);
+      },
     );
   }
 }

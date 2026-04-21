@@ -83,4 +83,36 @@ class TumeKyouenDao {
       whereArgs: [stageNo],
     );
   }
+
+  /// Inserts new stages and updates metadata for existing ones, preserving clear_flag/clear_date.
+  Future<void> insertOrUpdateStages(List<TumeKyouen> tumeKyouens) async {
+    final batch = _database.batch();
+    for (final tumeKyouen in tumeKyouens) {
+      batch.insert(
+        _tableName,
+        tumeKyouen.toJson()..remove('uid'),
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+      batch.rawUpdate(
+        'UPDATE $_tableName SET size=?, stage=?, creator=? WHERE stage_no=?',
+        [tumeKyouen.size, tumeKyouen.stage, tumeKyouen.creator, tumeKyouen.stageNo],
+      );
+    }
+    await batch.commit();
+  }
+
+  /// Bulk-updates clear status from server sync response.
+  /// Only updates stages that already exist locally.
+  Future<void> updateClearStatuses(Map<int, int> clearDateByStageNo) async {
+    final batch = _database.batch();
+    for (final entry in clearDateByStageNo.entries) {
+      batch.update(
+        _tableName,
+        {'clear_flag': TumeKyouen.cleared, 'clear_date': entry.value},
+        where: 'stage_no = ?',
+        whereArgs: [entry.key],
+      );
+    }
+    await batch.commit();
+  }
 }

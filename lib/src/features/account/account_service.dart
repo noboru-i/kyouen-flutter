@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
+import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -119,6 +120,17 @@ class AccountService extends _$AccountService {
     } on Exception catch (e) {
       logger.e('Login API call failed: $e');
       rethrow;
+    }
+
+    // Sync cleared stages after login; failures are non-fatal.
+    try {
+      if (!ref.mounted) return;
+      final stageRepository = await ref.read(stageRepositoryProvider.future);
+      await stageRepository.syncStages();
+      ref.invalidate(clearedStageNumbersProvider);
+      ref.invalidate(stageCountProvider);
+    } on Exception catch (e) {
+      logger.w('Sync after login failed (non-fatal): $e');
     }
   }
 }

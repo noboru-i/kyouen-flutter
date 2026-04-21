@@ -23,6 +23,14 @@ Future<Set<int>> clearedStageNumbers(Ref ref) async {
   return repository.getClearedStageNumbers();
 }
 
+@riverpod
+Future<Map<String, int>> stageCount(Ref ref) async {
+  // Depend on clearedStageNumbers so this refreshes when clear status changes.
+  ref.watch(clearedStageNumbersProvider);
+  final repository = await ref.watch(stageRepositoryProvider.future);
+  return repository.getStageCount();
+}
+
 class StageRepository {
   const StageRepository(this._apiClient, this._dao);
 
@@ -39,7 +47,6 @@ class StageRepository {
     );
 
     if (response.isSuccessful && response.body != null) {
-      // Save to local database
       final tumeKyouens = response.body!
           .map(
             (stage) => TumeKyouen(
@@ -53,7 +60,7 @@ class StageRepository {
           )
           .toList();
 
-      await _dao.insertAll(tumeKyouens);
+      await _dao.insertOrUpdateStages(tumeKyouens);
       return response.body!;
     }
 
@@ -64,7 +71,6 @@ class StageRepository {
     final response = await _apiClient.createStage(newStage);
 
     if (response.isSuccessful && response.body != null) {
-      // Save to local database
       final tumeKyouen = TumeKyouen(
         stageNo: response.body!.stageNo,
         size: response.body!.size,
@@ -74,7 +80,7 @@ class StageRepository {
         clearDate: 0,
       );
 
-      await _dao.insertAll([tumeKyouen]);
+      await _dao.insertOrUpdateStages([tumeKyouen]);
       return response.body!;
     }
 
@@ -83,18 +89,23 @@ class StageRepository {
 
   Future<void> clearStage(int stageNo, String userStage) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final clearStage = ClearStage(
-      stage: userStage,
-      clearDate: DateTime.now().toIso8601String(),
-    );
 
-    await _apiClient.clearStage(stageNo, clearStage);
+    try {
+      final clearStageRequest = ClearStage(
+        stage: userStage,
+        clearDate: DateTime.now().toIso8601String(),
+      );
+      await _apiClient.clearStage(stageNo, clearStageRequest);
+    } on Exception catch (_) {
+      // Offline or API error — the clear is stored locally and will sync later.
+    }
 
-    // Always update local database even if API call fails
     await _dao.clearStage(stageNo, now);
   }
 
-  Future<List<ClearedStage>> syncStages() async {
+  /// Sends locally cleared stages to server and updates local DB with the
+  /// server's merged cleared-stage list.
+  Future<void> syncStages() async {
     final clearedStages = await _dao.selectAllClearStage();
     final clearedStageRequests = clearedStages
         .map(
@@ -110,7 +121,16 @@ class StageRepository {
     final response = await _apiClient.syncStages(clearedStageRequests);
 
     if (response.isSuccessful && response.body != null) {
-      return response.body!;
+      final clearDateByStageNo = <int, int>{};
+      for (final cleared in response.body!) {
+        final clearDateMs =
+            DateTime.parse(cleared.clearDate).millisecondsSinceEpoch;
+        clearDateByStageNo[cleared.stageNo] = clearDateMs;
+      }
+      if (clearDateByStageNo.isNotEmpty) {
+        await _dao.updateClearStatuses(clearDateByStageNo);
+      }
+      return;
     }
 
     throw Exception('Failed to sync stages: ${response.error}');
@@ -133,7 +153,6 @@ class StageRepository {
     return _dao.selectAllClearStage();
   }
 
-  // Cleared stages management methods
   Future<Set<int>> getClearedStageNumbers() async {
     final clearedStages = await _dao.selectAllClearStage();
     return clearedStages.map((stage) => stage.stageNo).toSet();
