@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
+import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -67,6 +68,18 @@ class AccountService extends _$AccountService {
 
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> sync() async {
+    final logger = Logger();
+    try {
+      final repository = await ref.read(stageRepositoryProvider.future);
+      await repository.syncStages();
+      logger.i('Sync completed successfully');
+    } on Exception catch (e) {
+      logger.e('Sync failed: $e');
+      rethrow;
+    }
   }
 
   Future<void> deleteAccount() async {

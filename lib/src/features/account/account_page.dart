@@ -163,6 +163,28 @@ class _LogoutView extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 48),
+          // Sync button
+          SizedBox(
+            height: 56,
+            child: FilledButton(
+              onPressed: () => _sync(context, ref),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.sync, size: 20),
+                  SizedBox(width: 12),
+                  Text(
+                    'データを同期',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           // Logout button
           SizedBox(
             height: 56,
@@ -216,6 +238,23 @@ class _LogoutView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _sync(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(accountServiceProvider.notifier).sync();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('データを同期しました')),
+        );
+      }
+    } on Exception catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('同期に失敗しました: $e')),
+        );
+      }
+    }
   }
 
   void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {

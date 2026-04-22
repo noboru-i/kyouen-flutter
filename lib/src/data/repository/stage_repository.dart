@@ -94,7 +94,7 @@ class StageRepository {
     await _dao.clearStage(stageNo, now);
   }
 
-  Future<List<ClearedStage>> syncStages() async {
+  Future<void> syncStages() async {
     final clearedStages = await _dao.selectAllClearStage();
     final clearedStageRequests = clearedStages
         .map(
@@ -110,7 +110,14 @@ class StageRepository {
     final response = await _apiClient.syncStages(clearedStageRequests);
 
     if (response.isSuccessful && response.body != null) {
-      return response.body!;
+      for (final clearedStage in response.body!) {
+        final clearDate = DateTime.parse(clearedStage.clearDate);
+        await _dao.clearStage(
+          clearedStage.stageNo,
+          clearDate.millisecondsSinceEpoch,
+        );
+      }
+      return;
     }
 
     throw Exception('Failed to sync stages: ${response.error}');
