@@ -123,8 +123,9 @@ class StageRepository {
     if (response.isSuccessful && response.body != null) {
       final clearDateByStageNo = <int, int>{};
       for (final cleared in response.body!) {
-        final clearDateMs =
-            DateTime.parse(cleared.clearDate).millisecondsSinceEpoch;
+        final clearDateMs = DateTime.parse(
+          cleared.clearDate,
+        ).millisecondsSinceEpoch;
         clearDateByStageNo[cleared.stageNo] = clearDateMs;
       }
       if (clearDateByStageNo.isNotEmpty) {
