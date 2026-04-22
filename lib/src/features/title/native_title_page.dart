@@ -335,18 +335,15 @@ class _StageProgressDisplay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stageCountAsync = ref.watch(stageCountProvider);
+    final clearedAsync = ref.watch(clearedStageCountProvider);
     final totalAsync = ref.watch(totalStageCountProvider);
 
     final total = totalAsync.asData?.value ?? 0;
 
-    return stageCountAsync.when(
+    return clearedAsync.when(
       loading: () => const _ProgressView(cleared: 0, total: 0, isLoading: true),
       error: (_, _) => const SizedBox.shrink(),
-      data: (stageCount) {
-        final cleared = stageCount['clear_count'] ?? 0;
-        return _ProgressView(cleared: cleared, total: total);
-      },
+      data: (cleared) => _ProgressView(cleared: cleared, total: total),
     );
   }
 }

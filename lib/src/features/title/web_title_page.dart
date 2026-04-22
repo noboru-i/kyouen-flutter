@@ -335,12 +335,12 @@ class _ActivitiesDisplay extends ConsumerWidget {
 class _WebStageCountDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stageCountAsync = ref.watch(stageCountProvider);
+    final clearedAsync = ref.watch(clearedStageCountProvider);
     final totalAsync = ref.watch(totalStageCountProvider);
 
     final totalCount = totalAsync.asData?.value ?? 0;
 
-    return stageCountAsync.when(
+    return clearedAsync.when(
       loading: () => Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
@@ -367,27 +367,24 @@ class _WebStageCountDisplay extends ConsumerWidget {
           style: TextStyle(fontSize: 14, color: Color(0xFFE53935)),
         ),
       ),
-      data: (stageCount) {
-        final clearedCount = stageCount['clear_count'] ?? 0;
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppTheme.accentColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppTheme.accentColor.withValues(alpha: 0.4),
-            ),
+      data: (clearedCount) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppTheme.accentColor.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppTheme.accentColor.withValues(alpha: 0.4),
           ),
-          child: Text(
-            'クリアステージ数: $clearedCount / $totalCount',
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppTheme.accentColor,
-              fontWeight: FontWeight.w500,
-            ),
+        ),
+        child: Text(
+          'クリアステージ数: $clearedCount / $totalCount',
+          style: const TextStyle(
+            fontSize: 14,
+            color: AppTheme.accentColor,
+            fontWeight: FontWeight.w500,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:kyouen_flutter/src/data/api/entity/clear_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/local/cleared_stage_count_service.dart';
 import 'package:kyouen_flutter/src/data/local/dao/tume_kyouen_dao.dart';
 import 'package:kyouen_flutter/src/data/local/database.dart';
 import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
@@ -24,18 +25,17 @@ Future<Set<int>> clearedStageNumbers(Ref ref) async {
 }
 
 @riverpod
-Future<Map<String, int>> stageCount(Ref ref) async {
-  // Depend on clearedStageNumbers so this refreshes when clear status changes.
-  ref.watch(clearedStageNumbersProvider);
+Future<int> clearedStageCount(Ref ref) async {
   final repository = await ref.watch(stageRepositoryProvider.future);
-  return repository.getStageCount();
+  return repository.getClearedCount();
 }
 
 class StageRepository {
-  const StageRepository(this._apiClient, this._dao);
+  StageRepository(this._apiClient, this._dao);
 
   final ApiClient _apiClient;
   final TumeKyouenDao _dao;
+  final _clearedCountService = ClearedStageCountService();
 
   Future<List<StageResponse>> getStages({
     int startStageNo = 1,
@@ -100,6 +100,10 @@ class StageRepository {
       // Offline or API error — the clear is stored locally and will sync later.
     }
 
+    final existing = await _dao.findStage(stageNo);
+    if (existing?.clearFlag != TumeKyouen.cleared) {
+      await _clearedCountService.increment();
+    }
     await _dao.clearStage(stageNo, now);
   }
 
@@ -131,10 +135,26 @@ class StageRepository {
       if (clearDateByStageNo.isNotEmpty) {
         await _dao.updateClearStatuses(clearDateByStageNo);
       }
+      // Server is authoritative: save the exact cleared count it returned.
+      await _clearedCountService.saveCount(response.body!.length);
       return;
     }
 
     throw Exception('Failed to sync stages: ${response.error}');
+  }
+
+  /// Returns the cleared stage count from SharedPreferences.
+  /// On first call (before any sync or clear), seeds from local SQLite so
+  /// existing users see a sensible value immediately after an app update.
+  Future<int> getClearedCount() async {
+    final raw = await _clearedCountService.getRawCount();
+    if (raw == null) {
+      final counts = await _dao.selectStageCount();
+      final localCleared = counts['clear_count'] ?? 0;
+      await _clearedCountService.saveCount(localCleared);
+      return localCleared;
+    }
+    return raw;
   }
 
   // Local database operations
@@ -144,10 +164,6 @@ class StageRepository {
 
   Future<int> getMaxStageNo() {
     return _dao.selectMaxStageNo();
-  }
-
-  Future<Map<String, int>> getStageCount() {
-    return _dao.selectStageCount();
   }
 
   Future<List<TumeKyouen>> getAllClearedStages() {

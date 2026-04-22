@@ -223,8 +223,9 @@ class CurrentStage extends _$CurrentStage {
     final stageRepository = await ref.read(stageRepositoryProvider.future);
     await stageRepository.clearStage(currentStageNo, currentStageState);
 
-    // Invalidate the cleared stages provider to refresh UI
-    ref.invalidate(clearedStageNumbersProvider);
+    ref
+      ..invalidate(clearedStageNumbersProvider)
+      ..invalidate(clearedStageCountProvider);
   }
 }
 

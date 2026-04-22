@@ -131,7 +131,7 @@ class AccountService extends _$AccountService {
       await stageRepository.syncStages();
       ref
         ..invalidate(clearedStageNumbersProvider)
-        ..invalidate(stageCountProvider);
+        ..invalidate(clearedStageCountProvider);
     } on Exception catch (e) {
       logger.w('Sync after login failed (non-fatal): $e');
     }
