@@ -342,7 +342,7 @@ class _StageProgressDisplay extends ConsumerWidget {
 
     return stageCountAsync.when(
       loading: () => const _ProgressView(cleared: 0, total: 0, isLoading: true),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (stageCount) {
         final cleared = stageCount['clear_count'] ?? 0;
         return _ProgressView(cleared: cleared, total: total);

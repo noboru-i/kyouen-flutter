@@ -261,8 +261,9 @@ class _LogoutView extends ConsumerWidget {
     try {
       final stageRepository = await ref.read(stageRepositoryProvider.future);
       await stageRepository.syncStages();
-      ref.invalidate(clearedStageNumbersProvider);
-      ref.invalidate(stageCountProvider);
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(stageCountProvider);
 
       if (context.mounted) {
         Navigator.of(context).pop();

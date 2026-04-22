@@ -88,15 +88,21 @@ class TumeKyouenDao {
   Future<void> insertOrUpdateStages(List<TumeKyouen> tumeKyouens) async {
     final batch = _database.batch();
     for (final tumeKyouen in tumeKyouens) {
-      batch.insert(
-        _tableName,
-        tumeKyouen.toJson()..remove('uid'),
-        conflictAlgorithm: ConflictAlgorithm.ignore,
-      );
-      batch.rawUpdate(
-        'UPDATE $_tableName SET size=?, stage=?, creator=? WHERE stage_no=?',
-        [tumeKyouen.size, tumeKyouen.stage, tumeKyouen.creator, tumeKyouen.stageNo],
-      );
+      batch
+        ..insert(
+          _tableName,
+          tumeKyouen.toJson()..remove('uid'),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        )
+        ..rawUpdate(
+          'UPDATE $_tableName SET size=?, stage=?, creator=? WHERE stage_no=?',
+          [
+            tumeKyouen.size,
+            tumeKyouen.stage,
+            tumeKyouen.creator,
+            tumeKyouen.stageNo,
+          ],
+        );
     }
     await batch.commit();
   }

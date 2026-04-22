@@ -353,7 +353,7 @@ class _WebStageCountDisplay extends ConsumerWidget {
           style: TextStyle(fontSize: 14, color: Colors.white54),
         ),
       ),
-      error: (_, __) => Container(
+      error: (_, _) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.06),

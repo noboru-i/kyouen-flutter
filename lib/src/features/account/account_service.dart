@@ -124,11 +124,14 @@ class AccountService extends _$AccountService {
 
     // Sync cleared stages after login; failures are non-fatal.
     try {
-      if (!ref.mounted) return;
+      if (!ref.mounted) {
+        return;
+      }
       final stageRepository = await ref.read(stageRepositoryProvider.future);
       await stageRepository.syncStages();
-      ref.invalidate(clearedStageNumbersProvider);
-      ref.invalidate(stageCountProvider);
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(stageCountProvider);
     } on Exception catch (e) {
       logger.w('Sync after login failed (non-fatal): $e');
     }
