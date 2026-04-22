@@ -47,7 +47,8 @@ class StageRepository {
     );
 
     if (response.isSuccessful && response.body != null) {
-      final tumeKyouens = response.body!
+      final stages = response.body!;
+      final tumeKyouens = stages
           .map(
             (stage) => TumeKyouen(
               stageNo: stage.stageNo,
@@ -61,7 +62,21 @@ class StageRepository {
           .toList();
 
       await _dao.insertOrUpdateStages(tumeKyouens);
-      return response.body!;
+
+      // Reflect server-side clear status for stages the user has already cleared.
+      final clearDateByStageNo = <int, int>{};
+      for (final stage in stages) {
+        if (stage.clearDate != null) {
+          clearDateByStageNo[stage.stageNo] = DateTime.parse(
+            stage.clearDate!,
+          ).millisecondsSinceEpoch;
+        }
+      }
+      if (clearDateByStageNo.isNotEmpty) {
+        await _dao.updateClearStatuses(clearDateByStageNo);
+      }
+
+      return stages;
     }
 
     throw Exception('Failed to get stages: ${response.error}');

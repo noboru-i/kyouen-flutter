@@ -66,6 +66,19 @@ Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
         .toList();
 
     await dao.insertOrUpdateStages(tumeKyouens);
+
+    // Reflect server-side clear status for stages the user has already cleared.
+    final clearDateByStageNo = <int, int>{};
+    for (final apiStage in apiStages) {
+      if (apiStage.clearDate != null) {
+        clearDateByStageNo[apiStage.stageNo] = DateTime.parse(
+          apiStage.clearDate!,
+        ).millisecondsSinceEpoch;
+      }
+    }
+    if (clearDateByStageNo.isNotEmpty) {
+      await dao.updateClearStatuses(clearDateByStageNo);
+    }
   }
 
   return apiStages;
