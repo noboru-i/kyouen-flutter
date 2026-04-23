@@ -26,8 +26,12 @@ class MockStageRepository implements StageRepository {
 
   @override
   Future<bool> isStageCleared(int stageNo) async {
-    // Mock implementation - return false
     return false;
+  }
+
+  @override
+  Future<int> getClearedCount() async {
+    return 3;
   }
 
   // Add other required methods as no-op implementations
