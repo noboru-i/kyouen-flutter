@@ -75,6 +75,11 @@ class AccountService extends _$AccountService {
   }
 
   Future<void> signOut() async {
+    final stageRepository = await ref.read(stageRepositoryProvider.future);
+    await stageRepository.resetClearData();
+    ref
+      ..invalidate(clearedStageNumbersProvider)
+      ..invalidate(clearedStageCountProvider);
     await FirebaseAuth.instance.signOut();
   }
 

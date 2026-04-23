@@ -195,6 +195,11 @@ class StageRepository {
     return cleared.contains(stageNo);
   }
 
+  Future<void> resetClearData() async {
+    await _dao.resetAllClearStatuses();
+    await _clearedCountService.saveCount(0);
+  }
+
   Future<void> markStageCleared(int stageNo) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     await _dao.clearStage(stageNo, now);

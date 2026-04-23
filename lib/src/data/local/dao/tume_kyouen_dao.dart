@@ -107,6 +107,13 @@ class TumeKyouenDao {
     await batch.commit();
   }
 
+  Future<void> resetAllClearStatuses() async {
+    await _database.update(
+      _tableName,
+      {'clear_flag': TumeKyouen.notCleared, 'clear_date': 0},
+    );
+  }
+
   /// Bulk-updates clear status from server sync response.
   /// Only updates stages that already exist locally.
   Future<void> updateClearStatuses(Map<int, int> clearDateByStageNo) async {
