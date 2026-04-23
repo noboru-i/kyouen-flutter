@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'account_service.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AccountService extends _$AccountService {
   @override
   void build() {}
@@ -31,6 +31,7 @@ class AccountService extends _$AccountService {
       }
 
       if (!ref.mounted) {
+        logger.w('Ref not mounted after Twitter sign-in');
         return;
       }
       await _callLoginApi(userCredential.user);
@@ -57,6 +58,7 @@ class AccountService extends _$AccountService {
       }
 
       if (!ref.mounted) {
+        logger.w('Ref not mounted after Apple sign-in');
         return;
       }
       await _callLoginApi(userCredential.user);
