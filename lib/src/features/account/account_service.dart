@@ -8,13 +8,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'account_service.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class AccountService extends _$AccountService {
   @override
   void build() {}
 
   Future<void> signInWithTwitter() async {
     final logger = Logger();
+    final link = ref.keepAlive();
     await signOut();
     final twitterProvider = TwitterAuthProvider();
 
@@ -38,11 +39,14 @@ class AccountService extends _$AccountService {
     } on Exception catch (e) {
       logger.e('Twitter sign-in failed: $e');
       rethrow;
+    } finally {
+      link.close();
     }
   }
 
   Future<void> signInWithApple() async {
     final logger = Logger();
+    final link = ref.keepAlive();
     final appleProvider = AppleAuthProvider();
 
     try {
@@ -65,6 +69,8 @@ class AccountService extends _$AccountService {
     } on Exception catch (e) {
       logger.e('Apple sign-in failed: $e');
       rethrow;
+    } finally {
+      link.close();
     }
   }
 
