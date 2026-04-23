@@ -49,7 +49,7 @@ Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
       .getStages(startStageNo: ((page - 1) * 10) + 1);
   final apiStages = response.body ?? [];
 
-  // Save all stages to SQLite for future offline access
+  // Save all stages to SQLite, preserving existing clear_flag/clear_date.
   if (apiStages.isNotEmpty) {
     final dao = await ref.watch(tumeKyouenDaoProvider.future);
     final tumeKyouens = apiStages
@@ -65,8 +65,23 @@ Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
         )
         .toList();
 
-    // Insert with REPLACE to handle duplicates
-    await dao.insertAll(tumeKyouens);
+    await dao.insertOrUpdateStages(tumeKyouens);
+
+    // Reflect server-side clear status for stages the user has already cleared.
+    final clearDateByStageNo = <int, int>{};
+    for (final apiStage in apiStages) {
+      if (apiStage.clearDate != null) {
+        clearDateByStageNo[apiStage.stageNo] = DateTime.parse(
+          apiStage.clearDate!,
+        ).millisecondsSinceEpoch;
+      }
+    }
+    if (clearDateByStageNo.isNotEmpty) {
+      await dao.updateClearStatuses(clearDateByStageNo);
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(clearedStageCountProvider);
+    }
   }
 
   return apiStages;
@@ -94,7 +109,7 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
   final stages = await ref.watch(fetchStagesProvider(page: page).future);
   final apiStage = stages[((stageNo - 1) % 10)];
 
-  // Save to SQLite for future use
+  // Save to SQLite for future use, preserving existing clear_flag/clear_date.
   final tumeKyouen = TumeKyouen(
     stageNo: apiStage.stageNo,
     size: apiStage.size,
@@ -104,7 +119,7 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
     clearDate: 0,
   );
 
-  await dao.insertAll([tumeKyouen]);
+  await dao.insertOrUpdateStages([tumeKyouen]);
 
   return apiStage;
 }
@@ -224,8 +239,9 @@ class CurrentStage extends _$CurrentStage {
     final stageRepository = await ref.read(stageRepositoryProvider.future);
     await stageRepository.clearStage(currentStageNo, currentStageState);
 
-    // Invalidate the cleared stages provider to refresh UI
-    ref.invalidate(clearedStageNumbersProvider);
+    ref
+      ..invalidate(clearedStageNumbersProvider)
+      ..invalidate(clearedStageCountProvider);
   }
 }
 

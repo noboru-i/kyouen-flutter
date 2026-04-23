@@ -12,6 +12,7 @@ abstract class StageResponse with _$StageResponse {
     required String stage,
     required String creator,
     required String registDate,
+    String? clearDate,
   }) = _StageResponse;
 
   factory StageResponse.fromJson(Map<String, Object?> json) =>

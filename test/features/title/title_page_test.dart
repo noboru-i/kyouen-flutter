@@ -14,12 +14,6 @@ class MockTotalStageCount extends TotalStageCount {
 // Mock for testing
 class MockStageRepository implements StageRepository {
   @override
-  Future<Map<String, int>> getStageCount() async {
-    // Return mock data for testing
-    return {'count': 10, 'clear_count': 3};
-  }
-
-  @override
   Future<void> markStageCleared(int stageNo) async {
     // Mock implementation - do nothing
   }
@@ -32,8 +26,12 @@ class MockStageRepository implements StageRepository {
 
   @override
   Future<bool> isStageCleared(int stageNo) async {
-    // Mock implementation - return false
     return false;
+  }
+
+  @override
+  Future<int> getClearedCount() async {
+    return 3;
   }
 
   // Add other required methods as no-op implementations

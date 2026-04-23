@@ -15,6 +15,7 @@ class AccountService extends _$AccountService {
 
   Future<void> signInWithTwitter() async {
     final logger = Logger();
+    final link = ref.keepAlive();
     await signOut();
     final twitterProvider = TwitterAuthProvider();
 
@@ -31,17 +32,21 @@ class AccountService extends _$AccountService {
       }
 
       if (!ref.mounted) {
+        logger.w('Ref not mounted after Twitter sign-in');
         return;
       }
       await _callLoginApi(userCredential.user);
     } on Exception catch (e) {
       logger.e('Twitter sign-in failed: $e');
       rethrow;
+    } finally {
+      link.close();
     }
   }
 
   Future<void> signInWithApple() async {
     final logger = Logger();
+    final link = ref.keepAlive();
     final appleProvider = AppleAuthProvider();
 
     try {
@@ -57,29 +62,20 @@ class AccountService extends _$AccountService {
       }
 
       if (!ref.mounted) {
+        logger.w('Ref not mounted after Apple sign-in');
         return;
       }
       await _callLoginApi(userCredential.user);
     } on Exception catch (e) {
       logger.e('Apple sign-in failed: $e');
       rethrow;
+    } finally {
+      link.close();
     }
   }
 
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
-  }
-
-  Future<void> sync() async {
-    final logger = Logger();
-    try {
-      final repository = await ref.read(stageRepositoryProvider.future);
-      await repository.syncStages();
-      logger.i('Sync completed successfully');
-    } on Exception catch (e) {
-      logger.e('Sync failed: $e');
-      rethrow;
-    }
   }
 
   Future<void> deleteAccount() async {
@@ -132,6 +128,20 @@ class AccountService extends _$AccountService {
     } on Exception catch (e) {
       logger.e('Login API call failed: $e');
       rethrow;
+    }
+
+    // Sync cleared stages after login; failures are non-fatal.
+    try {
+      if (!ref.mounted) {
+        return;
+      }
+      final stageRepository = await ref.read(stageRepositoryProvider.future);
+      await stageRepository.syncStages();
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(clearedStageCountProvider);
+    } on Exception catch (e) {
+      logger.w('Sync after login failed (non-fatal): $e');
     }
   }
 }

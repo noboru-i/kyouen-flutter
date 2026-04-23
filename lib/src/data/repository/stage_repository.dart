@@ -3,6 +3,7 @@ import 'package:kyouen_flutter/src/data/api/entity/clear_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
+import 'package:kyouen_flutter/src/data/local/cleared_stage_count_service.dart';
 import 'package:kyouen_flutter/src/data/local/dao/tume_kyouen_dao.dart';
 import 'package:kyouen_flutter/src/data/local/database.dart';
 import 'package:kyouen_flutter/src/data/local/entity/tume_kyouen.dart';
@@ -23,11 +24,18 @@ Future<Set<int>> clearedStageNumbers(Ref ref) async {
   return repository.getClearedStageNumbers();
 }
 
+@riverpod
+Future<int> clearedStageCount(Ref ref) async {
+  final repository = await ref.watch(stageRepositoryProvider.future);
+  return repository.getClearedCount();
+}
+
 class StageRepository {
-  const StageRepository(this._apiClient, this._dao);
+  StageRepository(this._apiClient, this._dao);
 
   final ApiClient _apiClient;
   final TumeKyouenDao _dao;
+  final _clearedCountService = ClearedStageCountService();
 
   Future<List<StageResponse>> getStages({
     int startStageNo = 1,
@@ -39,8 +47,8 @@ class StageRepository {
     );
 
     if (response.isSuccessful && response.body != null) {
-      // Save to local database
-      final tumeKyouens = response.body!
+      final stages = response.body!;
+      final tumeKyouens = stages
           .map(
             (stage) => TumeKyouen(
               stageNo: stage.stageNo,
@@ -53,8 +61,22 @@ class StageRepository {
           )
           .toList();
 
-      await _dao.insertAll(tumeKyouens);
-      return response.body!;
+      await _dao.insertOrUpdateStages(tumeKyouens);
+
+      // Reflect server-side clear status for stages the user has already cleared.
+      final clearDateByStageNo = <int, int>{};
+      for (final stage in stages) {
+        if (stage.clearDate != null) {
+          clearDateByStageNo[stage.stageNo] = DateTime.parse(
+            stage.clearDate!,
+          ).millisecondsSinceEpoch;
+        }
+      }
+      if (clearDateByStageNo.isNotEmpty) {
+        await _dao.updateClearStatuses(clearDateByStageNo);
+      }
+
+      return stages;
     }
 
     throw Exception('Failed to get stages: ${response.error}');
@@ -64,7 +86,6 @@ class StageRepository {
     final response = await _apiClient.createStage(newStage);
 
     if (response.isSuccessful && response.body != null) {
-      // Save to local database
       final tumeKyouen = TumeKyouen(
         stageNo: response.body!.stageNo,
         size: response.body!.size,
@@ -74,7 +95,7 @@ class StageRepository {
         clearDate: 0,
       );
 
-      await _dao.insertAll([tumeKyouen]);
+      await _dao.insertOrUpdateStages([tumeKyouen]);
       return response.body!;
     }
 
@@ -83,17 +104,26 @@ class StageRepository {
 
   Future<void> clearStage(int stageNo, String userStage) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final clearStage = ClearStage(
-      stage: userStage,
-      clearDate: DateTime.now().toIso8601String(),
-    );
 
-    await _apiClient.clearStage(stageNo, clearStage);
+    try {
+      final clearStageRequest = ClearStage(
+        stage: userStage,
+        clearDate: DateTime.now().toIso8601String(),
+      );
+      await _apiClient.clearStage(stageNo, clearStageRequest);
+    } on Exception catch (_) {
+      // Offline or API error — the clear is stored locally and will sync later.
+    }
 
-    // Always update local database even if API call fails
+    final existing = await _dao.findStage(stageNo);
+    if (existing?.clearFlag != TumeKyouen.cleared) {
+      await _clearedCountService.increment();
+    }
     await _dao.clearStage(stageNo, now);
   }
 
+  /// Sends locally cleared stages to server and updates local DB with the
+  /// server's merged cleared-stage list.
   Future<void> syncStages() async {
     final clearedStages = await _dao.selectAllClearStage();
     final clearedStageRequests = clearedStages
@@ -110,17 +140,36 @@ class StageRepository {
     final response = await _apiClient.syncStages(clearedStageRequests);
 
     if (response.isSuccessful && response.body != null) {
-      for (final clearedStage in response.body!) {
-        final clearDate = DateTime.parse(clearedStage.clearDate);
-        await _dao.clearStage(
-          clearedStage.stageNo,
-          clearDate.millisecondsSinceEpoch,
-        );
+      final clearDateByStageNo = <int, int>{};
+      for (final cleared in response.body!) {
+        final clearDateMs = DateTime.parse(
+          cleared.clearDate,
+        ).millisecondsSinceEpoch;
+        clearDateByStageNo[cleared.stageNo] = clearDateMs;
       }
+      if (clearDateByStageNo.isNotEmpty) {
+        await _dao.updateClearStatuses(clearDateByStageNo);
+      }
+      // Server is authoritative: save the exact cleared count it returned.
+      await _clearedCountService.saveCount(response.body!.length);
       return;
     }
 
     throw Exception('Failed to sync stages: ${response.error}');
+  }
+
+  /// Returns the cleared stage count from SharedPreferences.
+  /// On first call (before any sync or clear), seeds from local SQLite so
+  /// existing users see a sensible value immediately after an app update.
+  Future<int> getClearedCount() async {
+    final raw = await _clearedCountService.getRawCount();
+    if (raw == null) {
+      final counts = await _dao.selectStageCount();
+      final localCleared = counts['clear_count'] ?? 0;
+      await _clearedCountService.saveCount(localCleared);
+      return localCleared;
+    }
+    return raw;
   }
 
   // Local database operations
@@ -132,15 +181,10 @@ class StageRepository {
     return _dao.selectMaxStageNo();
   }
 
-  Future<Map<String, int>> getStageCount() {
-    return _dao.selectStageCount();
-  }
-
   Future<List<TumeKyouen>> getAllClearedStages() {
     return _dao.selectAllClearStage();
   }
 
-  // Cleared stages management methods
   Future<Set<int>> getClearedStageNumbers() async {
     final clearedStages = await _dao.selectAllClearStage();
     return clearedStages.map((stage) => stage.stageNo).toSet();

@@ -335,12 +335,12 @@ class _ActivitiesDisplay extends ConsumerWidget {
 class _WebStageCountDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stageRepositoryAsync = ref.watch(stageRepositoryProvider);
+    final clearedAsync = ref.watch(clearedStageCountProvider);
     final totalAsync = ref.watch(totalStageCountProvider);
 
     final totalCount = totalAsync.asData?.value ?? 0;
 
-    return stageRepositoryAsync.when(
+    return clearedAsync.when(
       loading: () => Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
@@ -353,7 +353,7 @@ class _WebStageCountDisplay extends ConsumerWidget {
           style: TextStyle(fontSize: 14, color: Colors.white54),
         ),
       ),
-      error: (error, _) => Container(
+      error: (_, _) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.06),
@@ -367,78 +367,23 @@ class _WebStageCountDisplay extends ConsumerWidget {
           style: TextStyle(fontSize: 14, color: Color(0xFFE53935)),
         ),
       ),
-      data: (repository) => FutureBuilder<Map<String, int>>(
-        future: repository.getStageCount(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting &&
-              totalCount == 0) {
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-              child: const Text(
-                'ステージ情報を読み込み中...',
-                style: TextStyle(fontSize: 14, color: Colors.white54),
-              ),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFFE53935).withValues(alpha: 0.4),
-                ),
-              ),
-              child: const Text(
-                'ステージ情報取得エラー',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFFE53935),
-                ),
-              ),
-            );
-          }
-
-          final stageCount = snapshot.data ?? {};
-          final clearedCount = stageCount['clear_count'] ?? 0;
-
-          return Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 10,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.accentColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppTheme.accentColor.withValues(alpha: 0.4),
-              ),
-            ),
-            child: Text(
-              'クリアステージ数: $clearedCount / $totalCount',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.accentColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          );
-        },
+      data: (clearedCount) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppTheme.accentColor.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppTheme.accentColor.withValues(alpha: 0.4),
+          ),
+        ),
+        child: Text(
+          'クリアステージ数: $clearedCount / $totalCount',
+          style: const TextStyle(
+            fontSize: 14,
+            color: AppTheme.accentColor,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

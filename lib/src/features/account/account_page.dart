@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/account/account_service.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
@@ -166,15 +167,15 @@ class _LogoutView extends ConsumerWidget {
           // Sync button
           SizedBox(
             height: 56,
-            child: FilledButton(
-              onPressed: () => _sync(context, ref),
+            child: FilledButton.tonal(
+              onPressed: () => _syncStages(context, ref),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.sync, size: 20),
                   SizedBox(width: 12),
                   Text(
-                    'データを同期',
+                    'クリアデータを同期',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -240,16 +241,39 @@ class _LogoutView extends ConsumerWidget {
     );
   }
 
-  Future<void> _sync(BuildContext context, WidgetRef ref) async {
+  Future<void> _syncStages(BuildContext context, WidgetRef ref) async {
+    // ignore: unawaited_futures
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('同期中...'),
+          ],
+        ),
+      ),
+    );
+
     try {
-      await ref.read(accountServiceProvider.notifier).sync();
+      final stageRepository = await ref.read(stageRepositoryProvider.future);
+      await stageRepository.syncStages();
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(clearedStageCountProvider);
+
       if (context.mounted) {
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('データを同期しました')),
+          const SnackBar(content: Text('クリアデータを同期しました')),
         );
       }
     } on Exception catch (e) {
       if (context.mounted) {
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('同期に失敗しました: $e')),
         );
