@@ -78,6 +78,9 @@ Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
     }
     if (clearDateByStageNo.isNotEmpty) {
       await dao.updateClearStatuses(clearDateByStageNo);
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(clearedStageCountProvider);
     }
   }
 
