@@ -108,7 +108,7 @@ class StageRepository {
     try {
       final clearStageRequest = ClearStage(
         stage: userStage,
-        clearDate: DateTime.now().toIso8601String(),
+        clearDate: DateTime.now().toUtc().toIso8601String(),
       );
       await _apiClient.clearStage(stageNo, clearStageRequest);
     } on Exception catch (_) {
@@ -132,6 +132,7 @@ class StageRepository {
             stageNo: stage.stageNo,
             clearDate: DateTime.fromMillisecondsSinceEpoch(
               stage.clearDate,
+              isUtc: true,
             ).toIso8601String(),
           ),
         )
