@@ -16,6 +16,14 @@ part 'stage_service.g.dart';
 /// アプリ起動時に ProviderScope.overrides で上書きされる。
 final initialDeepLinkStageNoProvider = Provider<int?>((ref) => null);
 
+class StageNotFoundException implements Exception {
+  const StageNotFoundException(this.stageNo);
+  final int stageNo;
+
+  @override
+  String toString() => 'StageNotFoundException(stageNo: $stageNo)';
+}
+
 enum StoneState {
   none('0'), // 空
   black('1'), // 配置可能
@@ -40,61 +48,14 @@ enum StoneState {
   }
 }
 
-/// page starts with 1. (page 1 includes no.1 - no.10.)
-@riverpod
-Future<List<StageResponse>> fetchStages(Ref ref, {required int page}) async {
-  // Fetch from API
-  final response = await ref
-      .watch(apiClientProvider)
-      .getStages(startStageNo: ((page - 1) * 10) + 1);
-  final apiStages = response.body ?? [];
-
-  // Save all stages to SQLite, preserving existing clear_flag/clear_date.
-  if (apiStages.isNotEmpty) {
-    final dao = await ref.watch(tumeKyouenDaoProvider.future);
-    final tumeKyouens = apiStages
-        .map(
-          (apiStage) => TumeKyouen(
-            stageNo: apiStage.stageNo,
-            size: apiStage.size,
-            stage: apiStage.stage,
-            creator: apiStage.creator,
-            clearFlag: TumeKyouen.notCleared,
-            clearDate: 0,
-          ),
-        )
-        .toList();
-
-    await dao.insertOrUpdateStages(tumeKyouens);
-
-    // Reflect server-side clear status for stages the user has already cleared.
-    final clearDateByStageNo = <int, int>{};
-    for (final apiStage in apiStages) {
-      if (apiStage.clearDate != null) {
-        clearDateByStageNo[apiStage.stageNo] = DateTime.parse(
-          apiStage.clearDate!,
-        ).millisecondsSinceEpoch;
-      }
-    }
-    if (clearDateByStageNo.isNotEmpty) {
-      await dao.updateClearStatuses(clearDateByStageNo);
-      ref
-        ..invalidate(clearedStageNumbersProvider)
-        ..invalidate(clearedStageCountProvider);
-    }
-  }
-
-  return apiStages;
-}
-
 @riverpod
 Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
-  // First check if stage exists in SQLite
+  // Capture dependencies synchronously before any async gap.
+  final apiClient = ref.watch(apiClientProvider);
   final dao = await ref.watch(tumeKyouenDaoProvider.future);
-  final localStage = await dao.findStage(stageNo);
 
+  final localStage = await dao.findStage(stageNo);
   if (localStage != null) {
-    // Return from SQLite if available
     return StageResponse(
       stageNo: localStage.stageNo,
       size: localStage.size,
@@ -104,22 +65,55 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
     );
   }
 
-  // If not in SQLite, fetch from API and save to SQLite
+  // Fetch the containing page from API and cache all stages in the page.
   final page = ((stageNo - 1) / 10).floor() + 1;
-  final stages = await ref.watch(fetchStagesProvider(page: page).future);
-  final apiStage = stages[((stageNo - 1) % 10)];
-
-  // Save to SQLite for future use, preserving existing clear_flag/clear_date.
-  final tumeKyouen = TumeKyouen(
-    stageNo: apiStage.stageNo,
-    size: apiStage.size,
-    stage: apiStage.stage,
-    creator: apiStage.creator,
-    clearFlag: TumeKyouen.notCleared,
-    clearDate: 0,
+  final response = await apiClient.getStages(
+    startStageNo: ((page - 1) * 10) + 1,
   );
+  final apiStages = response.body ?? [];
 
-  await dao.insertOrUpdateStages([tumeKyouen]);
+  StageResponse? apiStage;
+  for (final s in apiStages) {
+    if (s.stageNo == stageNo) {
+      apiStage = s;
+      break;
+    }
+  }
+  if (apiStage == null) {
+    throw StageNotFoundException(stageNo);
+  }
+
+  final tumeKyouens = apiStages
+      .map(
+        (s) => TumeKyouen(
+          stageNo: s.stageNo,
+          size: s.size,
+          stage: s.stage,
+          creator: s.creator,
+          clearFlag: TumeKyouen.notCleared,
+          clearDate: 0,
+        ),
+      )
+      .toList();
+  await dao.insertOrUpdateStages(tumeKyouens);
+
+  // Reflect server-side clear status for stages the user has already cleared.
+  final clearDateByStageNo = <int, int>{};
+  for (final s in apiStages) {
+    if (s.clearDate != null) {
+      clearDateByStageNo[s.stageNo] = DateTime.parse(
+        s.clearDate!,
+      ).millisecondsSinceEpoch;
+    }
+  }
+  if (clearDateByStageNo.isNotEmpty) {
+    await dao.updateClearStatuses(clearDateByStageNo);
+    if (ref.mounted) {
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(clearedStageCountProvider);
+    }
+  }
 
   return apiStage;
 }
@@ -147,13 +141,21 @@ class CurrentStageNo extends _$CurrentStageNo {
     await lastStageService.saveLastStageNo(stageNo);
   }
 
-  Future<void> next() async {
+  Future<bool> next() async {
     final currentState = state;
-    if (currentState is AsyncData<int>) {
-      final newValue = currentState.value + 1;
-      state = AsyncData(newValue);
-      await _saveCurrentStageNo(newValue);
+    if (currentState is! AsyncData<int>) {
+      return false;
     }
+    final newValue = currentState.value + 1;
+
+    final repository = await ref.read(stageRepositoryProvider.future);
+    if (!await repository.stageExists(newValue)) {
+      return false;
+    }
+
+    state = AsyncData(newValue);
+    await _saveCurrentStageNo(newValue);
+    return true;
   }
 
   Future<void> prev() async {

@@ -195,6 +195,21 @@ class StageRepository {
     return cleared.contains(stageNo);
   }
 
+  /// Returns whether [stageNo] exists locally or on the server.
+  ///
+  /// If not cached locally, fetches the containing page from the API,
+  /// persisting it to SQLite as a side effect so subsequent reads are fast.
+  Future<bool> stageExists(int stageNo) async {
+    final local = await _dao.findStage(stageNo);
+    if (local != null) {
+      return true;
+    }
+
+    final startStageNo = ((stageNo - 1) ~/ 10) * 10 + 1;
+    final pageStages = await getStages(startStageNo: startStageNo);
+    return pageStages.any((s) => s.stageNo == stageNo);
+  }
+
   Future<void> resetClearData() async {
     await _dao.resetAllClearStatuses();
     await _clearedCountService.saveCount(0);

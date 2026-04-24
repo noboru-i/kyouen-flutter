@@ -128,7 +128,14 @@ class _Header extends ConsumerWidget {
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
               onPressed: () async {
-                await ref.read(currentStageNoProvider.notifier).next();
+                final moved = await ref
+                    .read(currentStageNoProvider.notifier)
+                    .next();
+                if (!moved && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('これ以上ステージがありません')),
+                  );
+                }
               },
               child: Text(isSmallScreen ? '次' : '次へ'),
             ),
@@ -182,7 +189,14 @@ class _Footer extends ConsumerWidget {
                         Navigator.of(context).pop();
                       },
                     );
-                    await ref.read(currentStageNoProvider.notifier).next();
+                    final moved = await ref
+                        .read(currentStageNoProvider.notifier)
+                        .next();
+                    if (!moved && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('これ以上ステージがありません')),
+                      );
+                    }
                   }
                 } else {
                   debugPrint('NOT KYOUEN!');
