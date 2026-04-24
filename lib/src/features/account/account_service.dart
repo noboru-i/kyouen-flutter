@@ -75,30 +75,49 @@ class AccountService extends _$AccountService {
   }
 
   Future<void> signOut() async {
-    final stageRepository = await ref.read(stageRepositoryProvider.future);
-    await stageRepository.resetClearData();
-    ref
-      ..invalidate(clearedStageNumbersProvider)
-      ..invalidate(clearedStageCountProvider);
-    await FirebaseAuth.instance.signOut();
+    final logger = Logger();
+    final link = ref.keepAlive();
+    try {
+      final stageRepository = await ref.read(stageRepositoryProvider.future);
+      await stageRepository.resetClearData();
+      if (!ref.mounted) {
+        logger.w('Ref not mounted after resetClearData');
+        return;
+      }
+      ref
+        ..invalidate(clearedStageNumbersProvider)
+        ..invalidate(clearedStageCountProvider);
+      await FirebaseAuth.instance.signOut();
+    } on Exception catch (e) {
+      logger.e('Sign-out failed: $e');
+      rethrow;
+    } finally {
+      link.close();
+    }
   }
 
   Future<void> deleteAccount() async {
     final logger = Logger();
+    final link = ref.keepAlive();
     try {
       final apiClient = ref.read(apiClientProvider);
       final response = await apiClient.deleteAccount();
 
       if (response.isSuccessful) {
         logger.i('Account deleted successfully');
-        // Sign out from Firebase after successful account deletion
+        if (!ref.mounted) {
+          logger.w('Ref not mounted after deleteAccount API call');
+          return;
+        }
         await signOut();
       } else {
         throw Exception('Failed to delete account: ${response.error}');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       logger.e('Error deleting account: $e');
       rethrow;
+    } finally {
+      link.close();
     }
   }
 

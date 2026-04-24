@@ -190,9 +190,7 @@ class _LogoutView extends ConsumerWidget {
           SizedBox(
             height: 56,
             child: FilledButton.tonal(
-              onPressed: () {
-                ref.read(accountServiceProvider.notifier).signOut();
-              },
+              onPressed: () => _signOut(context, ref),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -239,6 +237,18 @@ class _LogoutView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(accountServiceProvider.notifier).signOut();
+    } on Exception catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('ログアウトに失敗しました: $e')));
+      }
+    }
   }
 
   Future<void> _syncStages(BuildContext context, WidgetRef ref) async {
