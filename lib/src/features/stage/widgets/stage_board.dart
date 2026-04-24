@@ -38,9 +38,12 @@ class StageBoard extends ConsumerWidget {
 
   Widget _buildContent() {
     if (stageData == null) {
-      return Container(
-        alignment: Alignment.center,
-        child: const CircularProgressIndicator.adaptive(),
+      return const Center(
+        child: SizedBox(
+          width: 80,
+          height: 80,
+          child: CircularProgressIndicator.adaptive(strokeWidth: 6),
+        ),
       );
     }
 

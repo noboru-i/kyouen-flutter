@@ -99,26 +99,41 @@ class _Header extends ConsumerWidget {
           ),
           Expanded(
             flex: isSmallScreen ? 3 : 4,
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : '?'}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: isSmallScreen ? 16 : 18,
-                    fontWeight: FontWeight.bold,
-                    color: isCleared
-                        ? const Color(0xFF2E7D32)
-                        : null, // Dark green for cleared
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'STAGE: ${currentStage.hasValue ? currentStage.value!.stageNo : ''}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 20 : 24,
+                        fontWeight: FontWeight.bold,
+                        color: isCleared ? const Color(0xFF2E7D32) : null,
+                      ),
+                    ),
+                    if (isCleared) ...[
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.check_circle,
+                        color: const Color(0xFF4CAF50),
+                        size: isSmallScreen ? 20 : 24,
+                      ),
+                    ],
+                  ],
                 ),
-                if (isCleared) ...[
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.check_circle,
-                    color: const Color(0xFF4CAF50), // Material green
-                    size: isSmallScreen ? 16 : 20,
+                if (currentStage.hasValue) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    'created by ${currentStage.value!.creator}',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 11 : 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ],
