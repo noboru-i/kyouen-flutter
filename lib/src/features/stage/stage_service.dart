@@ -153,6 +153,12 @@ class CurrentStageNo extends _$CurrentStageNo {
       return false;
     }
 
+    // stageExists may have fetched a new page from the API and updated clear
+    // statuses in SQLite. Invalidate so the UI reflects the latest DB state.
+    ref
+      ..invalidate(clearedStageNumbersProvider)
+      ..invalidate(clearedStageCountProvider);
+
     state = AsyncData(newValue);
     await _saveCurrentStageNo(newValue);
     return true;
