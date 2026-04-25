@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/clear_stage.dart';
 import 'package:kyouen_flutter/src/data/api/entity/cleared_stage.dart';
@@ -117,9 +119,11 @@ class StageRepository {
       stage: userStage,
       clearDate: DateTime.now().toUtc().toIso8601String(),
     );
-    _apiClient.clearStage(stageNo, clearStageRequest).catchError((_) {
-      // Offline or API error — the clear is stored locally and will sync later.
-    });
+    unawaited(
+      _apiClient
+          .clearStage(stageNo, clearStageRequest)
+          .then<void>((_) {}, onError: (_) {}),
+    );
   }
 
   /// Sends locally cleared stages to server and updates local DB with the
