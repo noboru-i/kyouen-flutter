@@ -105,21 +105,21 @@ class StageRepository {
   Future<void> clearStage(int stageNo, String userStage) async {
     final now = DateTime.now().millisecondsSinceEpoch;
 
-    try {
-      final clearStageRequest = ClearStage(
-        stage: userStage,
-        clearDate: DateTime.now().toUtc().toIso8601String(),
-      );
-      await _apiClient.clearStage(stageNo, clearStageRequest);
-    } on Exception catch (_) {
-      // Offline or API error — the clear is stored locally and will sync later.
-    }
-
+    // Local DB operations first so the caller is not blocked by the network.
     final existing = await _dao.findStage(stageNo);
     if (existing?.clearFlag != TumeKyouen.cleared) {
       await _clearedCountService.increment();
     }
     await _dao.clearStage(stageNo, now);
+
+    // Fire-and-forget: sync to server without blocking the UI.
+    final clearStageRequest = ClearStage(
+      stage: userStage,
+      clearDate: DateTime.now().toUtc().toIso8601String(),
+    );
+    _apiClient.clearStage(stageNo, clearStageRequest).catchError((_) {
+      // Offline or API error — the clear is stored locally and will sync later.
+    });
   }
 
   /// Sends locally cleared stages to server and updates local DB with the
