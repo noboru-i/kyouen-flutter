@@ -285,6 +285,9 @@ jobs:
       - name: Build web app
         run: flutter build web --release --dart-define-from-file=.env.${{ github.event.inputs.environment }}
 
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools@15.7.0
+
       - name: Set Firebase Hosting config for environment
         run: cp firebase.${{ github.event.inputs.environment }}.json firebase.json
 
