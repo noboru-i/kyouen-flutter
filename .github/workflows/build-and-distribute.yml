@@ -105,13 +105,10 @@ jobs:
         env:
           APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode \
             > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_KEY_ID.p8
-          /usr/libexec/PlistBuddy -c "Add :apiKey string $APP_STORE_CONNECT_KEY_ID" ios/ExportOptions.prod.plist
-          /usr/libexec/PlistBuddy -c "Add :apiIssuerID string $APP_STORE_CONNECT_ISSUER_ID" ios/ExportOptions.prod.plist
 
       - name: Build iOS IPA
         run: |
@@ -129,6 +126,19 @@ jobs:
                 --build-number=$((560 + ${{ github.run_number }}))
           fi
       
+      - name: Upload IPA to App Store Connect
+        if: ${{ github.event.inputs.environment == 'prod' }}
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          IPA_PATH=$(find build/ios/ipa -name '*.ipa' | head -1)
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA_PATH" \
+            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
+
       - name: Upload iOS artifact
         if: ${{ github.event.inputs.environment == 'dev' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
