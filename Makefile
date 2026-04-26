@@ -1,4 +1,4 @@
-.PHONY: help run-dev run-prod build-dev build-prod build-ios-prod test gen analyze
+.PHONY: help run-dev run-prod build-dev build-prod test gen analyze
 
 help:
 	@echo "Usage: make <target>"
@@ -10,7 +10,6 @@ help:
 	@echo "Build:"
 	@echo "  build-dev       開発環境向けビルド"
 	@echo "  build-prod      本番環境向けビルド"
-	@echo "  build-ios-prod  iOS本番ビルド & App Store Connectアップロード"
 	@echo ""
 	@echo "Test:"
 	@echo "  test        開発環境でテスト実行"
@@ -62,18 +61,6 @@ build-prod:
 	mkdir -p build/web/.well-known
 	cp web/.well-known/prod/assetlinks.json build/web/.well-known/assetlinks.json
 	cp web/.well-known/prod/apple-app-site-association build/web/.well-known/apple-app-site-association
-
-build-ios-prod:
-	ios/scripts/generate_provisioning_config.sh prod
-	flutterfire configure \
-	  --project my-android-server \
-	  --android-package-name hm.orz.chaos114.android.tumekyouen \
-	  --ios-bundle-id hm.orz.chaos114.TumeKyouen \
-	  --platforms=android,ios,web \
-	  --yes
-	flutter build ipa \
-	  --dart-define-from-file=.env.prod \
-	  --export-options-plist=ios/ExportOptions.prod.plist
 
 test:
 	flutter test --dart-define-from-file=.env.prod
