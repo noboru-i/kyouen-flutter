@@ -198,47 +198,40 @@ jobs:
           echo "KEY_PASSWORD=$ANDROID_KEY_PASSWORD" >> $GITHUB_ENV
       
       - name: Build Android APK
+        if: ${{ github.event.inputs.environment == 'dev' }}
         run: |
-          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            flutter build apk --dart-define-from-file=.env.dev \
-                --release \
-                --verbose \
-                --build-number=$((560 + ${{ github.run_number }}))
-          else
-            flutter build apk --dart-define-from-file=.env.prod \
-                --release \
-                --verbose \
-                --build-number=$((560 + ${{ github.run_number }}))
-          fi
-      
+          flutter build apk --dart-define-from-file=.env.dev \
+              --release \
+              --verbose \
+              --build-number=$((560 + ${{ github.run_number }}))
+
       - name: Build Android AAB
+        if: ${{ github.event.inputs.environment == 'prod' }}
         run: |
-          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
-            flutter build appbundle --dart-define-from-file=.env.dev \
-                --release \
-                --build-number=$((560 + ${{ github.run_number }}))
-          else
-            flutter build appbundle --dart-define-from-file=.env.prod \
-                --release \
-                --build-number=$((560 + ${{ github.run_number }}))
-          fi
-      
+          flutter build appbundle --dart-define-from-file=.env.prod \
+              --release \
+              --verbose \
+              --build-number=$((560 + ${{ github.run_number }}))
+
       - name: Upload Android APK artifact
+        if: ${{ github.event.inputs.environment == 'dev' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-apk-${{ github.event.inputs.environment }}
           path: build/app/outputs/flutter-apk/app-release.apk
-      
+
       - name: Upload Android AAB artifact
+        if: ${{ github.event.inputs.environment == 'prod' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-aab-${{ github.event.inputs.environment }}
           path: build/app/outputs/bundle/release/app-release.aab
-      
+
       - name: Install Firebase CLI
         run: npm install -g firebase-tools@15.7.0
 
       - name: Distribute APK to Firebase App Distribution (Android)
+        if: ${{ github.event.inputs.environment == 'dev' }}
         env:
           FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
         run: |
@@ -247,6 +240,21 @@ jobs:
           chmod 600 "$SERVICE_ACCOUNT_FILE"
           export GOOGLE_APPLICATION_CREDENTIALS="$SERVICE_ACCOUNT_FILE"
           firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+            --app ${{ secrets.FIREBASE_ANDROID_APP_ID }} \
+            --groups testers \
+            --release-notes "Build from GitHub Actions - Android ${{ github.event.inputs.environment }}"
+          rm -f "$SERVICE_ACCOUNT_FILE"
+
+      - name: Distribute AAB to Firebase App Distribution (Android)
+        if: ${{ github.event.inputs.environment == 'prod' }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          SERVICE_ACCOUNT_FILE="$RUNNER_TEMP/firebase-service-account.json"
+          printf '%s\n' "$FIREBASE_SERVICE_ACCOUNT_KEY" > "$SERVICE_ACCOUNT_FILE"
+          chmod 600 "$SERVICE_ACCOUNT_FILE"
+          export GOOGLE_APPLICATION_CREDENTIALS="$SERVICE_ACCOUNT_FILE"
+          firebase appdistribution:distribute build/app/outputs/bundle/release/app-release.aab \
             --app ${{ secrets.FIREBASE_ANDROID_APP_ID }} \
             --groups testers \
             --release-notes "Build from GitHub Actions - Android ${{ github.event.inputs.environment }}"
