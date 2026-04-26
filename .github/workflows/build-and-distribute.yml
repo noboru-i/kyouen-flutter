@@ -289,9 +289,14 @@ jobs:
         run: cp firebase.${{ github.event.inputs.environment }}.json firebase.json
 
       - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0.10.0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-          channelId: live
-          projectId: ${{ github.event.inputs.environment == 'dev' && 'api-project-732262258565' || 'my-android-server' }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          SERVICE_ACCOUNT_FILE="$RUNNER_TEMP/firebase-service-account.json"
+          printf '%s\n' "$FIREBASE_SERVICE_ACCOUNT_KEY" > "$SERVICE_ACCOUNT_FILE"
+          chmod 600 "$SERVICE_ACCOUNT_FILE"
+          export GOOGLE_APPLICATION_CREDENTIALS="$SERVICE_ACCOUNT_FILE"
+          firebase deploy --only hosting \
+            --project ${{ github.event.inputs.environment == 'dev' && 'api-project-732262258565' || 'my-android-server' }} \
+            --non-interactive
+          rm -f "$SERVICE_ACCOUNT_FILE"
