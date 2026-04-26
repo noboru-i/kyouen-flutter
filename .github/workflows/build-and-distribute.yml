@@ -105,10 +105,13 @@ jobs:
         env:
           APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode \
             > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_KEY_ID.p8
+          /usr/libexec/PlistBuddy -c "Add :apiKey string $APP_STORE_CONNECT_KEY_ID" ios/ExportOptions.prod.plist
+          /usr/libexec/PlistBuddy -c "Add :apiIssuerID string $APP_STORE_CONNECT_ISSUER_ID" ios/ExportOptions.prod.plist
 
       - name: Build iOS IPA
         run: |
