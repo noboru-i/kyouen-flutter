@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
@@ -6,6 +8,18 @@ import 'package:kyouen_flutter/src/features/stage/widgets/stage_board.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
+
+class _IsNavigatingNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void start() => state = true;
+  void stop() => state = false;
+}
+
+final _isNavigatingProvider = NotifierProvider<_IsNavigatingNotifier, bool>(
+  _IsNavigatingNotifier.new,
+);
 
 // Notifier for controlling kyouen overlay visibility
 // Automatically resets when currentStageNoProvider changes
@@ -55,14 +69,58 @@ class StagePage extends ConsumerWidget {
   }
 }
 
-class _Header extends ConsumerWidget {
+class _Header extends ConsumerStatefulWidget {
   const _Header();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends ConsumerState<_Header> {
+  bool _isNavigating = false;
+  Timer? _loadingTimer;
+
+  @override
+  void dispose() {
+    _loadingTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _navigateNext(Future<bool> Function() action) async {
+    if (_isNavigating) {
+      return;
+    }
+    setState(() => _isNavigating = true);
+
+    _loadingTimer = Timer(const Duration(milliseconds: 250), () {
+      if (mounted) {
+        ref.read(_isNavigatingProvider.notifier).start();
+      }
+    });
+
+    try {
+      final moved = await action();
+      if (!moved && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('これ以上ステージがありません')),
+        );
+      }
+    } finally {
+      _loadingTimer?.cancel();
+      _loadingTimer = null;
+      ref.read(_isNavigatingProvider.notifier).stop();
+      if (mounted) {
+        setState(() => _isNavigating = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentStage = ref.watch(currentStageProvider);
     final currentStageNoAsync = ref.watch(currentStageNoProvider);
     final clearedStages = ref.watch(clearedStageNumbersProvider);
+    final isLoadingShown = ref.watch(_isNavigatingProvider);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     // Extract current stage number from AsyncValue
@@ -89,12 +147,12 @@ class _Header extends ConsumerWidget {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed: currentStageNo > 1
+              onPressed: !_isNavigating && currentStageNo > 1
                   ? () async {
                       await ref.read(currentStageNoProvider.notifier).prev();
                     }
                   : null,
-              onLongPress: currentStageNo > 1
+              onLongPress: !_isNavigating && currentStageNo > 1
                   ? () async {
                       await ref
                           .read(currentStageNoProvider.notifier)
@@ -149,27 +207,25 @@ class _Header extends ConsumerWidget {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed: () async {
-                final moved = await ref
-                    .read(currentStageNoProvider.notifier)
-                    .next();
-                if (!moved && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('これ以上ステージがありません')),
-                  );
-                }
-              },
-              onLongPress: () async {
-                final moved = await ref
-                    .read(currentStageNoProvider.notifier)
-                    .nextUncleared();
-                if (!moved && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('これ以上ステージがありません')),
-                  );
-                }
-              },
-              child: Text(isSmallScreen ? '次' : '次へ'),
+              onPressed: _isNavigating
+                  ? null
+                  : () => _navigateNext(
+                      () => ref.read(currentStageNoProvider.notifier).next(),
+                    ),
+              onLongPress: _isNavigating
+                  ? null
+                  : () => _navigateNext(
+                      () => ref
+                          .read(currentStageNoProvider.notifier)
+                          .nextUncleared(),
+                    ),
+              child: isLoadingShown
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+                    )
+                  : Text(isSmallScreen ? '次' : '次へ'),
             ),
           ),
         ],
@@ -271,8 +327,13 @@ class _Body extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isNavigating = ref.watch(_isNavigatingProvider);
     final currentStage = ref.watch(currentStageProvider);
     final showOverlay = ref.watch(showKyouenOverlayProvider);
+
+    if (isNavigating) {
+      return const StageBoard();
+    }
 
     return currentStage.when(
       data: (data) {
