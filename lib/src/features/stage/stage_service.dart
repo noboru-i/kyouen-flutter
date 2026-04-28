@@ -173,6 +173,57 @@ class CurrentStageNo extends _$CurrentStageNo {
     }
   }
 
+  Future<bool> nextUncleared() async {
+    final currentState = state;
+    if (currentState is! AsyncData<int>) {
+      return false;
+    }
+    final currentStageNo = currentState.value;
+
+    final repository = await ref.read(stageRepositoryProvider.future);
+    final clearedStages = await ref.read(clearedStageNumbersProvider.future);
+    final maxLoadedStageNo = await repository.getMaxStageNo();
+
+    final found = [
+      for (var n = currentStageNo + 1; n <= maxLoadedStageNo; n++)
+        if (!clearedStages.contains(n)) n,
+    ];
+    final targetStageNo = found.isNotEmpty ? found.first : maxLoadedStageNo + 1;
+
+    if (!await repository.stageExists(targetStageNo)) {
+      return false;
+    }
+
+    ref
+      ..invalidate(clearedStageNumbersProvider)
+      ..invalidate(clearedStageCountProvider);
+
+    state = AsyncData(targetStageNo);
+    await _saveCurrentStageNo(targetStageNo);
+    return true;
+  }
+
+  Future<void> prevUncleared() async {
+    final currentState = state;
+    if (currentState is! AsyncData<int> || currentState.value <= 1) {
+      return;
+    }
+    final currentStageNo = currentState.value;
+
+    final clearedStages = await ref.read(clearedStageNumbersProvider.future);
+
+    var targetStageNo = currentStageNo - 1;
+    for (var n = currentStageNo - 1; n >= 1; n--) {
+      if (!clearedStages.contains(n)) {
+        targetStageNo = n;
+        break;
+      }
+    }
+
+    state = AsyncData(targetStageNo);
+    await _saveCurrentStageNo(targetStageNo);
+  }
+
   Future<void> setStageNo(int stageNo) async {
     if (stageNo > 0) {
       state = AsyncData(stageNo);

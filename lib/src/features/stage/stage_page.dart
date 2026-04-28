@@ -94,6 +94,13 @@ class _Header extends ConsumerWidget {
                       await ref.read(currentStageNoProvider.notifier).prev();
                     }
                   : null,
+              onLongPress: currentStageNo > 1
+                  ? () async {
+                      await ref
+                          .read(currentStageNoProvider.notifier)
+                          .prevUncleared();
+                    }
+                  : null,
               child: Text(isSmallScreen ? '前' : '前へ'),
             ),
           ),
@@ -146,6 +153,16 @@ class _Header extends ConsumerWidget {
                 final moved = await ref
                     .read(currentStageNoProvider.notifier)
                     .next();
+                if (!moved && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('これ以上ステージがありません')),
+                  );
+                }
+              },
+              onLongPress: () async {
+                final moved = await ref
+                    .read(currentStageNoProvider.notifier)
+                    .nextUncleared();
                 if (!moved && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('これ以上ステージがありません')),
