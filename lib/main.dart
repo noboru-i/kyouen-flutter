@@ -53,7 +53,9 @@ int? _extractStageNo(Uri? uri) {
   if (uri == null) {
     return null;
   }
-  final stageParam = uri.queryParameters['stage'];
+  // `open` は旧URLフォーマット (?page_no=375&open=3756) 用
+  final stageParam =
+      uri.queryParameters['open'] ?? uri.queryParameters['stage'];
   if (stageParam == null) {
     return null;
   }

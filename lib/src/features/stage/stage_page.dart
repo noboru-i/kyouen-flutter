@@ -76,8 +76,10 @@ class _Header extends ConsumerStatefulWidget {
   ConsumerState<_Header> createState() => _HeaderState();
 }
 
+enum _NavDirection { next, prev }
+
 class _HeaderState extends ConsumerState<_Header> {
-  bool _isNavigating = false;
+  _NavDirection? _activeNavigation;
   Timer? _loadingTimer;
 
   @override
@@ -86,11 +88,14 @@ class _HeaderState extends ConsumerState<_Header> {
     super.dispose();
   }
 
-  Future<void> _navigateNext(Future<bool> Function() action) async {
-    if (_isNavigating) {
+  Future<void> _navigate(
+    _NavDirection direction,
+    Future<bool> Function() action,
+  ) async {
+    if (_activeNavigation != null) {
       return;
     }
-    setState(() => _isNavigating = true);
+    setState(() => _activeNavigation = direction);
 
     _loadingTimer = Timer(const Duration(milliseconds: 250), () {
       if (mounted) {
@@ -110,7 +115,7 @@ class _HeaderState extends ConsumerState<_Header> {
       _loadingTimer = null;
       ref.read(_isNavigatingProvider.notifier).stop();
       if (mounted) {
-        setState(() => _isNavigating = false);
+        setState(() => _activeNavigation = null);
       }
     }
   }
@@ -122,6 +127,7 @@ class _HeaderState extends ConsumerState<_Header> {
     final clearedStages = ref.watch(clearedStageNumbersProvider);
     final isLoadingShown = ref.watch(_isNavigatingProvider);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
+    final isBusy = _activeNavigation != null;
 
     // Extract current stage number from AsyncValue
     final currentStageNo = currentStageNoAsync.when(
@@ -147,19 +153,27 @@ class _HeaderState extends ConsumerState<_Header> {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed: !_isNavigating && currentStageNo > 1
-                  ? () async {
-                      await ref.read(currentStageNoProvider.notifier).prev();
-                    }
+              onPressed: !isBusy && currentStageNo > 1
+                  ? () => _navigate(
+                      _NavDirection.prev,
+                      () => ref.read(currentStageNoProvider.notifier).prev(),
+                    )
                   : null,
-              onLongPress: !_isNavigating && currentStageNo > 1
-                  ? () async {
-                      await ref
+              onLongPress: !isBusy && currentStageNo > 1
+                  ? () => _navigate(
+                      _NavDirection.prev,
+                      () => ref
                           .read(currentStageNoProvider.notifier)
-                          .prevUncleared();
-                    }
+                          .prevUncleared(),
+                    )
                   : null,
-              child: Text(isSmallScreen ? '前' : '前へ'),
+              child: isLoadingShown && _activeNavigation == _NavDirection.prev
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+                    )
+                  : Text(isSmallScreen ? '前' : '前へ'),
             ),
           ),
           Expanded(
@@ -207,19 +221,21 @@ class _HeaderState extends ConsumerState<_Header> {
           Expanded(
             flex: isSmallScreen ? 1 : 2,
             child: FilledButton(
-              onPressed: _isNavigating
+              onPressed: isBusy
                   ? null
-                  : () => _navigateNext(
+                  : () => _navigate(
+                      _NavDirection.next,
                       () => ref.read(currentStageNoProvider.notifier).next(),
                     ),
-              onLongPress: _isNavigating
+              onLongPress: isBusy
                   ? null
-                  : () => _navigateNext(
+                  : () => _navigate(
+                      _NavDirection.next,
                       () => ref
                           .read(currentStageNoProvider.notifier)
                           .nextUncleared(),
                     ),
-              child: isLoadingShown
+              child: isLoadingShown && _activeNavigation == _NavDirection.next
                   ? const SizedBox(
                       height: 20,
                       width: 20,

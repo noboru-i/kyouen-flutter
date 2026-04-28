@@ -164,13 +164,25 @@ class CurrentStageNo extends _$CurrentStageNo {
     return true;
   }
 
-  Future<void> prev() async {
+  Future<bool> prev() async {
     final currentState = state;
-    if (currentState is AsyncData<int> && currentState.value > 1) {
-      final newValue = currentState.value - 1;
-      state = AsyncData(newValue);
-      await _saveCurrentStageNo(newValue);
+    if (currentState is! AsyncData<int> || currentState.value <= 1) {
+      return false;
     }
+    final newValue = currentState.value - 1;
+
+    final repository = await ref.read(stageRepositoryProvider.future);
+    if (!await repository.stageExists(newValue)) {
+      return false;
+    }
+
+    ref
+      ..invalidate(clearedStageNumbersProvider)
+      ..invalidate(clearedStageCountProvider);
+
+    state = AsyncData(newValue);
+    await _saveCurrentStageNo(newValue);
+    return true;
   }
 
   Future<bool> nextUncleared() async {
@@ -203,10 +215,10 @@ class CurrentStageNo extends _$CurrentStageNo {
     return true;
   }
 
-  Future<void> prevUncleared() async {
+  Future<bool> prevUncleared() async {
     final currentState = state;
     if (currentState is! AsyncData<int> || currentState.value <= 1) {
-      return;
+      return false;
     }
     final currentStageNo = currentState.value;
 
@@ -220,8 +232,18 @@ class CurrentStageNo extends _$CurrentStageNo {
       }
     }
 
+    final repository = await ref.read(stageRepositoryProvider.future);
+    if (!await repository.stageExists(targetStageNo)) {
+      return false;
+    }
+
+    ref
+      ..invalidate(clearedStageNumbersProvider)
+      ..invalidate(clearedStageCountProvider);
+
     state = AsyncData(targetStageNo);
     await _saveCurrentStageNo(targetStageNo);
+    return true;
   }
 
   Future<void> setStageNo(int stageNo) async {

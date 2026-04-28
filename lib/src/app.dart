@@ -118,6 +118,13 @@ class _MyAppState extends ConsumerState<MyApp> {
               case PrivacyPolicyPage.routeName:
                 return const PrivacyPolicyPage();
               default:
+                // 未知パス（旧URLの /html/list.html 等）はWebのみ対応
+                if (kIsWeb) {
+                  if (initialStageNo != null) {
+                    return const StagePage();
+                  }
+                  return const WebTitlePage();
+                }
                 throw Exception();
             }
           },
