@@ -2,7 +2,7 @@ name: kyouen_flutter
 description: A new Flutter project.
 publish_to: "none"
 
-version: 3.0.3+561
+version: 4.0.0+561
 
 environment:
   sdk: ">=3.11.0 <4.0.0"
@@ -29,6 +29,7 @@ dependencies:
   json_annotation: ^4.11.0
   kyouen: ^0.0.1
   logger: ^2.7.0
+  package_info_plus: ^8.3.0
   path: ^1.9.1
   riverpod_annotation: ^4.0.2
   shared_preferences: ^2.5.5

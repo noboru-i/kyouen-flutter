@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
@@ -87,6 +88,25 @@ class MyDrawer extends StatelessWidget {
             ),
             onTap: () {
               showLicensePage(context: context);
+            },
+          ),
+          FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, snapshot) {
+              final version = snapshot.hasData
+                  ? '${snapshot.data!.version} (${snapshot.data!.buildNumber})'
+                  : '';
+              return ListTile(
+                leading: const Icon(Icons.info_outline, color: Colors.white70),
+                title: const Text(
+                  'バージョン',
+                  style: TextStyle(color: Colors.white),
+                ),
+                trailing: Text(
+                  version,
+                  style: const TextStyle(color: Colors.white70),
+                ),
+              );
             },
           ),
         ],
