@@ -3,6 +3,7 @@ import 'package:kyouen_flutter/src/data/api/entity/new_stage.dart';
 import 'package:kyouen_flutter/src/data/local/last_creator_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
+import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'create_stage_service.g.dart';
@@ -151,6 +152,7 @@ class CreateStage extends _$CreateStage {
       await ref
           .read(lastCreatorServiceProvider)
           .saveLastCreator(currentData.creator);
+      ref.invalidate(totalStageCountProvider);
 
       state = AsyncData(
         currentData.copyWith(isSubmitting: false, hasSubmitted: true),
