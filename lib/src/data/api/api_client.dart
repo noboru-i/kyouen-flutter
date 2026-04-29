@@ -25,7 +25,7 @@ abstract class ApiClient extends ChopperService {
   @GET(path: '/stages')
   Future<Response<List<StageResponse>>> getStages({
     @Query('start_stage_no') int startStageNo = 1,
-    @Query('limit') int? limit,
+    @Query('limit') int limit = 100,
   });
 
   @POST(path: '/users/login')

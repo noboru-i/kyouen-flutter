@@ -41,7 +41,7 @@ class StageRepository {
 
   Future<List<StageResponse>> getStages({
     int startStageNo = 1,
-    int? limit,
+    int limit = 100,
   }) async {
     final response = await _apiClient.getStages(
       startStageNo: startStageNo,
