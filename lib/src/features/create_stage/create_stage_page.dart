@@ -46,54 +46,76 @@ class _CreateStagePageState extends ConsumerState<CreateStagePage> {
               _controllerInitialized = true;
             }
 
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _SizeSelector(
-                      selectedSize: state.size,
-                      hasStones: state.stage.contains(StoneState.white.value),
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (state.kyouen != null) ...[
+                    _KyouenForm(
+                      controller: _creatorController,
+                      isSubmitting: state.isSubmitting,
+                      hasSubmitted: state.hasSubmitted,
+                      onCreatorChanged: (name) => ref
+                          .read(createStageProvider.notifier)
+                          .setCreator(name),
+                      onSubmit: () => _submit(context),
                     ),
-                    const SizedBox(height: 16),
-                    CreateStageBoard(
-                      stage: state.stage,
-                      size: state.size,
-                      kyouen: state.kyouen,
-                      onTap: state.kyouen == null
-                          ? (index) => ref
-                                .read(createStageProvider.notifier)
-                                .tapCell(index)
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    if (state.kyouen != null) ...[
-                      _KyouenForm(
-                        controller: _creatorController,
-                        isSubmitting: state.isSubmitting,
-                        hasSubmitted: state.hasSubmitted,
-                        onCreatorChanged: (name) => ref
-                            .read(createStageProvider.notifier)
-                            .setCreator(name),
-                        onSubmit: () => _submit(context),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                    OutlinedButton(
-                      onPressed: () =>
-                          ref.read(createStageProvider.notifier).reset(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white38),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text('リセット'),
-                    ),
+                    const SizedBox(height: 12),
                   ],
-                ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              _SizeSelector(
+                                selectedSize: state.size,
+                                hasStones: state.stage.contains(
+                                  StoneState.white.value,
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: OutlinedButton(
+                                  onPressed: () => ref
+                                      .read(createStageProvider.notifier)
+                                      .reset(),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    side: const BorderSide(
+                                      color: Colors.white38,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text('リセット'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: CreateStageBoard(
+                            stage: state.stage,
+                            size: state.size,
+                            kyouen: state.kyouen,
+                            onTap: state.kyouen == null
+                                ? (index) => ref
+                                      .read(createStageProvider.notifier)
+                                      .tapCell(index)
+                                : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           },
