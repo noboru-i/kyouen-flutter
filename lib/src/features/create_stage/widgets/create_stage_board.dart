@@ -25,6 +25,7 @@ class CreateStageBoard extends StatelessWidget {
       child: Stack(
         children: [
           GridView.count(
+            padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: size,
             children: [

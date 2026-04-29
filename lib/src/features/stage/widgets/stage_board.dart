@@ -8,10 +8,16 @@ import 'package:kyouen_flutter/src/widgets/common/board_card_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/stone_widget.dart';
 
 class StageBoard extends ConsumerWidget {
-  const StageBoard({this.stageData, this.onTapStone, super.key});
+  const StageBoard({
+    this.stageData,
+    this.onTapStone,
+    this.overlay,
+    super.key,
+  });
 
   final StageResponse? stageData;
   final void Function(int index)? onTapStone;
+  final Widget? overlay;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,18 +35,24 @@ class StageBoard extends ConsumerWidget {
       );
     }
 
-    return GridView.count(
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: sqrt(stageData!.stage.length).toInt(),
+    return Stack(
       children: [
-        for (final (index, state) in stageData!.stage.split('').indexed)
-          GestureDetector(
-            onTap: onTapStone != null ? () => onTapStone!(index) : null,
-            child: StoneWidget(
-              state: StoneState.fromString(state),
-              key: ValueKey(index),
-            ),
-          ),
+        GridView.count(
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: sqrt(stageData!.stage.length).toInt(),
+          children: [
+            for (final (index, state) in stageData!.stage.split('').indexed)
+              GestureDetector(
+                onTap: onTapStone != null ? () => onTapStone!(index) : null,
+                child: StoneWidget(
+                  state: StoneState.fromString(state),
+                  key: ValueKey(index),
+                ),
+              ),
+          ],
+        ),
+        if (overlay != null) Positioned.fill(child: overlay!),
       ],
     );
   }

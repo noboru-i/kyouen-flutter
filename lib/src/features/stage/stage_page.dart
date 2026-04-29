@@ -354,29 +354,25 @@ class _Body extends ConsumerWidget {
     return currentStage.when(
       data: (data) {
         final boardSize = data.size;
-        return Stack(
-          children: [
-            StageBoard(
-              stageData: data,
-              onTapStone: (index) => _onTapStone(ref, index),
-            ),
-            if (showOverlay) ...[
-              Consumer(
-                builder: (context, ref, child) {
-                  final kyouenData = ref
-                      .read(currentStageProvider.notifier)
-                      .getKyouenData();
-                  if (kyouenData != null) {
-                    return KyouenAnswerOverlayWidget(
-                      kyouenData: kyouenData,
-                      boardSize: boardSize,
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-            ],
-          ],
+        return StageBoard(
+          stageData: data,
+          onTapStone: (index) => _onTapStone(ref, index),
+          overlay: showOverlay
+              ? Consumer(
+                  builder: (context, ref, child) {
+                    final kyouenData = ref
+                        .read(currentStageProvider.notifier)
+                        .getKyouenData();
+                    if (kyouenData != null) {
+                      return KyouenAnswerOverlayWidget(
+                        kyouenData: kyouenData,
+                        boardSize: boardSize,
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                )
+              : null,
         );
       },
       error: (error, stackTrace) {
