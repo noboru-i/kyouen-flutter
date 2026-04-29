@@ -15,6 +15,7 @@ class CreateStageState {
   const CreateStageState({
     required this.size,
     required this.stage,
+    required this.placedIndexes,
     this.kyouen,
     required this.creator,
     this.isSubmitting = false,
@@ -23,6 +24,7 @@ class CreateStageState {
 
   final int size;
   final String stage;
+  final List<int> placedIndexes;
   final KyouenData? kyouen;
   final String creator;
   final bool isSubmitting;
@@ -31,6 +33,7 @@ class CreateStageState {
   CreateStageState copyWith({
     int? size,
     String? stage,
+    List<int>? placedIndexes,
     Object? kyouen = _unset,
     String? creator,
     bool? isSubmitting,
@@ -39,6 +42,7 @@ class CreateStageState {
     return CreateStageState(
       size: size ?? this.size,
       stage: stage ?? this.stage,
+      placedIndexes: placedIndexes ?? this.placedIndexes,
       kyouen: identical(kyouen, _unset) ? this.kyouen : kyouen as KyouenData?,
       creator: creator ?? this.creator,
       isSubmitting: isSubmitting ?? this.isSubmitting,
@@ -57,6 +61,7 @@ class CreateStage extends _$CreateStage {
     return CreateStageState(
       size: 6,
       stage: StoneState.none.value * 36,
+      placedIndexes: const [],
       creator: lastCreator ?? 'no name',
     );
   }
@@ -75,6 +80,7 @@ class CreateStage extends _$CreateStage {
       currentData.copyWith(
         size: size,
         stage: StoneState.none.value * cellCount,
+        placedIndexes: const [],
       ),
     );
   }
@@ -89,14 +95,54 @@ class CreateStage extends _$CreateStage {
     }
 
     final stageList = currentData.stage.split('');
-    stageList[index] = stageList[index] == StoneState.none.value
-        ? StoneState.white.value
-        : StoneState.none.value;
+    if (stageList[index] != StoneState.none.value) {
+      return;
+    }
+
+    stageList[index] = StoneState.black.value;
     final newStage = stageList.join();
 
     final kyouenData = _checkKyouen(newStage);
+    if (kyouenData != null) {
+      for (final point in kyouenData.points) {
+        final pointIndex = point.x.toInt() + point.y.toInt() * currentData.size;
+        stageList[pointIndex] = StoneState.white.value;
+      }
+    }
+
     state = AsyncData(
-      currentData.copyWith(stage: newStage, kyouen: kyouenData),
+      currentData.copyWith(
+        stage: stageList.join(),
+        placedIndexes: [...currentData.placedIndexes, index],
+        kyouen: kyouenData,
+      ),
+    );
+  }
+
+  void undo() {
+    final currentData = state.asData?.value;
+    if (currentData == null || currentData.placedIndexes.isEmpty) {
+      return;
+    }
+
+    final stageList = currentData.stage.split('');
+    final placedIndexes = [...currentData.placedIndexes];
+    final lastIndex = placedIndexes.removeLast();
+
+    for (var i = 0; i < stageList.length; i++) {
+      if (stageList[i] == StoneState.white.value) {
+        stageList[i] = StoneState.black.value;
+      }
+    }
+    stageList[lastIndex] = StoneState.none.value;
+
+    state = AsyncData(
+      currentData.copyWith(
+        stage: stageList.join(),
+        placedIndexes: placedIndexes,
+        kyouen: null,
+        hasSubmitted: false,
+      ),
     );
   }
 
@@ -110,6 +156,7 @@ class CreateStage extends _$CreateStage {
     state = AsyncData(
       currentData.copyWith(
         stage: StoneState.none.value * cellCount,
+        placedIndexes: const [],
         kyouen: null,
         hasSubmitted: false,
       ),
@@ -164,7 +211,9 @@ class CreateStage extends _$CreateStage {
   }
 
   KyouenData? _checkKyouen(String stage) {
-    final stones = stonesFromString(stage);
+    final stones = stonesFromString(
+      stage.replaceAll(StoneState.black.value, StoneState.white.value),
+    );
     if (stones.length < 4) {
       return null;
     }

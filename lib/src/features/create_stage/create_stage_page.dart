@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/features/create_stage/create_stage_service.dart';
 import 'package:kyouen_flutter/src/features/create_stage/widgets/create_stage_board.dart';
-import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 
@@ -51,53 +50,47 @@ class _CreateStagePageState extends ConsumerState<CreateStagePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (state.kyouen != null) ...[
-                    _KyouenForm(
-                      controller: _creatorController,
-                      isSubmitting: state.isSubmitting,
-                      hasSubmitted: state.hasSubmitted,
-                      onCreatorChanged: (name) => ref
-                          .read(createStageProvider.notifier)
-                          .setCreator(name),
-                      onSubmit: () => _submit(context),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      return SizeTransition(
+                        sizeFactor: animation,
+                        axisAlignment: -1,
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: state.kyouen != null
+                        ? Padding(
+                            key: const ValueKey('kyouen-form'),
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _KyouenForm(
+                              controller: _creatorController,
+                              isSubmitting: state.isSubmitting,
+                              hasSubmitted: state.hasSubmitted,
+                              onCreatorChanged: (name) => ref
+                                  .read(createStageProvider.notifier)
+                                  .setCreator(name),
+                              onSubmit: () => _submit(context),
+                            ),
+                          )
+                        : const SizedBox.shrink(
+                            key: ValueKey('kyouen-form-empty'),
+                          ),
+                  ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SizedBox(
-                          height: 40,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              _SizeSelector(
-                                selectedSize: state.size,
-                                hasStones: state.stage.contains(
-                                  StoneState.white.value,
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: OutlinedButton(
-                                  onPressed: () => ref
-                                      .read(createStageProvider.notifier)
-                                      .reset(),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    side: const BorderSide(
-                                      color: Colors.white38,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text('リセット'),
-                                ),
-                              ),
-                            ],
-                          ),
+                        _CreateStageToolbar(
+                          selectedSize: state.size,
+                          hasStones: state.placedIndexes.isNotEmpty,
+                          canUndo: state.placedIndexes.isNotEmpty,
+                          onUndo: () =>
+                              ref.read(createStageProvider.notifier).undo(),
+                          onReset: () =>
+                              ref.read(createStageProvider.notifier).reset(),
                         ),
                         const SizedBox(height: 12),
                         Expanded(
@@ -142,6 +135,70 @@ class _CreateStagePageState extends ConsumerState<CreateStagePage> {
   }
 }
 
+class _CreateStageToolbar extends StatelessWidget {
+  const _CreateStageToolbar({
+    required this.selectedSize,
+    required this.hasStones,
+    required this.canUndo,
+    required this.onUndo,
+    required this.onReset,
+  });
+
+  final int selectedSize;
+  final bool hasStones;
+  final bool canUndo;
+  final VoidCallback onUndo;
+  final VoidCallback onReset;
+
+  @override
+  Widget build(BuildContext context) {
+    final sizeSelector = _SizeSelector(
+      selectedSize: selectedSize,
+      hasStones: hasStones,
+    );
+    final actions = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        OutlinedButton(
+          onPressed: canUndo ? onUndo : null,
+          style: _buttonStyle(),
+          child: const Text('1手戻す'),
+        ),
+        const SizedBox(width: 8),
+        OutlinedButton(
+          onPressed: onReset,
+          style: _buttonStyle(),
+          child: const Text('リセット'),
+        ),
+      ],
+    );
+
+    return SizedBox(
+      height: 40,
+      child: Row(
+        children: [
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: sizeSelector,
+            ),
+          ),
+          actions,
+        ],
+      ),
+    );
+  }
+
+  ButtonStyle _buttonStyle() {
+    return OutlinedButton.styleFrom(
+      foregroundColor: Colors.white,
+      disabledForegroundColor: Colors.white38,
+      side: const BorderSide(color: Colors.white38),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    );
+  }
+}
+
 class _SizeSelector extends ConsumerWidget {
   const _SizeSelector({required this.selectedSize, required this.hasStones});
 
@@ -150,26 +207,24 @@ class _SizeSelector extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: SegmentedButton<int>(
-        selected: {selectedSize},
-        segments: const [
-          ButtonSegment(value: 6, label: Text('6×6')),
-          ButtonSegment(value: 9, label: Text('9×9')),
-        ],
-        onSelectionChanged: hasStones
-            ? null
-            : (selection) {
-                ref.read(createStageProvider.notifier).setSize(selection.first);
-              },
-        style: ButtonStyle(
-          foregroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return Colors.white;
-            }
-            return Colors.white54;
-          }),
-        ),
+    return SegmentedButton<int>(
+      selected: {selectedSize},
+      segments: const [
+        ButtonSegment(value: 6, label: Text('6×6')),
+        ButtonSegment(value: 9, label: Text('9×9')),
+      ],
+      onSelectionChanged: hasStones
+          ? null
+          : (selection) {
+              ref.read(createStageProvider.notifier).setSize(selection.first);
+            },
+      style: ButtonStyle(
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.white;
+          }
+          return Colors.white54;
+        }),
       ),
     );
   }
