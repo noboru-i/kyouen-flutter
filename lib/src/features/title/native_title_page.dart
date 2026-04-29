@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
+import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/options/options_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
@@ -89,6 +90,32 @@ class TitlePage extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 52,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.restorablePushNamed(
+                        context,
+                        CreateStagePage.routeName,
+                      );
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white.withValues(alpha: 0.12),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'ステージ作成',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

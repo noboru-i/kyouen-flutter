@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/options/options_page.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
@@ -117,6 +118,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const OptionsPage();
               case PrivacyPolicyPage.routeName:
                 return const PrivacyPolicyPage();
+              case CreateStagePage.routeName:
+                return const CreateStagePage();
               default:
                 // 未知パス（旧URLの /html/list.html 等）はWebのみ対応
                 if (kIsWeb) {

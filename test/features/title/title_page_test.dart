@@ -54,6 +54,11 @@ void main() {
         ],
       );
 
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       // Build the title page with provider scope
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -86,6 +91,11 @@ void main() {
           totalStageCountProvider.overrideWith(MockTotalStageCount.new),
         ],
       );
+
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
         UncontrolledProviderScope(

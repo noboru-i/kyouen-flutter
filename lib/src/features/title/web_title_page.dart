@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/data/repository/web_title_repository.dart';
+import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
@@ -102,12 +103,30 @@ class WebTitlePage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Start Game Button
           FilledButton(
             onPressed: () {
               Navigator.restorablePushNamed(context, StagePage.routeName);
             },
-            child: const Text('ステージ一覧へ'),
+            child: const Text('スタート'),
+          ),
+
+          const SizedBox(height: 12),
+
+          FilledButton(
+            onPressed: () {
+              Navigator.restorablePushNamed(
+                context,
+                CreateStagePage.routeName,
+              );
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.12),
+              foregroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+            ),
+            child: const Text('ステージ作成'),
           ),
 
           const SizedBox(height: 12),
