@@ -8,6 +8,7 @@ import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dar
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
 import 'package:kyouen_flutter/src/features/title/views/my_app_bar.dart';
 import 'package:kyouen_flutter/src/features/title/views/my_drawer.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 
@@ -33,9 +34,9 @@ class WebTitlePage extends ConsumerWidget {
                   const SizedBox(height: 48),
 
                   // Main Title
-                  const Text(
-                    '共円',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.kyouenTitle,
+                    style: const TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -46,10 +47,10 @@ class WebTitlePage extends ConsumerWidget {
                   const SizedBox(height: 16),
 
                   // Subtitle
-                  const Text(
-                    '共円とは、４つの石を通る円のことです。\nこのページでは、盤上に置かれた石から共円を指摘する、「詰め共円」が多数登録されています。',
+                  Text(
+                    AppLocalizations.of(context)!.kyouenDescription,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.white54),
+                    style: const TextStyle(fontSize: 16, color: Colors.white54),
                   ),
 
                   const SizedBox(height: 32),
@@ -70,10 +71,10 @@ class WebTitlePage extends ConsumerWidget {
                     runSpacing: 20,
                     children: [
                       // Latest Registrations Section
-                      _buildLatestRegistrationsSection(),
+                      _buildLatestRegistrationsSection(context),
 
                       // Activity Section
-                      _buildActivitySection(),
+                      _buildActivitySection(context),
                     ],
                   ),
 
@@ -107,7 +108,7 @@ class WebTitlePage extends ConsumerWidget {
             onPressed: () {
               Navigator.restorablePushNamed(context, StagePage.routeName);
             },
-            child: const Text('スタート'),
+            child: Text(AppLocalizations.of(context)!.start),
           ),
 
           const SizedBox(height: 12),
@@ -126,7 +127,7 @@ class WebTitlePage extends ConsumerWidget {
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
             ),
-            child: const Text('ステージ作成'),
+            child: Text(AppLocalizations.of(context)!.createStage),
           ),
 
           const SizedBox(height: 12),
@@ -157,7 +158,7 @@ class WebTitlePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildLatestRegistrationsSection() {
+  Widget _buildLatestRegistrationsSection(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(minWidth: 280),
       decoration: BoxDecoration(
@@ -169,9 +170,9 @@ class WebTitlePage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '最新の登録',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.latestRegistrations,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -184,7 +185,7 @@ class WebTitlePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildActivitySection() {
+  Widget _buildActivitySection(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(minWidth: 280),
       decoration: BoxDecoration(
@@ -196,9 +197,9 @@ class WebTitlePage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'アクティビティ',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.activity,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -224,6 +225,7 @@ class WebTitlePage extends ConsumerWidget {
 class _RecentStagesDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final recentStagesAsync = ref.watch(recentStagesProvider);
 
     return recentStagesAsync.when(
@@ -231,9 +233,9 @@ class _RecentStagesDisplay extends ConsumerWidget {
         child: CircularProgressIndicator(color: AppTheme.accentColor),
       ),
       error: (error, trace) {
-        return const Text(
-          'エラーが発生しました',
-          style: TextStyle(fontSize: 14, color: Color(0xFFE53935)),
+        return Text(
+          l10n.errorOccurred,
+          style: const TextStyle(fontSize: 14, color: Color(0xFFE53935)),
         );
       },
       data: (stages) => Column(
@@ -275,6 +277,7 @@ class _RecentStagesDisplay extends ConsumerWidget {
 class _ActivitiesDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final activitiesAsync = ref.watch(activitiesProvider);
 
     return activitiesAsync.when(
@@ -282,9 +285,9 @@ class _ActivitiesDisplay extends ConsumerWidget {
         child: CircularProgressIndicator(color: AppTheme.accentColor),
       ),
       error: (error, _) {
-        return const Text(
-          'エラーが発生しました',
-          style: TextStyle(fontSize: 14, color: Color(0xFFE53935)),
+        return Text(
+          l10n.errorOccurred,
+          style: const TextStyle(fontSize: 14, color: Color(0xFFE53935)),
         );
       },
       data: (activities) => Column(
@@ -332,7 +335,9 @@ class _ActivitiesDisplay extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            '${activity.clearedStages.length}ステージクリア',
+                            l10n.stagesClearedCount(
+                              activity.clearedStages.length,
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.white54,
@@ -354,6 +359,7 @@ class _ActivitiesDisplay extends ConsumerWidget {
 class _WebStageCountDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final clearedAsync = ref.watch(clearedStageCountProvider);
     final totalAsync = ref.watch(totalStageCountProvider);
 
@@ -367,9 +373,9 @@ class _WebStageCountDisplay extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
-        child: const Text(
-          'ステージ情報を読み込み中...',
-          style: TextStyle(fontSize: 14, color: Colors.white54),
+        child: Text(
+          l10n.loadingStageInfo,
+          style: const TextStyle(fontSize: 14, color: Colors.white54),
         ),
       ),
       error: (_, _) => Container(
@@ -381,9 +387,9 @@ class _WebStageCountDisplay extends ConsumerWidget {
             color: const Color(0xFFE53935).withValues(alpha: 0.4),
           ),
         ),
-        child: const Text(
-          'ステージ情報取得エラー',
-          style: TextStyle(fontSize: 14, color: Color(0xFFE53935)),
+        child: Text(
+          l10n.stageInfoError,
+          style: const TextStyle(fontSize: 14, color: Color(0xFFE53935)),
         ),
       ),
       data: (clearedCount) => Container(
@@ -396,7 +402,7 @@ class _WebStageCountDisplay extends ConsumerWidget {
           ),
         ),
         child: Text(
-          'クリアステージ数: $clearedCount / $totalCount',
+          l10n.clearedStagesCount(clearedCount, totalCount),
           style: const TextStyle(
             fontSize: 14,
             color: AppTheme.accentColor,

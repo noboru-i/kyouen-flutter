@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -10,19 +11,20 @@ class OptionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BackgroundWidget(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text('オプション'),
+          title: Text(l10n.options),
         ),
         body: ListView(
           children: [
             ListTile(
               leading: const Icon(Icons.privacy_tip_outlined),
-              title: const Text('プライバシーポリシー'),
+              title: Text(l10n.privacyPolicy),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.restorablePushNamed(
@@ -33,7 +35,7 @@ class OptionsPage extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.description_outlined),
-              title: const Text('ライセンス'),
+              title: Text(l10n.licenses),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 showLicensePage(context: context);
@@ -47,7 +49,7 @@ class OptionsPage extends StatelessWidget {
                     : '';
                 return ListTile(
                   leading: const Icon(Icons.info_outline),
-                  title: const Text('バージョン'),
+                  title: Text(l10n.version),
                   trailing: Text(version),
                 );
               },

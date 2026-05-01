@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/account/account_service.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 
@@ -19,7 +20,7 @@ class AccountPage extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text('アカウント'),
+          title: Text(AppLocalizations.of(context)!.account),
         ),
         body: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
@@ -156,7 +157,7 @@ class _LogoutView extends ConsumerWidget {
                       : const Icon(Icons.account_circle, size: 32),
                   const SizedBox(height: 16),
                   Text(
-                    user.displayName ?? 'ユーザー',
+                    user.displayName ?? AppLocalizations.of(context)!.user,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ],
@@ -169,14 +170,14 @@ class _LogoutView extends ConsumerWidget {
             height: 56,
             child: FilledButton.tonal(
               onPressed: () => _syncStages(context, ref),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.sync, size: 20),
-                  SizedBox(width: 12),
+                  const Icon(Icons.sync, size: 20),
+                  const SizedBox(width: 12),
                   Text(
-                    'クリアデータを同期',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.syncClearData,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -191,14 +192,14 @@ class _LogoutView extends ConsumerWidget {
             height: 56,
             child: FilledButton.tonal(
               onPressed: () => _signOut(context, ref),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.logout, size: 20),
-                  SizedBox(width: 12),
+                  const Icon(Icons.logout, size: 20),
+                  const SizedBox(width: 12),
                   Text(
-                    'ログアウト',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.logout,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -217,14 +218,14 @@ class _LogoutView extends ConsumerWidget {
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.delete_forever, size: 20),
-                  SizedBox(width: 12),
+                  const Icon(Icons.delete_forever, size: 20),
+                  const SizedBox(width: 12),
                   Text(
-                    'アカウント削除',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.deleteAccount,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -246,7 +247,13 @@ class _LogoutView extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('ログアウトに失敗しました: $e')));
+        ).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.logoutFailed(e.toString()),
+            ),
+          ),
+        );
       }
     }
   }
@@ -256,13 +263,13 @@ class _LogoutView extends ConsumerWidget {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('同期中...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(AppLocalizations.of(context)!.syncing),
           ],
         ),
       ),
@@ -278,14 +285,18 @@ class _LogoutView extends ConsumerWidget {
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('クリアデータを同期しました')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.syncSuccess)),
         );
       }
     } on Exception catch (e) {
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('同期に失敗しました: $e')),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.syncFailed(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -294,26 +305,27 @@ class _LogoutView extends ConsumerWidget {
   void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('アカウント削除'),
-        content: const Text(
-          'アカウントを削除してもよろしいですか？この操作は元に戻すことができず、すべてのデータが永久に削除されます。',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _deleteAccount(context, ref);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('削除'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(l10n.deleteAccount),
+          content: Text(l10n.deleteAccountConfirmation),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteAccount(context, ref);
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: Text(l10n.delete),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -323,13 +335,13 @@ class _LogoutView extends ConsumerWidget {
       showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const AlertDialog(
+        builder: (context) => AlertDialog(
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('アカウントを削除中...'),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(AppLocalizations.of(context)!.deletingAccount),
             ],
           ),
         ),
@@ -340,18 +352,24 @@ class _LogoutView extends ConsumerWidget {
 
       if (context.mounted) {
         Navigator.of(context).pop(); // Close loading dialog
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('アカウントが正常に削除されました')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.accountDeleted),
+          ),
+        );
         // After account deletion, user is automatically signed out
         // The StreamBuilder will detect the auth state change and show sign-in view
       }
     } on Exception catch (e) {
       if (context.mounted) {
         Navigator.of(context).pop(); // Close loading dialog
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('アカウント削除に失敗しました: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.accountDeleteFailed(e.toString()),
+            ),
+          ),
+        );
       }
     }
   }

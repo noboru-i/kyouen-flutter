@@ -1,4 +1,4 @@
-.PHONY: help run-dev run-prod build-dev build-prod test gen analyze screenshots screenshots-ios screenshots-android clean-screenshots
+.PHONY: help run-dev run-prod build-dev build-prod test gen analyze screenshots screenshots-ios screenshots-android clean-screenshots sim-lang-ja sim-lang-en
 
 help:
 	@echo "Usage: make <target>"
@@ -19,6 +19,10 @@ help:
 	@echo "  screenshots-ios      iOS シミュレータでスクリーンショット撮影"
 	@echo "  screenshots-android  Android エミュレータでスクリーンショット撮影"
 	@echo "  clean-screenshots    撮影済み画像を削除"
+	@echo ""
+	@echo "Simulator:"
+	@echo "  sim-lang-ja  iOSシミュレーターを日本語に切り替えて再起動"
+	@echo "  sim-lang-en  iOSシミュレーターを英語に切り替えて再起動"
 	@echo ""
 	@echo "Code:"
 	@echo "  gen         コード生成 (Riverpod, Freezed, JSON, Chopper)"
@@ -124,3 +128,19 @@ screenshots-android:
 clean-screenshots:
 	@echo "🗑️  スクリーンショットを削除します"
 	rm -rf build/screenshots/
+
+sim-lang-ja:
+	@echo "iOSシミュレーターを日本語に切り替えます..."
+	xcrun simctl spawn booted defaults write -g AppleLanguages -array "ja"
+	xcrun simctl spawn booted defaults write -g AppleLocale -string "ja_JP"
+	xcrun simctl shutdown booted
+	xcrun simctl boot "$(IOS_DEVICE)"
+	@echo "日本語に切り替えました（シミュレーターが再起動されました）"
+
+sim-lang-en:
+	@echo "iOSシミュレーターを英語に切り替えます..."
+	xcrun simctl spawn booted defaults write -g AppleLanguages -array "en"
+	xcrun simctl spawn booted defaults write -g AppleLocale -string "en_US"
+	xcrun simctl shutdown booted
+	xcrun simctl boot "$(IOS_DEVICE)"
+	@echo "英語に切り替えました（シミュレーターが再起動されました）"

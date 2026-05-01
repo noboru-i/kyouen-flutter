@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -10,6 +11,7 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Drawer(
       backgroundColor: const Color(0xFF1C2334),
       child: ListView(
@@ -37,7 +39,7 @@ class MyDrawer extends StatelessWidget {
                   ),
                 ),
                 accountName: Text(
-                  user.displayName ?? 'ゲスト',
+                  user.displayName ?? l10n.guest,
                   style: const TextStyle(color: Colors.white),
                 ),
                 accountEmail: Text(
@@ -49,14 +51,17 @@ class MyDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.home, color: Colors.white70),
-            title: const Text('ホーム', style: TextStyle(color: Colors.white)),
+            title: Text(l10n.home, style: const TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.restorablePushNamed(context, TitlePage.routeName);
             },
           ),
           ListTile(
             leading: const Icon(Icons.settings, color: Colors.white70),
-            title: const Text('設定', style: TextStyle(color: Colors.white)),
+            title: Text(
+              l10n.settingsMenu,
+              style: const TextStyle(color: Colors.white),
+            ),
             onTap: () {
               Navigator.restorablePushNamed(context, AccountPage.routeName);
             },
@@ -66,9 +71,9 @@ class MyDrawer extends StatelessWidget {
               Icons.privacy_tip_outlined,
               color: Colors.white70,
             ),
-            title: const Text(
-              'プライバシーポリシー',
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              l10n.privacyPolicy,
+              style: const TextStyle(color: Colors.white),
             ),
             onTap: () {
               Navigator.restorablePushNamed(
@@ -82,9 +87,9 @@ class MyDrawer extends StatelessWidget {
               Icons.description_outlined,
               color: Colors.white70,
             ),
-            title: const Text(
-              'ライセンス',
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              l10n.licenses,
+              style: const TextStyle(color: Colors.white),
             ),
             onTap: () {
               showLicensePage(context: context);
@@ -98,9 +103,9 @@ class MyDrawer extends StatelessWidget {
                   : '';
               return ListTile(
                 leading: const Icon(Icons.info_outline, color: Colors.white70),
-                title: const Text(
-                  'バージョン',
-                  style: TextStyle(color: Colors.white),
+                title: Text(
+                  l10n.version,
+                  style: const TextStyle(color: Colors.white),
                 ),
                 trailing: Text(
                   version,

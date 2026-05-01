@@ -1,6 +1,281 @@
 {
-  "appTitle": "kyouen_flutter",
+  "@@locale": "en",
+  "appTitle": "Kyouen",
   "@appTitle": {
     "description": "The title of the application"
+  },
+  "kyouenTitle": "Kyouen",
+  "@kyouenTitle": {
+    "description": "The game title displayed on the web title page"
+  },
+  "kyouenDescription": "Kyouen is a circle passing through 4 stones.\nThis page hosts many 'Tsume Kyouen' puzzles, where you find the kyouen from stones placed on the board.",
+  "@kyouenDescription": {
+    "description": "Description of the game on the web title page"
+  },
+  "start": "Start",
+  "@start": {
+    "description": "Start button label"
+  },
+  "createStage": "Create Stage",
+  "@createStage": {
+    "description": "Create stage button label"
+  },
+  "latestRegistrations": "Latest Registrations",
+  "@latestRegistrations": {
+    "description": "Section title for latest registrations"
+  },
+  "activity": "Activity",
+  "@activity": {
+    "description": "Section title for activity"
+  },
+  "errorOccurred": "An error occurred",
+  "@errorOccurred": {
+    "description": "Generic error message"
+  },
+  "stagesClearedCount": "{count} stages cleared",
+  "@stagesClearedCount": {
+    "description": "Number of stages cleared by a user in activity",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loadingStageInfo": "Loading stage information...",
+  "@loadingStageInfo": {
+    "description": "Loading indicator for stage information"
+  },
+  "stageInfoError": "Error fetching stage information",
+  "@stageInfoError": {
+    "description": "Error message for stage information fetch failure"
+  },
+  "clearedStagesCount": "Cleared: {cleared} / {total}",
+  "@clearedStagesCount": {
+    "description": "Cleared stage count display",
+    "placeholders": {
+      "cleared": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button label"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button label"
+  },
+  "account": "Account",
+  "@account": {
+    "description": "Account button/page label"
+  },
+  "guest": "Guest",
+  "@guest": {
+    "description": "Default name for a guest user"
+  },
+  "user": "User",
+  "@user": {
+    "description": "Default name for a logged-in user without a display name"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home menu item label"
+  },
+  "settingsMenu": "Settings",
+  "@settingsMenu": {
+    "description": "Settings menu item label in drawer"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy menu item label"
+  },
+  "licenses": "Licenses",
+  "@licenses": {
+    "description": "Licenses menu item label"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "Version label"
+  },
+  "options": "Options",
+  "@options": {
+    "description": "Options page title"
+  },
+  "puzzleDescription": "A puzzle to find a circle passing through 4 stones",
+  "@puzzleDescription": {
+    "description": "Short description of the game on the native title page"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Generic loading indicator text"
+  },
+  "stageClearedProgress": "{cleared} / {total} stages cleared",
+  "@stageClearedProgress": {
+    "description": "Stage clear progress text on native title page",
+    "placeholders": {
+      "cleared": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "noMoreStages": "No more stages",
+  "@noMoreStages": {
+    "description": "Message when there are no more stages to navigate to"
+  },
+  "prevShort": "Prev",
+  "@prevShort": {
+    "description": "Short label for previous button on small screens"
+  },
+  "prevFull": "Previous",
+  "@prevFull": {
+    "description": "Full label for previous button on large screens"
+  },
+  "nextShort": "Next",
+  "@nextShort": {
+    "description": "Short label for next button on small screens"
+  },
+  "nextFull": "Next",
+  "@nextFull": {
+    "description": "Full label for next button on large screens"
+  },
+  "kyouenButton": "Kyouen!!",
+  "@kyouenButton": {
+    "description": "Label for the kyouen check button"
+  },
+  "tooBad": "Too bad!",
+  "@tooBad": {
+    "description": "Dialog title when the answer is not kyouen"
+  },
+  "notKyouenMessage": "That was not kyouen.",
+  "@notKyouenMessage": {
+    "description": "Dialog message when the answer is not kyouen"
+  },
+  "syncClearData": "Sync Clear Data",
+  "@syncClearData": {
+    "description": "Button label to sync clear data"
+  },
+  "syncing": "Syncing...",
+  "@syncing": {
+    "description": "Loading text while syncing"
+  },
+  "syncSuccess": "Clear data synced",
+  "@syncSuccess": {
+    "description": "Success message after syncing clear data"
+  },
+  "syncFailed": "Failed to sync: {error}",
+  "@syncFailed": {
+    "description": "Error message when sync fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "logoutFailed": "Failed to logout: {error}",
+  "@logoutFailed": {
+    "description": "Error message when logout fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccount": "Delete Account",
+  "@deleteAccount": {
+    "description": "Delete account button label and dialog title"
+  },
+  "deleteAccountConfirmation": "Are you sure you want to delete your account? This action cannot be undone and all data will be permanently deleted.",
+  "@deleteAccountConfirmation": {
+    "description": "Confirmation message for account deletion"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button label"
+  },
+  "deletingAccount": "Deleting account...",
+  "@deletingAccount": {
+    "description": "Loading text while deleting account"
+  },
+  "accountDeleted": "Account successfully deleted",
+  "@accountDeleted": {
+    "description": "Success message after account deletion"
+  },
+  "accountDeleteFailed": "Failed to delete account: {error}",
+  "@accountDeleteFailed": {
+    "description": "Error message when account deletion fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "kyouenSuccess": "Kyouen!!",
+  "@kyouenSuccess": {
+    "description": "Success title in the kyouen success dialog"
+  },
+  "stageClear": "Stage Clear",
+  "@stageClear": {
+    "description": "Subtitle in the kyouen success dialog"
+  },
+  "nextStage": "Next Stage",
+  "@nextStage": {
+    "description": "Button label to go to the next stage"
+  },
+  "kyouenFormed": "Kyouen formed!",
+  "@kyouenFormed": {
+    "description": "Title shown in the create stage form when kyouen is achieved"
+  },
+  "nameLabel": "Name",
+  "@nameLabel": {
+    "description": "Label for the name input field in create stage form"
+  },
+  "submitted": "Submitted",
+  "@submitted": {
+    "description": "Button label after a stage has been submitted"
+  },
+  "submit": "Submit",
+  "@submit": {
+    "description": "Button label to submit a stage"
+  },
+  "submitSuccess": "Stage submitted!",
+  "@submitSuccess": {
+    "description": "Snackbar message after successfully submitting a stage"
+  },
+  "submitFailed": "Failed to submit: {error}",
+  "@submitFailed": {
+    "description": "Snackbar message when stage submission fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "undo": "Undo",
+  "@undo": {
+    "description": "Button label to undo the last move in create stage"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Button label to reset the board in create stage"
+  },
+  "errorWithMessage": "Error: {error}",
+  "@errorWithMessage": {
+    "description": "Error message with details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   }
 }

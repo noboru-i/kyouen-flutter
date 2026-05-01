@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 
 class AccountButton extends StatelessWidget {
   const AccountButton({
@@ -16,6 +17,7 @@ class AccountButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     try {
       return StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -29,7 +31,7 @@ class AccountButton extends StatelessWidget {
                 Navigator.restorablePushNamed(context, AccountPage.routeName);
               },
               child: Text(
-                isLoggedIn ? 'アカウント' : 'ログイン',
+                isLoggedIn ? l10n.account : l10n.login,
                 style:
                     textStyle ??
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -48,7 +50,7 @@ class AccountButton extends StatelessWidget {
             Navigator.restorablePushNamed(context, AccountPage.routeName);
           },
           child: Text(
-            'ログイン',
+            l10n.login,
             style:
                 textStyle ??
                 const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -73,6 +75,7 @@ class OutlinedAccountButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     try {
       return StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -86,7 +89,7 @@ class OutlinedAccountButton extends StatelessWidget {
                 Navigator.restorablePushNamed(context, AccountPage.routeName);
               },
               child: Text(
-                isLoggedIn ? 'アカウント' : 'ログイン',
+                isLoggedIn ? l10n.account : l10n.login,
                 style:
                     textStyle ??
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -105,7 +108,7 @@ class OutlinedAccountButton extends StatelessWidget {
             Navigator.restorablePushNamed(context, AccountPage.routeName);
           },
           child: Text(
-            'ログイン',
+            l10n.login,
             style:
                 textStyle ??
                 const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),

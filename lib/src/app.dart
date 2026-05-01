@@ -93,7 +93,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en', '')],
+      supportedLocales: AppLocalizations.supportedLocales,
       onGenerateTitle: (BuildContext context) => Environment.appName,
       theme: AppTheme.darkTheme,
       initialRoute: initialRoute,

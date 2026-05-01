@@ -9,6 +9,7 @@ import 'package:kyouen_flutter/src/features/options/options_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 
 const _kBgTop = Color(0xFF1C2334);
 const _kBgBottom = Color(0xFF0D1117);
@@ -57,10 +58,10 @@ class TitlePage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '４つの石を通る円を見つけるパズル',
+                Text(
+                  AppLocalizations.of(context)!.puzzleDescription,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: Colors.white54,
                     letterSpacing: 0.5,
@@ -85,9 +86,9 @@ class TitlePage extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'スタート',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context)!.start,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -111,9 +112,9 @@ class TitlePage extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'ステージ作成',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context)!.createStage,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -388,6 +389,7 @@ class _ProgressView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final progress = (total > 0) ? cleared / total : 0.0;
 
     return Column(
@@ -404,8 +406,8 @@ class _ProgressView extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           isLoading
-              ? '読み込み中...'
-              : (total > 0 ? '$cleared / $total ステージクリア' : ''),
+              ? l10n.loading
+              : (total > 0 ? l10n.stageClearedProgress(cleared, total) : ''),
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 13, color: Colors.white54),
         ),

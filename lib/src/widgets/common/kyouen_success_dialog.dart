@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 
 const _kAccent = Color(0xFFFF6B35);
 const _kSurface = Color(0xFF1E2A3A);
@@ -80,9 +81,9 @@ class _KyouenSuccessDialogState extends State<KyouenSuccessDialog>
                 child: const Icon(Icons.check, color: _kAccent, size: 36),
               ),
               const SizedBox(height: 20),
-              const Text(
-                '共円！！',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.kyouenSuccess,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -91,7 +92,7 @@ class _KyouenSuccessDialogState extends State<KyouenSuccessDialog>
               ),
               const SizedBox(height: 6),
               Text(
-                'ステージクリア',
+                AppLocalizations.of(context)!.stageClear,
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.white.withValues(alpha: 0.54),
@@ -115,7 +116,7 @@ class _KyouenSuccessDialogState extends State<KyouenSuccessDialog>
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  child: const Text('次のステージへ'),
+                  child: Text(AppLocalizations.of(context)!.nextStage),
                 ),
               ),
             ],

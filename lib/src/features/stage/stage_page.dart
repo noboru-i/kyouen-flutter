@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/stage/widgets/stage_board.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
@@ -107,7 +108,7 @@ class _HeaderState extends ConsumerState<_Header> {
       final moved = await action();
       if (!moved && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('これ以上ステージがありません')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.noMoreStages)),
         );
       }
     } finally {
@@ -173,7 +174,11 @@ class _HeaderState extends ConsumerState<_Header> {
                       width: 20,
                       child: CircularProgressIndicator.adaptive(strokeWidth: 2),
                     )
-                  : Text(isSmallScreen ? '前' : '前へ'),
+                  : Text(
+                      isSmallScreen
+                          ? AppLocalizations.of(context)!.prevShort
+                          : AppLocalizations.of(context)!.prevFull,
+                    ),
             ),
           ),
           Expanded(
@@ -241,7 +246,11 @@ class _HeaderState extends ConsumerState<_Header> {
                       width: 20,
                       child: CircularProgressIndicator.adaptive(strokeWidth: 2),
                     )
-                  : Text(isSmallScreen ? '次' : '次へ'),
+                  : Text(
+                      isSmallScreen
+                          ? AppLocalizations.of(context)!.nextShort
+                          : AppLocalizations.of(context)!.nextFull,
+                    ),
             ),
           ),
         ],
@@ -298,7 +307,11 @@ class _Footer extends ConsumerWidget {
                         .next();
                     if (!moved && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('これ以上ステージがありません')),
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(context)!.noMoreStages,
+                          ),
+                        ),
                       );
                     }
                   }
@@ -311,19 +324,20 @@ class _Footer extends ConsumerWidget {
                 }
               }
             : null,
-        child: const Text('共円！！'),
+        child: Text(AppLocalizations.of(context)!.kyouenButton),
       ),
     );
   }
 
   Future<void> _showNotKyouenDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          title: const Center(child: Text('残念！')),
-          content: const Text('共円ではありませんでした。'),
+          title: Center(child: Text(l10n.tooBad)),
+          content: Text(l10n.notKyouenMessage),
           actions: [
             TextButton(
               onPressed: () {

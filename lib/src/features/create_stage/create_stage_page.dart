@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/features/create_stage/create_stage_service.dart';
 import 'package:kyouen_flutter/src/features/create_stage/widgets/create_stage_board.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 
@@ -32,13 +33,17 @@ class _CreateStagePageState extends ConsumerState<CreateStagePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: const Text('ステージ作成'),
+          title: Text(AppLocalizations.of(context)!.createStage),
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
         ),
         body: stateAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('エラー: $e')),
+          error: (e, _) => Center(
+            child: Text(
+              AppLocalizations.of(context)!.errorWithMessage(e.toString()),
+            ),
+          ),
           data: (state) {
             if (!_controllerInitialized) {
               _creatorController.text = state.creator;
@@ -122,13 +127,17 @@ class _CreateStagePageState extends ConsumerState<CreateStagePage> {
       await ref.read(createStageProvider.notifier).submit();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ステージを送信しました！')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.submitSuccess)),
         );
       }
     } on Exception catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('送信に失敗しました: $e')),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.submitFailed(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -162,13 +171,13 @@ class _CreateStageToolbar extends StatelessWidget {
         OutlinedButton(
           onPressed: canUndo ? onUndo : null,
           style: _buttonStyle(),
-          child: const Text('1手戻す'),
+          child: Text(AppLocalizations.of(context)!.undo),
         ),
         const SizedBox(width: 8),
         OutlinedButton(
           onPressed: onReset,
           style: _buttonStyle(),
-          child: const Text('リセット'),
+          child: Text(AppLocalizations.of(context)!.reset),
         ),
       ],
     );
@@ -257,10 +266,10 @@ class _KyouenForm extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            '共円成立！',
+          Text(
+            AppLocalizations.of(context)!.kyouenFormed,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.accentColor,
@@ -271,7 +280,7 @@ class _KyouenForm extends StatelessWidget {
             controller: controller,
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              labelText: '名前',
+              labelText: AppLocalizations.of(context)!.nameLabel,
               labelStyle: const TextStyle(color: Colors.white54),
               enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(color: Colors.white38),
@@ -296,7 +305,11 @@ class _KyouenForm extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                : Text(hasSubmitted ? '送信済み' : '送信する'),
+                : Text(
+                    hasSubmitted
+                        ? AppLocalizations.of(context)!.submitted
+                        : AppLocalizations.of(context)!.submit,
+                  ),
           ),
         ],
       ),

@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -21,7 +23,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.restorablePushNamed(context, AccountPage.routeName);
                 },
                 style: TextButton.styleFrom(foregroundColor: Colors.white),
-                child: const Text('ログイン'),
+                child: Text(l10n.login),
               );
             }
 
@@ -30,7 +32,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                 FirebaseAuth.instance.signOut();
               },
               style: TextButton.styleFrom(foregroundColor: Colors.white),
-              child: const Text('ログアウト'),
+              child: Text(l10n.logout),
             );
           },
         ),
