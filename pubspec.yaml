@@ -26,6 +26,7 @@ dependencies:
     sdk: flutter
   freezed_annotation: ^3.1.0
   http: ^1.6.0
+  intl: ^0.20.2
   json_annotation: ^4.11.0
   kyouen: ^0.0.1
   logger: ^2.7.0

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/data/repository/web_title_repository.dart';
 import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
+import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
 import 'package:kyouen_flutter/src/features/title/views/my_app_bar.dart';
@@ -222,6 +224,16 @@ class WebTitlePage extends ConsumerWidget {
   }
 }
 
+String _formatDate(String registDate) {
+  try {
+    final utc = DateTime.parse(registDate);
+    final local = utc.toLocal();
+    return DateFormat('yyyy/MM/dd HH:mm').format(local);
+  } on FormatException {
+    return registDate;
+  }
+}
+
 class _RecentStagesDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -247,17 +259,37 @@ class _RecentStagesDisplay extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
-                    Text(
-                      '${stage.stageNo}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    TextButton(
+                      onPressed: () async {
+                        await ref
+                            .read(currentStageNoProvider.notifier)
+                            .setStageNo(stage.stageNo);
+                        if (context.mounted) {
+                          await Navigator.pushNamed(
+                            context,
+                            StagePage.routeName,
+                          );
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        '${stage.stageNo}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.accentColor,
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppTheme.accentColor,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '${stage.creator} - ${stage.registDate}',
+                        '${stage.creator} - ${_formatDate(stage.registDate)}',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.white54,
