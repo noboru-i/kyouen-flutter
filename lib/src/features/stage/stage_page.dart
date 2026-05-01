@@ -6,6 +6,7 @@ import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/stage/widgets/stage_board.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
+import 'package:kyouen_flutter/src/utils/web_url_updater.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
@@ -48,8 +49,9 @@ class StagePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // initialize and keep instance
-    ref.watch(currentStageNoProvider);
+    ref.listen<AsyncValue<int>>(currentStageNoProvider, (_, next) {
+      next.whenData(updateStageUrl);
+    });
 
     return BackgroundWidget(
       child: Scaffold(
