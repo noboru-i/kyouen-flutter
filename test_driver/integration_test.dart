@@ -7,7 +7,9 @@ Future<void> main() => integrationDriver(
   onScreenshot:
       (String name, List<int> bytes, [Map<String, Object?>? args]) async {
         final dir = Directory('build/screenshots');
-        if (!dir.existsSync()) dir.createSync(recursive: true);
+        if (!dir.existsSync()) {
+          dir.createSync(recursive: true);
+        }
 
         // App Store申請要件: アルファチャンネルを除去してRGBで保存
         final decoded = img.decodePng(Uint8List.fromList(bytes))!;

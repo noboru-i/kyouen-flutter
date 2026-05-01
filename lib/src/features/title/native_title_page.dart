@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/options/options_page.dart';
@@ -47,10 +46,10 @@ class TitlePage extends ConsumerWidget {
                 const Spacer(flex: 2),
                 const _KyouenDiagram(),
                 const SizedBox(height: 32),
-                const Text(
-                  Environment.appName,
+                Text(
+                  AppLocalizations.of(context)!.appTitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

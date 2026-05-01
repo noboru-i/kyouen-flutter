@@ -45,10 +45,10 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+  freezed: ^3.2.5
   image: ^4.2.0
   integration_test:
     sdk: flutter
-  freezed: ^3.2.5
   json_serializable: ^6.13.0
   pedantic_mono: ^1.36.0
   riverpod_generator: ^4.0.3
