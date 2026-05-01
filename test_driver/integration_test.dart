@@ -6,7 +6,9 @@ import 'package:integration_test/integration_test_driver_extended.dart';
 Future<void> main() => integrationDriver(
   onScreenshot:
       (String name, List<int> bytes, [Map<String, Object?>? args]) async {
-        final dir = Directory('build/screenshots');
+        final outputDir =
+            Platform.environment['SCREENSHOT_DIR'] ?? 'build/screenshots';
+        final dir = Directory(outputDir);
         if (!dir.existsSync()) {
           dir.createSync(recursive: true);
         }
