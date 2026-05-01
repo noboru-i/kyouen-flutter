@@ -18,15 +18,15 @@ runs:
       with:
         flutter-version-file: 'pubspec.yaml'
         channel: 'stable'
-    
+
     - name: Install Firebase CLI
       shell: bash
       run: npm install -g firebase-tools@15.7.0
-    
+
     - name: Install FlutterFire CLI
       shell: bash
       run: dart pub global activate flutterfire_cli
-    
+
     - name: Setup Firebase Authentication
       shell: bash
       env:
@@ -36,18 +36,18 @@ runs:
         printf '%s\n' "$FIREBASE_SERVICE_ACCOUNT_KEY" > "$SERVICE_ACCOUNT_FILE"
         chmod 600 "$SERVICE_ACCOUNT_FILE"
         echo "GOOGLE_APPLICATION_CREDENTIALS=$SERVICE_ACCOUNT_FILE" >> "$GITHUB_ENV"
-    
+
     - name: Get dependencies
       shell: bash
       run: flutter pub get
-    
+
     - name: Generate code
       shell: bash
-      run: dart run build_runner build --delete-conflicting-outputs
-    
+      run: make gen
+
     - name: Setup sqflite for web
       shell: bash
-      run: dart run sqflite_common_ffi_web:setup
+      run: make setup-web
 
     - name: Configure Firebase for environment
       shell: bash

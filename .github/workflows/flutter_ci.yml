@@ -9,20 +9,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    
+
     - name: Setup Flutter
       uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
       with:
         flutter-version-file: 'pubspec.yaml'
         channel: 'stable'
         cache: true
-    
+
     - name: Get dependencies
       run: flutter pub get
-    
+
     - name: Generate required files
       run: |
         # Create a mock firebase_options.dart for CI if it doesn't exist
@@ -30,18 +30,14 @@ jobs:
           mkdir -p lib
           mv .github/workflows/firebase_options_mock.dart lib/firebase_options.dart
         fi
-        
-        # Generate build_runner files
-        dart run build_runner build --delete-conflicting-outputs
-        
-        # Setup sqflite for web
-        dart run sqflite_common_ffi_web:setup
-    
+        make gen
+        make setup-web
+
     - name: Analyze project source
-      run: flutter analyze --fatal-infos
+      run: make analyze
 
     - name: Run tests
-      run: flutter test
-    
+      run: make test
+
     - name: Check build for Web
       run: flutter build web --target=lib/main.dart --no-tree-shake-icons

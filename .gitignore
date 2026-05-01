@@ -69,6 +69,7 @@ android/app/cert/release.keystore
 *.g.dart
 *.freezed.dart
 *.chopper.dart
+lib/src/localization/
 
 # Web SQLite files
 web/sqflite_sw.js

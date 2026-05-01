@@ -1,4 +1,4 @@
-.PHONY: help run-dev run-prod build-dev build-prod test gen analyze screenshots screenshots-ios screenshots-android clean-screenshots sim-lang-ja sim-lang-en
+.PHONY: help run-dev run-prod build-dev build-prod test gen setup-web analyze screenshots screenshots-ios screenshots-android clean-screenshots sim-lang-ja sim-lang-en
 
 help:
 	@echo "Usage: make <target>"
@@ -25,7 +25,8 @@ help:
 	@echo "  sim-lang-en  iOSシミュレーターを英語に切り替えて再起動"
 	@echo ""
 	@echo "Code:"
-	@echo "  gen         コード生成 (Riverpod, Freezed, JSON, Chopper)"
+	@echo "  gen         コード生成 (Riverpod, Freezed, JSON, Chopper, L10n)"
+	@echo "  setup-web   Web向けSQLiteファイル生成"
 	@echo "  analyze     flutter analyze 実行"
 
 run-dev:
@@ -77,9 +78,13 @@ test:
 
 gen:
 	dart run build_runner build --delete-conflicting-outputs
+	flutter gen-l10n
+
+setup-web:
+	dart run sqflite_common_ffi_web:setup
 
 analyze:
-	flutter analyze
+	flutter analyze --fatal-infos
 
 # ==============================================================
 # Flutter スクリーンショット自動撮影
