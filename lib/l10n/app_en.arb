@@ -131,19 +131,11 @@
   },
   "prevShort": "Prev",
   "@prevShort": {
-    "description": "Short label for previous button on small screens"
-  },
-  "prevFull": "Previous",
-  "@prevFull": {
-    "description": "Full label for previous button on large screens"
+    "description": "Label for previous button"
   },
   "nextShort": "Next",
   "@nextShort": {
-    "description": "Short label for next button on small screens"
-  },
-  "nextFull": "Next",
-  "@nextFull": {
-    "description": "Full label for next button on large screens"
+    "description": "Label for next button"
   },
   "kyouenButton": "Kyouen!!",
   "@kyouenButton": {

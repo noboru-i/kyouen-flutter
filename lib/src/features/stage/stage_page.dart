@@ -176,15 +176,11 @@ class _HeaderState extends ConsumerState<_Header> {
                       width: 20,
                       child: CircularProgressIndicator.adaptive(strokeWidth: 2),
                     )
-                  : Text(
-                      isSmallScreen
-                          ? AppLocalizations.of(context)!.prevShort
-                          : AppLocalizations.of(context)!.prevFull,
-                    ),
+                  : Text(AppLocalizations.of(context)!.prevShort),
             ),
           ),
           Expanded(
-            flex: isSmallScreen ? 3 : 4,
+            flex: isSmallScreen ? 2 : 4,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -248,11 +244,7 @@ class _HeaderState extends ConsumerState<_Header> {
                       width: 20,
                       child: CircularProgressIndicator.adaptive(strokeWidth: 2),
                     )
-                  : Text(
-                      isSmallScreen
-                          ? AppLocalizations.of(context)!.nextShort
-                          : AppLocalizations.of(context)!.nextFull,
-                    ),
+                  : Text(AppLocalizations.of(context)!.nextShort),
             ),
           ),
         ],
