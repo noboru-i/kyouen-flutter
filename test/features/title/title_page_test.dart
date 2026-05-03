@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 
 // totalStageCountProvider のモック（常に 10 を返す）
 class MockTotalStageCount extends TotalStageCount {
@@ -63,7 +64,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: TitlePage()),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('ja'),
+            home: TitlePage(),
+          ),
         ),
       );
 
@@ -100,7 +106,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: TitlePage()),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('ja'),
+            home: TitlePage(),
+          ),
         ),
       );
 
