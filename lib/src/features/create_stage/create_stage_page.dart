@@ -234,6 +234,7 @@ class _SizeSelector extends ConsumerWidget {
           }
           return Colors.white54;
         }),
+        visualDensity: VisualDensity.compact,
       ),
     );
   }

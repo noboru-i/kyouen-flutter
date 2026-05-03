@@ -2,10 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
+import 'package:kyouen_flutter/src/data/repository/web_title_repository.dart';
 import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/options/options_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
+import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
@@ -23,118 +26,142 @@ class TitlePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: _TitleBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.more_vert, color: Colors.white54),
-                      onPressed: () {
-                        Navigator.restorablePushNamed(
-                          context,
-                          OptionsPage.routeName,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-                const Spacer(flex: 2),
-                const _KyouenDiagram(),
-                const SizedBox(height: 32),
-                Text(
-                  AppLocalizations.of(context)!.appTitle,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 6,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  AppLocalizations.of(context)!.puzzleDescription,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.white54,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                const _StageProgressDisplay(),
-                const Spacer(flex: 2),
-                SizedBox(
-                  height: 56,
-                  child: FilledButton(
-                    onPressed: () {
-                      Navigator.restorablePushNamed(
-                        context,
-                        StagePage.routeName,
-                      );
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: _kBgTop,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final padding = MediaQuery.paddingOf(context);
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: padding.bottom),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: constraints.maxHeight - 72,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(32, padding.top, 32, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  color: Colors.white54,
+                                ),
+                                onPressed: () {
+                                  Navigator.restorablePushNamed(
+                                    context,
+                                    OptionsPage.routeName,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const Spacer(flex: 2),
+                          const _KyouenDiagram(),
+                          const SizedBox(height: 32),
+                          Text(
+                            AppLocalizations.of(context)!.appTitle,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 6,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            AppLocalizations.of(context)!.puzzleDescription,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.white54,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          const _StageProgressDisplay(),
+                          const Spacer(flex: 2),
+                          SizedBox(
+                            height: 56,
+                            child: FilledButton(
+                              onPressed: () {
+                                Navigator.restorablePushNamed(
+                                  context,
+                                  StagePage.routeName,
+                                );
+                              },
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: _kBgTop,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.start,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 52,
+                            child: FilledButton(
+                              onPressed: () {
+                                Navigator.restorablePushNamed(
+                                  context,
+                                  CreateStagePage.routeName,
+                                );
+                              },
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.12,
+                                ),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.createStage,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          AccountButton(
+                            height: 52,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.12,
+                              ),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                       ),
                     ),
-                    child: Text(
-                      AppLocalizations.of(context)!.start,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 52,
-                  child: FilledButton(
-                    onPressed: () {
-                      Navigator.restorablePushNamed(
-                        context,
-                        CreateStagePage.routeName,
-                      );
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.12),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      AppLocalizations.of(context)!.createStage,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                AccountButton(
-                  height: 52,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.12),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const Spacer(),
-              ],
-            ),
-          ),
+                  const _RecentStagesSection(),
+                  const _ActivitiesSection(),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -409,6 +436,215 @@ class _ProgressView extends StatelessWidget {
               : (total > 0 ? l10n.stageClearedProgress(cleared, total) : ''),
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 13, color: Colors.white54),
+        ),
+      ],
+    );
+  }
+}
+
+String _formatDate(String registDate) {
+  try {
+    final utc = DateTime.parse(registDate);
+    final local = utc.toLocal();
+    return DateFormat('yyyy/MM/dd HH:mm').format(local);
+  } on FormatException {
+    return registDate;
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecentStagesSection extends ConsumerWidget {
+  const _RecentStagesSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final recentStagesAsync = ref.watch(recentStagesProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionHeader(title: l10n.latestRegistrations),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: recentStagesAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: _kAccent),
+            ),
+            error: (e, s) => Text(
+              l10n.errorOccurred,
+              style: const TextStyle(fontSize: 14, color: Color(0xFFE53935)),
+            ),
+            data: (stages) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: stages
+                  .take(5)
+                  .map(
+                    (stage) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: InkWell(
+                        onTap: () async {
+                          await ref
+                              .read(currentStageNoProvider.notifier)
+                              .setStageNo(stage.stageNo);
+                          if (context.mounted) {
+                            await Navigator.pushNamed(
+                              context,
+                              StagePage.routeName,
+                            );
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Text(
+                                '#${stage.stageNo}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: _kAccent,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '${stage.creator} - ${_formatDate(stage.registDate)}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActivitiesSection extends ConsumerWidget {
+  const _ActivitiesSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final activitiesAsync = ref.watch(activitiesProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionHeader(title: l10n.activity),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: activitiesAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: _kAccent),
+            ),
+            error: (e, s) => Text(
+              l10n.errorOccurred,
+              style: const TextStyle(fontSize: 14, color: Color(0xFFE53935)),
+            ),
+            data: (activities) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: activities
+                  .take(5)
+                  .map(
+                    (activity) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.network(
+                              activity.image,
+                              width: 32,
+                              height: 32,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 16,
+                                      color: Colors.white54,
+                                    ),
+                                  ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  activity.screenName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  l10n.stagesClearedCount(
+                                    activity.clearedStages.length,
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ),
       ],
     );
