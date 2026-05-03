@@ -5,8 +5,22 @@
   <meta name="viewport" content="width=1280, height=720" />
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <style>
+    :root {
+      --bg: #0D1117;
+      --accent: #FF6B35;
+      --board-top: #4CAF50;
+      --board-bottom: #2E7D32;
+      --grid: rgba(13, 17, 23, 0.48);
+      --grid-border: rgba(13, 17, 23, 0.68);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 1280px; height: 720px; overflow: hidden; background: #0f0f0f; }
+    html, body {
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      background: var(--bg);
+    }
 
     #root { position: relative; width: 1280px; height: 720px; }
 
@@ -17,14 +31,14 @@
       overflow: hidden;
     }
 
-    #s1  { z-index: 1; background: #0f0f0f; }
-    #s2a { z-index: 2; opacity: 0; background: #0f0f0f; }
-    #s2b { z-index: 3; opacity: 0; background: #0f0f0f; }
-    #s2c { z-index: 4; opacity: 0; background: #0f0f0f; }
-    #s3a { z-index: 5; opacity: 0; background: #0f0f0f; }
-    #s3b { z-index: 6; opacity: 0; background: #0f0f0f; }
-    #s3c { z-index: 7; opacity: 0; background: #0f0f0f; }
-    #s4  { z-index: 8; opacity: 0; background: #0f0f0f; }
+    #s1  { z-index: 1; background: var(--bg); }
+    #s2a { z-index: 2; opacity: 0; background: var(--bg); }
+    #s2b { z-index: 3; opacity: 0; background: var(--bg); }
+    #s2c { z-index: 4; opacity: 0; background: var(--bg); }
+    #s3a { z-index: 5; opacity: 0; background: var(--bg); }
+    #s3b { z-index: 6; opacity: 0; background: var(--bg); }
+    #s3c { z-index: 7; opacity: 0; background: var(--bg); }
+    #s4  { z-index: 8; opacity: 0; background: var(--bg); }
 
     .split { display: flex; width: 1280px; height: 720px; }
     .split-left {
@@ -40,92 +54,161 @@
     .scene-label {
       position: absolute; top: 76px; left: 96px;
       font-family: 'Inter', sans-serif; font-size: 11px;
-      color: rgba(126,184,201,0.72); letter-spacing: 0.28em;
+      color: #FF8A5C; letter-spacing: 0.28em;
       pointer-events: none;
     }
 
     .deco-ring {
       position: absolute; border-radius: 50%;
-      border: 1px solid rgba(126,184,201,0.06);
+      border: 1px solid rgba(255,255,255,0.04);
       pointer-events: none;
     }
 
     .step-label {
       font-family: 'Inter', sans-serif; font-size: 12px;
-      color: #7eb8c9; letter-spacing: 0.32em; margin-bottom: 20px;
+      color: var(--accent); letter-spacing: 0.32em; margin-bottom: 20px;
+    }
+
+    .board-stack {
+      position: relative;
+      width: 360px;
+      height: 360px;
+    }
+
+    .board-stack > div {
+      position: absolute;
+      inset: 0;
+    }
+
+    .board-stack svg {
+      position: absolute;
+      inset: 0;
+      display: block;
+      overflow: visible;
+    }
+
+    .split-right svg {
+      background: linear-gradient(135deg, var(--board-top), var(--board-bottom));
+      border-radius: 8px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.28);
+    }
+
+    .split-right svg rect[stroke="#282828"] { stroke: var(--grid-border); }
+    .split-right svg line[stroke="#222"] { stroke: var(--grid); }
+    circle[fill="#1c1c1c"] { fill: url(#blackStone); stroke: #000000; }
+    circle[fill="#d4d4d4"],
+    circle[fill="#d8d8d8"] { fill: url(#whiteStone); stroke: #D0D0D0; }
+    #kc,
+    #def-circle {
+      stroke: var(--accent);
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+    .judge-button {
+      position: absolute;
+      left: 50%;
+      bottom: -76px;
+      transform: translateX(-50%);
+      width: 190px;
+      height: 46px;
+      border-radius: 12px;
+      background: #ffffff;
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.32);
     }
   </style>
 </head>
 <body>
 <div id="root" data-composition-id="main" data-start="0" data-duration="60" data-width="1280" data-height="720">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false" data-layout-ignore>
+    <defs>
+      <radialGradient id="blackStone" cx="32%" cy="28%" r="70%">
+        <stop offset="0%" stop-color="#4A4A4A"/>
+        <stop offset="52%" stop-color="#1C1C1C"/>
+        <stop offset="100%" stop-color="#000000"/>
+      </radialGradient>
+      <radialGradient id="whiteStone" cx="32%" cy="28%" r="72%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="58%" stop-color="#E8E8E8"/>
+        <stop offset="100%" stop-color="#D0D0D0"/>
+      </radialGradient>
+    </defs>
+  </svg>
 
-  <!-- SCENE 1: Title (0s–8s) -->
+  <!-- SCENE 1: Title (0s-5s) -->
   <div id="s1" class="scene" style="display:flex;align-items:center;justify-content:center;flex-direction:column;">
-    <div style="position:absolute;width:640px;height:640px;border-radius:50%;background:radial-gradient(circle,rgba(126,184,201,0.055) 0%,rgba(126,184,201,0) 70%);top:40px;left:320px;pointer-events:none;" data-layout-ignore></div>
+    <div style="position:absolute;width:640px;height:640px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,0.055) 0%,rgba(255,107,53,0) 70%);top:40px;left:320px;pointer-events:none;" data-layout-ignore></div>
     <div class="deco-ring" style="width:560px;height:560px;top:80px;left:360px;" data-layout-ignore></div>
     <div class="deco-ring" style="width:380px;height:380px;top:170px;left:450px;" data-layout-ignore></div>
     <div id="s1-title" style="position:relative;z-index:2;font-family:'Noto Sans JP',sans-serif;font-size:80px;font-weight:300;letter-spacing:0.15em;color:#e8e8e8;">詰め共円</div>
-    <div id="s1-rule" style="position:relative;z-index:2;width:56px;height:1px;background:rgba(126,184,201,0.45);margin:24px 0;"></div>
+    <div id="s1-rule" style="position:relative;z-index:2;width:56px;height:1px;background:rgba(255,107,53,0.45);margin:24px 0;"></div>
     <div id="s1-sub" style="position:relative;z-index:2;font-family:'Noto Sans JP',sans-serif;font-size:17px;color:#888888;letter-spacing:0.38em;">― 共円パズル ―</div>
   </div>
 
-  <!-- SCENE 2A: Rule 1 (8s–14s) -->
+  <!-- SCENE 2A: Rule 1 (5s-12s) -->
   <div id="s2a" class="scene" style="display:flex;align-items:center;justify-content:center;">
-    <div style="position:absolute;width:680px;height:680px;border-radius:50%;background:radial-gradient(circle,rgba(126,184,201,0.04) 0%,rgba(126,184,201,0) 70%);top:20px;left:300px;pointer-events:none;" data-layout-ignore></div>
+    <div style="position:absolute;width:680px;height:680px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,0.04) 0%,rgba(255,107,53,0) 70%);top:20px;left:300px;pointer-events:none;" data-layout-ignore></div>
     <div class="deco-ring" style="width:600px;height:600px;top:60px;left:340px;" data-layout-ignore></div>
     <div class="scene-label" data-layout-ignore>RULE 01 / 03</div>
     <div style="width:820px;text-align:center;position:relative;z-index:2;">
       <div id="s2a-main" style="font-family:'Noto Sans JP',sans-serif;font-size:46px;font-weight:300;color:#e8e8e8;letter-spacing:0.07em;line-height:1.4;">盤面に、石が並んでいます。</div>
-      <div id="s2a-rule" style="width:48px;height:1px;background:rgba(126,184,201,0.38);margin:28px auto;"></div>
-      <div id="s2a-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:22px;color:#898989;line-height:1.9;letter-spacing:0.04em;max-width:680px;margin:0 auto;">オセロに似た碁盤目の上に、黒と白の石が置かれた状態からゲームは始まります。</div>
+      <div id="s2a-rule" style="width:48px;height:1px;background:rgba(255,107,53,0.38);margin:28px auto;"></div>
+      <div id="s2a-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:22px;color:#898989;line-height:1.9;letter-spacing:0.04em;max-width:680px;margin:0 auto;">囲碁に似たボード上に、<br>黒の石が置かれた状態からゲームは始まります。</div>
     </div>
   </div>
 
-  <!-- SCENE 2B: Kyouen definition (14s–21s) -->
+  <!-- SCENE 2B: Kyouen definition (12s-21s) -->
   <div id="s2b" class="scene">
     <div class="scene-label" data-layout-ignore>RULE 02 / 03</div>
     <div style="display:flex;align-items:center;width:1280px;height:720px;">
       <div style="width:640px;padding:80px 48px 80px 100px;display:flex;flex-direction:column;">
-        <div id="s2b-vline" style="width:2px;height:72px;background:rgba(126,184,201,0.42);margin-bottom:28px;"></div>
-        <div id="s2b-heading" style="font-family:'Noto Sans JP',sans-serif;font-size:38px;font-weight:300;color:#7eb8c9;letter-spacing:0.07em;margin-bottom:28px;">「共円」とは ―</div>
+        <div id="s2b-vline" style="width:2px;height:72px;background:rgba(255,107,53,0.42);margin-bottom:28px;"></div>
+        <div id="s2b-heading" style="font-family:'Noto Sans JP',sans-serif;font-size:38px;font-weight:300;color:#FF6B35;letter-spacing:0.07em;margin-bottom:28px;">「共円」とは ―</div>
         <div id="s2b-desc" style="font-family:'Noto Sans JP',sans-serif;font-size:26px;font-weight:300;color:#e8e8e8;line-height:1.65;letter-spacing:0.03em;margin-bottom:24px;">同一円周上に存在する 4つの点のことです。</div>
-        <div id="s2b-note" style="font-family:'Noto Sans JP',sans-serif;font-size:18px;color:#888888;line-height:1.85;max-width:440px;">3点は必ず1つの円を決める。4点目がその円の上にあるとき、4点は共円の関係になります。</div>
+        <div id="s2b-note" style="font-family:'Noto Sans JP',sans-serif;font-size:18px;color:#888888;line-height:1.85;max-width:440px;">3つの点なら、どんな並びでも円として見ることができます。4点目も同じ円の上にあれば、共円の関係になります。</div>
       </div>
       <div style="width:640px;height:720px;display:flex;align-items:center;justify-content:center;">
         <svg id="s2b-diagram" width="300" height="300" viewBox="0 0 280 280" style="overflow:visible;">
-          <circle cx="140" cy="140" r="112" fill="none" stroke="rgba(126,184,201,0.07)" stroke-width="1"/>
-          <circle id="p1" cx="50" cy="50" r="13" fill="#1c1c1c" stroke="#363636" stroke-width="1.5" opacity="0"/>
+          <circle id="p1" cx="50" cy="50" r="13" fill="#d8d8d8" stroke="#b8b8b8" stroke-width="1.5" opacity="0"/>
           <circle id="p2" cx="230" cy="50" r="13" fill="#d8d8d8" stroke="#b8b8b8" stroke-width="1.5" opacity="0"/>
-          <circle id="p3" cx="230" cy="230" r="13" fill="#1c1c1c" stroke="#363636" stroke-width="1.5" opacity="0"/>
+          <circle id="p3" cx="230" cy="230" r="13" fill="#d8d8d8" stroke="#b8b8b8" stroke-width="1.5" opacity="0"/>
           <circle id="p4" cx="50" cy="230" r="13" fill="#d8d8d8" stroke="#b8b8b8" stroke-width="1.5" opacity="0"/>
           <!-- circle through square corners (50,50)(230,50)(230,230)(50,230): center(140,140) r=127.3 circ≈800 -->
-          <circle id="def-circle" cx="140" cy="140" r="127" fill="none" stroke="#7eb8c9" stroke-width="1.5" stroke-dasharray="799" stroke-dashoffset="799"/>
+          <circle id="def-circle" cx="140" cy="140" r="127" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-dasharray="799" stroke-dashoffset="799" transform="rotate(-90 140 140)"/>
         </svg>
       </div>
     </div>
   </div>
 
-  <!-- SCENE 2C: Game goal (21s–28s) -->
+  <!-- SCENE 2C: Game goal (20s-28s) -->
   <div id="s2c" class="scene" style="display:flex;align-items:center;justify-content:center;">
-    <div style="position:absolute;width:680px;height:680px;border-radius:50%;background:radial-gradient(circle,rgba(126,184,201,0.04) 0%,rgba(126,184,201,0) 70%);top:20px;left:300px;pointer-events:none;" data-layout-ignore></div>
+    <div style="position:absolute;width:680px;height:680px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,0.04) 0%,rgba(255,107,53,0) 70%);top:20px;left:300px;pointer-events:none;" data-layout-ignore></div>
     <div class="deco-ring" style="width:580px;height:580px;top:70px;left:350px;" data-layout-ignore></div>
     <div class="scene-label" data-layout-ignore>RULE 03 / 03</div>
     <div style="width:820px;text-align:center;position:relative;z-index:2;">
-      <div id="s2c-tag" style="font-family:'Inter',sans-serif;font-size:12px;color:#7eb8c9;letter-spacing:0.32em;margin-bottom:36px;">GAME GOAL</div>
+      <div id="s2c-tag" style="font-family:'Inter',sans-serif;font-size:12px;color:#FF6B35;letter-spacing:0.32em;margin-bottom:36px;">GAME GOAL</div>
       <div id="s2c-main" style="font-family:'Noto Sans JP',sans-serif;font-size:40px;font-weight:300;color:#e8e8e8;letter-spacing:0.04em;line-height:1.6;max-width:720px;margin:0 auto 36px;">盤面の中から、共円になる 4つの石を見つけてください。</div>
-      <div id="s2c-note" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.85;max-width:640px;margin:0 auto;">正方形・長方形・等脚台形など、幾何学的なパターンが手がかりになります。</div>
+      <div id="s2c-note" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.85;max-width:640px;margin:0 auto;">正方形・長方形・等脚台形・直線など、幾何学的なパターンが手がかりになります。</div>
     </div>
   </div>
 
-  <!-- SCENE 3A: Step 1 (28s–36s) -->
+  <!-- SCENE 3A: Step 1 (28s-40s) -->
   <div id="s3a" class="scene">
     <div class="scene-label" data-layout-ignore>HOW TO PLAY</div>
     <div class="split">
       <div class="split-left">
         <div id="s3a-step" class="step-label">STEP 1</div>
-        <div id="s3a-rule" style="width:36px;height:1px;background:rgba(126,184,201,0.4);margin-bottom:20px;"></div>
+        <div id="s3a-rule" style="width:36px;height:1px;background:rgba(255,107,53,0.4);margin-bottom:20px;"></div>
         <div id="s3a-main" style="font-family:'Noto Sans JP',sans-serif;font-size:40px;font-weight:300;color:#e8e8e8;line-height:1.55;letter-spacing:0.04em;margin-bottom:20px;">問題を選んで盤面を開きます。</div>
-        <div id="s3a-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.8;">難易度は初級から上級まであります。</div>
+        <div id="s3a-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.8;">いろいろな盤面から、気になる問題を選べます。</div>
       </div>
       <div class="split-right">
         <div id="s3a-board">
@@ -171,15 +254,15 @@
     </div>
   </div>
 
-  <!-- SCENE 3B: Step 2 (36s–44s) -->
+  <!-- SCENE 3B: Step 2 (40s-48s) -->
   <div id="s3b" class="scene">
     <div class="scene-label" data-layout-ignore>HOW TO PLAY</div>
     <div class="split">
       <div class="split-left">
         <div id="s3b-step" class="step-label">STEP 2</div>
-        <div id="s3b-rule" style="width:36px;height:1px;background:rgba(126,184,201,0.4);margin-bottom:20px;"></div>
+        <div id="s3b-rule" style="width:36px;height:1px;background:rgba(255,107,53,0.4);margin-bottom:20px;"></div>
         <div id="s3b-main" style="font-family:'Noto Sans JP',sans-serif;font-size:40px;font-weight:300;color:#e8e8e8;line-height:1.55;letter-spacing:0.04em;margin-bottom:20px;">4つの石をタップして選択します。</div>
-        <div id="s3b-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.8;">選んだ石はハイライト表示されます。</div>
+        <div id="s3b-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.8;">選んだ黒石は白く変わります。</div>
       </div>
       <div class="split-right">
         <div id="s3b-board">
@@ -216,28 +299,28 @@
             <circle cx="247.5" cy="67.5" r="17" fill="#d4d4d4" stroke="#bbb" stroke-width="1"/>
             <circle cx="67.5" cy="202.5" r="17" fill="#d4d4d4" stroke="#bbb" stroke-width="1"/>
             <!-- highlight rings, animated in -->
-            <circle id="hl1" cx="67.5" cy="67.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2" opacity="0"/>
-            <circle id="hl2" cx="247.5" cy="67.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2" opacity="0"/>
-            <circle id="hl3" cx="247.5" cy="202.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2" opacity="0"/>
-            <circle id="hl4" cx="67.5" cy="202.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2" opacity="0"/>
+            <circle id="hl1" cx="67.5" cy="67.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2" opacity="0"/>
+            <circle id="hl2" cx="247.5" cy="67.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2" opacity="0"/>
+            <circle id="hl3" cx="247.5" cy="202.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2" opacity="0"/>
+            <circle id="hl4" cx="67.5" cy="202.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2" opacity="0"/>
           </svg>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCENE 3C: Step 3 (44s–52s) -->
+  <!-- SCENE 3C: Step 3 (48s-55s) -->
   <div id="s3c" class="scene">
     <div class="scene-label" data-layout-ignore>HOW TO PLAY</div>
     <div class="split">
       <div class="split-left">
         <div id="s3c-step" class="step-label">STEP 3</div>
-        <div id="s3c-rule" style="width:36px;height:1px;background:rgba(126,184,201,0.4);margin-bottom:20px;"></div>
-        <div id="s3c-main" style="font-family:'Noto Sans JP',sans-serif;font-size:36px;font-weight:300;color:#e8e8e8;line-height:1.65;letter-spacing:0.04em;margin-bottom:20px;">4点が共円であれば、円が描かれて正解となります。</div>
-        <div id="s3c-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.8;">間違えた場合は選択がリセットされます。</div>
+        <div id="s3c-rule" style="width:36px;height:1px;background:rgba(255,107,53,0.4);margin-bottom:20px;"></div>
+        <div id="s3c-main" style="font-family:'Noto Sans JP',sans-serif;font-size:36px;font-weight:300;color:#e8e8e8;line-height:1.65;letter-spacing:0.04em;margin-bottom:20px;">判定ボタンを押すと、正解かどうかをチェックします。</div>
+        <div id="s3c-sub" style="font-family:'Noto Sans JP',sans-serif;font-size:20px;color:#888888;line-height:1.8;">共円なら、円が描かれてクリアです。</div>
       </div>
       <div class="split-right">
-        <div id="s3c-board">
+        <div id="s3c-board" style="position:relative;">
           <svg width="360" height="360" viewBox="0 0 360 360" style="display:block;overflow:visible;">
             <rect x="1" y="1" width="358" height="358" fill="none" stroke="#282828" stroke-width="1.5"/>
             <line x1="0" y1="45" x2="360" y2="45" stroke="#222" stroke-width="1"/>
@@ -271,33 +354,28 @@
             <circle cx="247.5" cy="67.5" r="17" fill="#d4d4d4" stroke="#bbb" stroke-width="1"/>
             <circle cx="67.5" cy="202.5" r="17" fill="#d4d4d4" stroke="#bbb" stroke-width="1"/>
             <!-- highlight rings always visible in this scene -->
-            <circle cx="67.5" cy="67.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2"/>
-            <circle cx="247.5" cy="67.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2"/>
-            <circle cx="247.5" cy="202.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2"/>
-            <circle cx="67.5" cy="202.5" r="21" fill="none" stroke="#7eb8c9" stroke-width="2"/>
+            <circle cx="67.5" cy="67.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2"/>
+            <circle cx="247.5" cy="67.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2"/>
+            <circle cx="247.5" cy="202.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2"/>
+            <circle cx="67.5" cy="202.5" r="21" fill="none" stroke="#FF6B35" stroke-width="2"/>
             <!-- kyouen circle: center(157.5,135) r=112.5 circ=707 -->
-            <circle id="kc" cx="157.5" cy="135" r="112.5" fill="none" stroke="#7eb8c9" stroke-width="1.5" stroke-dasharray="707" stroke-dashoffset="707"/>
+            <circle id="kc" cx="157.5" cy="135" r="112.5" fill="none" stroke="#FF6B35" stroke-width="1.5" stroke-dasharray="707" stroke-dashoffset="707"/>
           </svg>
+          <div id="judge-button" class="judge-button">共円！！</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCENE 4: CTA (52s–60s) -->
+  <!-- SCENE 4: CTA (55s-60s) -->
   <div id="s4" class="scene" style="display:flex;align-items:center;justify-content:center;">
-    <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(126,184,201,0.05) 0%,rgba(126,184,201,0) 70%);top:10px;left:290px;pointer-events:none;" data-layout-ignore></div>
+    <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,0.05) 0%,rgba(255,107,53,0) 70%);top:10px;left:290px;pointer-events:none;" data-layout-ignore></div>
     <div class="deco-ring" style="width:560px;height:560px;top:80px;left:360px;" data-layout-ignore></div>
     <div style="text-align:center;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2;">
-      <div id="s4-copy" style="font-family:'Noto Sans JP',sans-serif;font-size:24px;font-weight:300;color:#888888;letter-spacing:0.05em;line-height:1.8;max-width:680px;margin-bottom:52px;">詰め共円は、幾何学的な直感を静かに問いかけるパズルです。</div>
-      <div id="s4-vline" style="width:1px;height:40px;background:rgba(126,184,201,0.3);margin-bottom:32px;"></div>
-      <div id="s4-name" style="font-family:'Noto Sans JP',sans-serif;font-size:52px;font-weight:300;color:#e8e8e8;letter-spacing:0.15em;margin-bottom:32px;">詰め共円</div>
-      <div id="s4-icon" style="width:80px;height:80px;border-radius:18px;background:#1e3a45;display:flex;align-items:center;justify-content:center;margin-bottom:28px;">
-        <svg width="40" height="40" viewBox="0 0 40 40">
-          <circle cx="20" cy="20" r="15" fill="none" stroke="#7eb8c9" stroke-width="1.5"/>
-          <circle cx="20" cy="20" r="3" fill="#7eb8c9"/>
-        </svg>
-      </div>
-      <div id="s4-stores" style="font-family:'Inter',sans-serif;font-size:15px;color:#888888;letter-spacing:0.18em;">App Store / Google Play にて配信中</div>
+      <div id="s4-copy" style="font-family:'Noto Sans JP',sans-serif;font-size:24px;font-weight:300;color:#888888;letter-spacing:0.05em;line-height:1.8;max-width:1040px;white-space:nowrap;margin-bottom:52px;">詰め共円は、幾何学的な直感を静かに問いかけるパズルです。</div>
+      <div id="s4-vline" style="width:1px;height:40px;background:rgba(255,107,53,0.3);margin-bottom:32px;"></div>
+      <div id="s4-name" style="font-family:'Noto Sans JP',sans-serif;font-size:52px;font-weight:300;color:#e8e8e8;letter-spacing:0.15em;margin-bottom:36px;">詰め共円</div>
+      <div id="s4-stores" style="font-family:'Inter',sans-serif;font-size:15px;color:#888888;letter-spacing:0.18em;">Google Play にて配信中</div>
     </div>
   </div>
 
@@ -305,188 +383,168 @@
 
 <script>
   window.__timelines = window.__timelines || {};
+
+  var stageStrings = [
+    "000000010000001100001100000000001000",
+    "000000000000000100010010001100000000",
+    "000000001000010000000100010010001000",
+    "001000001000000010010000010100000000"
+  ];
+  var selectedStage4 = [8, 16, 19, 27];
+
+  function renderBoard(stage, options) {
+    var opts = options || {};
+    var selected = opts.selected || [];
+    var selectedSet = new Set(selected);
+    var cell = 60;
+    var size = 360;
+    var stoneR = 28;
+    var html = '<svg width="360" height="360" viewBox="0 0 360 360" style="display:block;overflow:visible;">';
+    html += '<rect x="1" y="1" width="358" height="358" fill="none" stroke="#282828" stroke-width="1.5"/>';
+    for (var i = 0; i < 6; i += 1) {
+      var p = (i + 0.5) * cell;
+      html += '<line x1="0" y1="' + p + '" x2="' + size + '" y2="' + p + '" stroke="#222" stroke-width="1"/>';
+      html += '<line x1="' + p + '" y1="0" x2="' + p + '" y2="' + size + '" stroke="#222" stroke-width="1"/>';
+    }
+    for (var index = 0; index < stage.length; index += 1) {
+      if (stage[index] !== '1') continue;
+      var row = Math.floor(index / 6);
+      var col = index % 6;
+      var cx = (col + 0.5) * cell;
+      var cy = (row + 0.5) * cell;
+      html += '<circle cx="' + cx + '" cy="' + cy + '" r="' + stoneR + '" fill="#1c1c1c" stroke="#333" stroke-width="1"/>';
+      if (selectedSet.has(index)) {
+        var id = opts.selectedPrefix ? ' id="' + opts.selectedPrefix + selected.indexOf(index) + '"' : '';
+        var opacity = opts.selectedVisible ? 1 : 0;
+        html += '<circle' + id + ' cx="' + cx + '" cy="' + cy + '" r="' + stoneR + '" fill="#d4d4d4" stroke="#bbb" stroke-width="1" opacity="' + opacity + '"/>';
+      }
+    }
+    if (opts.circleId) {
+      html += '<circle id="' + opts.circleId + '" cx="180" cy="180" r="94.9" fill="none" stroke="#FF6B35" stroke-width="4" stroke-linecap="round" stroke-dasharray="596" stroke-dashoffset="596" transform="rotate(-90 180 180)"/>';
+    }
+    html += '</svg>';
+    return html;
+  }
+
+  function installBoards() {
+    var s3a = '<div class="board-stack">';
+    stageStrings.forEach(function(stage, index) {
+      var style = index === 0 ? '' : ' style="opacity:0"';
+      s3a += '<div id="s3a-stage' + (index + 1) + '"' + style + '>' + renderBoard(stage) + '</div>';
+    });
+    s3a += '</div>';
+    document.getElementById('s3a-board').innerHTML = s3a;
+    document.getElementById('s3b-board').innerHTML = renderBoard(stageStrings[3], {
+      selected: selectedStage4,
+      selectedPrefix: 'sel',
+      selectedVisible: false
+    });
+    document.getElementById('s3c-board').innerHTML = renderBoard(stageStrings[3], {
+      selected: selectedStage4,
+      selectedVisible: true,
+      circleId: 'kc'
+    }) + '<div id="judge-button" class="judge-button">共円！！</div>';
+  }
+
+  installBoards();
+
   var tl = gsap.timeline({ paused: true });
 
-  // ── SCENE 1 entrances ───────────────────────────────────────────
-  tl.fromTo('#s1-title',
-    { opacity: 0, y: 18 },
-    { opacity: 1, y: 0, duration: 1.5, ease: 'power1.out' }, 0.3);
-  tl.fromTo('#s1-rule',
-    { opacity: 0, scaleX: 0 },
-    { opacity: 1, scaleX: 1, duration: 0.8, ease: 'power2.out', transformOrigin: 'center' }, 1.0);
-  tl.fromTo('#s1-sub',
-    { opacity: 0 },
-    { opacity: 1, duration: 1.2, ease: 'sine.out' }, 1.3);
+  // 60-second Google Play preview timing.
+  // Scene 1
+  tl.fromTo('#s1-title', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1.5, ease: 'power1.out' }, 0.3);
+  tl.fromTo('#s1-rule', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.8, ease: 'power2.out', transformOrigin: 'center' }, 1.0);
+  tl.fromTo('#s1-sub', { opacity: 0 }, { opacity: 1, duration: 1.2, ease: 'sine.out' }, 1.3);
 
-  // ── Transition T1: S1→S2A  (T=6.8) ────────────────────────────
-  var T1 = 6.8;
-  tl.to('#s1',  { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T1);
-  tl.fromTo('#s2a',
-    { filter: 'blur(25px)', scale: 0.95, opacity: 0 },
-    { filter: 'blur(0px)',  scale: 1,    opacity: 1, duration: 0.9, ease: 'power1.out' }, T1 + 0.3);
+  var T1 = 3.2;
+  tl.to('#s1', { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T1);
+  tl.fromTo('#s2a', { filter: 'blur(25px)', scale: 0.95, opacity: 0 }, { filter: 'blur(0px)', scale: 1, opacity: 1, duration: 0.9, ease: 'power1.out' }, T1 + 0.3);
 
-  // ── SCENE 2A entrances ──────────────────────────────────────────
-  tl.fromTo('#s2a-main',
-    { opacity: 0, y: 22 },
-    { opacity: 1, y: 0, duration: 1.2, ease: 'power2.out' }, 8.5);
-  tl.fromTo('#s2a-rule',
-    { opacity: 0, scaleX: 0 },
-    { opacity: 1, scaleX: 1, duration: 0.6, ease: 'power2.out', transformOrigin: 'center' }, 9.4);
-  tl.fromTo('#s2a-sub',
-    { opacity: 0, y: 14 },
-    { opacity: 1, y: 0, duration: 1.0, ease: 'sine.out' }, 10.0);
+  // Scene 2A
+  tl.fromTo('#s2a-main', { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 1.2, ease: 'power2.out' }, 4.8);
+  tl.fromTo('#s2a-rule', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.6, ease: 'power2.out', transformOrigin: 'center' }, 5.7);
+  tl.fromTo('#s2a-sub', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 1.0, ease: 'sine.out' }, 6.3);
 
-  // ── Transition T2: S2A→S2B  (T=12.8) ───────────────────────────
-  var T2 = 12.8;
-  tl.to('#s2a',  { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T2);
-  tl.fromTo('#s2b',
-    { filter: 'blur(25px)', scale: 0.95, opacity: 0 },
-    { filter: 'blur(0px)',  scale: 1,    opacity: 1, duration: 0.9, ease: 'power1.out' }, T2 + 0.3);
+  var T2 = 10.2;
+  tl.to('#s2a', { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T2);
+  tl.fromTo('#s2b', { filter: 'blur(25px)', scale: 0.95, opacity: 0 }, { filter: 'blur(0px)', scale: 1, opacity: 1, duration: 0.9, ease: 'power1.out' }, T2 + 0.3);
 
-  // ── SCENE 2B entrances ──────────────────────────────────────────
-  tl.fromTo('#s2b-vline',
-    { opacity: 0, scaleY: 0 },
-    { opacity: 1, scaleY: 1, duration: 0.7, ease: 'power2.out', transformOrigin: 'top' }, 14.5);
-  tl.fromTo('#s2b-heading',
-    { opacity: 0, x: -18 },
-    { opacity: 1, x: 0, duration: 1.0, ease: 'power2.out' }, 14.8);
-  tl.fromTo('#s2b-desc',
-    { opacity: 0, x: -14 },
-    { opacity: 1, x: 0, duration: 1.0, ease: 'expo.out' }, 15.8);
-  tl.fromTo('#s2b-note',
-    { opacity: 0 },
-    { opacity: 1, duration: 0.9, ease: 'sine.out' }, 16.8);
-  tl.fromTo('#p1', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 17.2);
-  tl.fromTo('#p2', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 17.5);
-  tl.fromTo('#p3', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 17.8);
-  tl.fromTo('#p4', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 18.1);
-  tl.fromTo('#def-circle',
-    { strokeDashoffset: 799 },
-    { strokeDashoffset: 0, duration: 1.5, ease: 'power1.inOut' }, 18.5);
+  // Scene 2B
+  tl.fromTo('#s2b-vline', { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.7, ease: 'power2.out', transformOrigin: 'top' }, 11.7);
+  tl.fromTo('#s2b-heading', { opacity: 0, x: -18 }, { opacity: 1, x: 0, duration: 1.0, ease: 'power2.out' }, 12.0);
+  tl.fromTo('#s2b-desc', { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 1.0, ease: 'expo.out' }, 13.0);
+  tl.fromTo('#s2b-note', { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'sine.out' }, 14.0);
+  tl.fromTo('#p1', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 14.4);
+  tl.fromTo('#p2', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 14.7);
+  tl.fromTo('#p3', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 15.0);
+  tl.fromTo('#p4', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power1.out' }, 15.3);
+  tl.fromTo('#def-circle', { strokeDashoffset: 799 }, { strokeDashoffset: 0, duration: 1.5, ease: 'power1.inOut' }, 15.7);
 
-  // ── Transition T3: S2B→S2C  (T=20.0) ───────────────────────────
-  var T3 = 20.0;
-  tl.to('#s2b',  { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T3);
-  tl.fromTo('#s2c',
-    { filter: 'blur(25px)', scale: 0.95, opacity: 0 },
-    { filter: 'blur(0px)',  scale: 1,    opacity: 1, duration: 0.9, ease: 'power1.out' }, T3 + 0.3);
+  var T3 = 19.0;
+  tl.to('#s2b', { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T3);
+  tl.fromTo('#s2c', { filter: 'blur(25px)', scale: 0.95, opacity: 0 }, { filter: 'blur(0px)', scale: 1, opacity: 1, duration: 0.9, ease: 'power1.out' }, T3 + 0.3);
 
-  // ── SCENE 2C entrances ──────────────────────────────────────────
-  tl.fromTo('#s2c-tag',
-    { opacity: 0, y: -10 },
-    { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 21.5);
-  tl.fromTo('#s2c-main',
-    { opacity: 0, y: 20 },
-    { opacity: 1, y: 0, duration: 1.1, ease: 'power2.out' }, 22.3);
-  tl.fromTo('#s2c-note',
-    { opacity: 0, y: 14 },
-    { opacity: 1, y: 0, duration: 1.0, ease: 'sine.out' }, 23.6);
+  // Scene 2C
+  tl.fromTo('#s2c-tag', { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 21.2);
+  tl.fromTo('#s2c-main', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1.1, ease: 'power2.out' }, 22.0);
+  tl.fromTo('#s2c-note', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 1.0, ease: 'sine.out' }, 23.3);
 
-  // ── Transition T4: S2C→S3A  (T=26.8) ───────────────────────────
-  var T4 = 26.8;
-  tl.to('#s2c',  { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T4);
-  tl.fromTo('#s3a',
-    { filter: 'blur(25px)', scale: 0.95, opacity: 0 },
-    { filter: 'blur(0px)',  scale: 1,    opacity: 1, duration: 0.9, ease: 'power1.out' }, T4 + 0.3);
+  var T4 = 26.0;
+  tl.to('#s2c', { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T4);
+  tl.fromTo('#s3a', { filter: 'blur(25px)', scale: 0.95, opacity: 0 }, { filter: 'blur(0px)', scale: 1, opacity: 1, duration: 0.9, ease: 'power1.out' }, T4 + 0.3);
 
-  // ── SCENE 3A entrances ──────────────────────────────────────────
-  tl.fromTo('#s3a-step',
-    { opacity: 0, x: -16 },
-    { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 28.5);
-  tl.fromTo('#s3a-rule',
-    { opacity: 0, scaleX: 0 },
-    { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'left' }, 29.0);
-  tl.fromTo('#s3a-main',
-    { opacity: 0, y: 18 },
-    { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 29.4);
-  tl.fromTo('#s3a-sub',
-    { opacity: 0 },
-    { opacity: 1, duration: 0.9, ease: 'sine.out' }, 30.3);
-  tl.fromTo('#s3a-board',
-    { opacity: 0, scale: 0.96 },
-    { opacity: 1, scale: 1, duration: 1.2, ease: 'power1.out' }, 30.8);
+  // Scene 3A
+  tl.fromTo('#s3a-step', { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 27.5);
+  tl.fromTo('#s3a-rule', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'left' }, 28.0);
+  tl.fromTo('#s3a-main', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 28.4);
+  tl.fromTo('#s3a-sub', { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'sine.out' }, 29.3);
+  tl.fromTo('#s3a-board', { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 1.2, ease: 'power1.out' }, 29.8);
+  tl.to('#s3a-stage1', { opacity: 0, duration: 0.45, ease: 'sine.inOut' }, 31.0);
+  tl.to('#s3a-stage2', { opacity: 1, duration: 0.45, ease: 'sine.inOut' }, 31.0);
+  tl.to('#s3a-stage2', { opacity: 0, duration: 0.45, ease: 'sine.inOut' }, 32.6);
+  tl.to('#s3a-stage3', { opacity: 1, duration: 0.45, ease: 'sine.inOut' }, 32.6);
+  tl.to('#s3a-stage3', { opacity: 0, duration: 0.45, ease: 'sine.inOut' }, 34.2);
+  tl.to('#s3a-stage4', { opacity: 1, duration: 0.45, ease: 'sine.inOut' }, 34.2);
+  var T5 = 37.0;
+  tl.to('#s3a', { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T5);
+  tl.fromTo('#s3b', { filter: 'blur(25px)', scale: 0.95, opacity: 0 }, { filter: 'blur(0px)', scale: 1, opacity: 1, duration: 0.9, ease: 'power1.out' }, T5 + 0.3);
 
-  // ── Transition T5: S3A→S3B  (T=34.8) ───────────────────────────
-  var T5 = 34.8;
-  tl.to('#s3a',  { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T5);
-  tl.fromTo('#s3b',
-    { filter: 'blur(25px)', scale: 0.95, opacity: 0 },
-    { filter: 'blur(0px)',  scale: 1,    opacity: 1, duration: 0.9, ease: 'power1.out' }, T5 + 0.3);
+  // Scene 3B
+  tl.fromTo('#s3b-step', { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 39.5);
+  tl.fromTo('#s3b-rule', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'left' }, 40.0);
+  tl.fromTo('#s3b-main', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 40.3);
+  tl.fromTo('#s3b-sub', { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'sine.out' }, 41.2);
+  tl.fromTo('#s3b-board', { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'power1.out' }, 40.5);
+  tl.to('#sel0', { opacity: 1, duration: 0.3, ease: 'power2.out' }, 42.0);
+  tl.to('#sel1', { opacity: 1, duration: 0.3, ease: 'power2.out' }, 42.55);
+  tl.to('#sel2', { opacity: 1, duration: 0.3, ease: 'power2.out' }, 43.1);
+  tl.to('#sel3', { opacity: 1, duration: 0.3, ease: 'power2.out' }, 43.65);
 
-  // ── SCENE 3B entrances ──────────────────────────────────────────
-  tl.fromTo('#s3b-step',
-    { opacity: 0, x: -16 },
-    { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 36.5);
-  tl.fromTo('#s3b-rule',
-    { opacity: 0, scaleX: 0 },
-    { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'left' }, 37.0);
-  tl.fromTo('#s3b-main',
-    { opacity: 0, y: 18 },
-    { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 37.3);
-  tl.fromTo('#s3b-sub',
-    { opacity: 0 },
-    { opacity: 1, duration: 0.9, ease: 'sine.out' }, 38.2);
-  tl.fromTo('#s3b-board',
-    { opacity: 0, scale: 0.96 },
-    { opacity: 1, scale: 1, duration: 0.8, ease: 'power1.out' }, 37.5);
-  tl.fromTo('#hl1', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power2.out' }, 38.7);
-  tl.fromTo('#hl2', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power2.out' }, 39.2);
-  tl.fromTo('#hl3', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power2.out' }, 39.7);
-  tl.fromTo('#hl4', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power2.out' }, 40.2);
+  var T6 = 46.0;
+  tl.to('#s3b', { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T6);
+  tl.fromTo('#s3c', { filter: 'blur(25px)', scale: 0.95, opacity: 0 }, { filter: 'blur(0px)', scale: 1, opacity: 1, duration: 0.9, ease: 'power1.out' }, T6 + 0.3);
 
-  // ── Transition T6: S3B→S3C  (T=43.0) ───────────────────────────
-  var T6 = 43.0;
-  tl.to('#s3b',  { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T6);
-  tl.fromTo('#s3c',
-    { filter: 'blur(25px)', scale: 0.95, opacity: 0 },
-    { filter: 'blur(0px)',  scale: 1,    opacity: 1, duration: 0.9, ease: 'power1.out' }, T6 + 0.3);
+  // Scene 3C
+  tl.fromTo('#s3c-step', { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 47.3);
+  tl.fromTo('#s3c-rule', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'left' }, 47.8);
+  tl.fromTo('#s3c-main', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 48.1);
+  tl.fromTo('#s3c-sub', { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'sine.out' }, 49.0);
+  tl.fromTo('#s3c-board', { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'power1.out' }, 48.2);
+  tl.fromTo('#judge-button', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, 50.1);
+  tl.to('#judge-button', { scale: 0.94, duration: 0.15, ease: 'power1.inOut', yoyo: true, repeat: 1 }, 50.8);
+  tl.fromTo('#kc', { strokeDashoffset: 596 }, { strokeDashoffset: 0, duration: 1.8, ease: 'power1.inOut' }, 51.2);
+  tl.to('#judge-button', { opacity: 0, duration: 0.25, ease: 'power1.in' }, 52.6);
 
-  // ── SCENE 3C entrances ──────────────────────────────────────────
-  tl.fromTo('#s3c-step',
-    { opacity: 0, x: -16 },
-    { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 44.5);
-  tl.fromTo('#s3c-rule',
-    { opacity: 0, scaleX: 0 },
-    { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'left' }, 45.0);
-  tl.fromTo('#s3c-main',
-    { opacity: 0, y: 18 },
-    { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 45.3);
-  tl.fromTo('#s3c-sub',
-    { opacity: 0 },
-    { opacity: 1, duration: 0.9, ease: 'sine.out' }, 46.2);
-  tl.fromTo('#s3c-board',
-    { opacity: 0, scale: 0.96 },
-    { opacity: 1, scale: 1, duration: 0.8, ease: 'power1.out' }, 45.5);
-  tl.fromTo('#kc',
-    { strokeDashoffset: 707 },
-    { strokeDashoffset: 0, duration: 2.0, ease: 'power1.inOut' }, 46.5);
+  var T7 = 54.0;
+  tl.to('#s3c', { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.8, ease: 'power1.in' }, T7);
+  tl.fromTo('#s4', { filter: 'blur(25px)', scale: 0.95, opacity: 0 }, { filter: 'blur(0px)', scale: 1, opacity: 1, duration: 0.8, ease: 'power1.out' }, T7 + 0.25);
 
-  // ── Transition T7: S3C→S4  (T=51.0) ────────────────────────────
-  var T7 = 51.0;
-  tl.to('#s3c',  { filter: 'blur(25px)', scale: 1.05, opacity: 0, duration: 0.9, ease: 'power1.in' }, T7);
-  tl.fromTo('#s4',
-    { filter: 'blur(25px)', scale: 0.95, opacity: 0 },
-    { filter: 'blur(0px)',  scale: 1,    opacity: 1, duration: 0.9, ease: 'power1.out' }, T7 + 0.3);
-
-  // ── SCENE 4 entrances ───────────────────────────────────────────
-  tl.fromTo('#s4-copy',
-    { opacity: 0, y: 16 },
-    { opacity: 1, y: 0, duration: 1.2, ease: 'power1.out' }, 52.5);
-  tl.fromTo('#s4-vline',
-    { opacity: 0, scaleY: 0 },
-    { opacity: 1, scaleY: 1, duration: 0.7, ease: 'power2.out', transformOrigin: 'top' }, 53.9);
-  tl.fromTo('#s4-name',
-    { opacity: 0, y: 14 },
-    { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 54.5);
-  tl.fromTo('#s4-icon',
-    { opacity: 0, scale: 0.85 },
-    { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.5)' }, 55.5);
-  tl.fromTo('#s4-stores',
-    { opacity: 0 },
-    { opacity: 1, duration: 0.8, ease: 'sine.out' }, 56.5);
-
-  // ── Final scene fade out ─────────────────────────────────────────
-  tl.to('#s4', { opacity: 0, duration: 0.5, ease: 'power1.in' }, 59.5);
+  // Scene 4
+  tl.fromTo('#s4-copy', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.9, ease: 'power1.out' }, 54.6);
+  tl.fromTo('#s4-vline', { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.55, ease: 'power2.out', transformOrigin: 'top' }, 55.7);
+  tl.fromTo('#s4-name', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.75, ease: 'power2.out' }, 56.2);
+  tl.fromTo('#s4-stores', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'sine.out' }, 57.55);
+  tl.to('#s4', { opacity: 0, duration: 0.45, ease: 'power1.in' }, 59.5);
   tl.set('#s4', { visibility: 'hidden' }, 60.0);
 
   window.__timelines["main"] = tl;
