@@ -1,0 +1,4 @@
+# HyperFrames generated files
+.thumbnails/
+node_modules/
+*.mp4

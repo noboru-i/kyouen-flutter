@@ -77,4 +77,6 @@ web/sqlite3.wasm
 
 # Playwright CLI temporary files
 .playwright-cli/
-.claude/skills/playwright-cli/
+
+# Claude Code skills (reinstall manually — see README.md)
+.claude/skills/

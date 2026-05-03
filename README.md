@@ -14,8 +14,13 @@
 
 以下のスキルはgitignore対象のため、別PCでセットアップする際は個別にインストールが必要です。
 
+```bash
+# HyperFrames — 動画コンポジション作成スキル
+gh skill install heygen-com/hyperframes --agent claude-code --allow-hidden-dirs
+```
+
+- **hyperframes**: HyperFrames による動画コンポジション・レンダリングスキル（`kyouen-app-intro/` の紹介動画制作で使用）
 - **playwright-cli**: ブラウザ自動操作スキル
-  インストール方法は https://github.com/microsoft/playwright-cli を参照してください。
 
 ### クイックスタート
 
