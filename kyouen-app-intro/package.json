@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npx --yes hyperframes@0.4.42 preview",
     "check": "npx --yes hyperframes@0.4.42 lint && npx --yes hyperframes@0.4.42 validate && npx --yes hyperframes@0.4.42 inspect",
-    "render": "npx --yes hyperframes@0.4.42 render",
+    "render": "npx --yes hyperframes@0.4.42 render --fps 30 --quality high --workers auto",
     "publish": "npx --yes hyperframes@0.4.42 publish"
   }
 }

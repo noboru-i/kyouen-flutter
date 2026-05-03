@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=1280, height=720" />
+  <meta name="viewport" content="width=3840, height=2160" />
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <style>
     :root {
@@ -16,13 +16,29 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      width: 1280px;
-      height: 720px;
+      width: 3840px;
+      height: 2160px;
       overflow: hidden;
       background: var(--bg);
     }
 
-    #root { position: relative; width: 1280px; height: 720px; }
+    #root {
+      position: relative;
+      width: 3840px;
+      height: 2160px;
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    #stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1280px;
+      height: 720px;
+      transform: scale(3);
+      transform-origin: top left;
+    }
 
     .scene {
       position: absolute;
@@ -127,7 +143,16 @@
   </style>
 </head>
 <body>
-<div id="root" data-composition-id="main" data-start="0" data-duration="60" data-width="1280" data-height="720">
+<div id="root" data-composition-id="main" data-start="0" data-duration="60" data-width="3840" data-height="2160">
+  <audio
+    id="intro-bgm"
+    src="assets/intro-bgm.mp3"
+    data-start="0"
+    data-duration="60"
+    data-track-index="0"
+  ></audio>
+
+  <div id="stage">
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false" data-layout-ignore>
     <defs>
       <radialGradient id="blackStone" cx="32%" cy="28%" r="70%">
@@ -379,6 +404,7 @@
     </div>
   </div>
 
+  </div><!-- /#stage -->
 </div><!-- /#root -->
 
 <script>

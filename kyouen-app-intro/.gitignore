@@ -1,4 +1,5 @@
 # HyperFrames generated files
 .thumbnails/
+.waveform-cache/
 node_modules/
 *.mp4
