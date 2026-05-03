@@ -269,5 +269,13 @@
         "type": "String"
       }
     }
+  },
+  "newStageAdded": "New stage added",
+  "@newStageAdded": {
+    "description": "Snackbar message when a new stage notification is received in the foreground"
+  },
+  "openAction": "Open",
+  "@openAction": {
+    "description": "Snackbar action label to open the new stage"
   }
 }

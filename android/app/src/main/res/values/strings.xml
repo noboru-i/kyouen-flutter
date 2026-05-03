@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TumeKyouen</string>
+    <string name="notification_new_stage_title">New stage added</string>
 </resources>

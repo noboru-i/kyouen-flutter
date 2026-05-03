@@ -55,5 +55,7 @@
   "submitFailed": "送信に失敗しました: {error}",
   "undo": "1手戻す",
   "reset": "リセット",
-  "errorWithMessage": "エラー: {error}"
+  "errorWithMessage": "エラー: {error}",
+  "newStageAdded": "新しいステージが追加されました",
+  "openAction": "開く"
 }
