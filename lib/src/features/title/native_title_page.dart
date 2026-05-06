@@ -35,102 +35,155 @@ class TitlePage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(
-                    height: constraints.maxHeight - 72,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(32, padding.top, 32, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.more_vert,
-                                  color: Colors.white54,
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: math.max(0, constraints.maxHeight - 72),
+                    ),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(32, padding.top, 32, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.more_vert,
+                                    color: Colors.white54,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.restorablePushNamed(
+                                      context,
+                                      OptionsPage.routeName,
+                                    );
+                                  },
                                 ),
+                              ],
+                            ),
+                            const Spacer(flex: 2),
+                            const _KyouenDiagram(),
+                            const SizedBox(height: 32),
+                            Text(
+                              AppLocalizations.of(context)!.appTitle,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 6,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLocalizations.of(context)!.puzzleDescription,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white54,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            const _StageProgressDisplay(),
+                            const Spacer(flex: 2),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 56,
+                              child: FilledButton(
                                 onPressed: () {
                                   Navigator.restorablePushNamed(
                                     context,
-                                    OptionsPage.routeName,
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          const Spacer(flex: 2),
-                          const _KyouenDiagram(),
-                          const SizedBox(height: 32),
-                          Text(
-                            AppLocalizations.of(context)!.appTitle,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 6,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppLocalizations.of(context)!.puzzleDescription,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.white54,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          const _StageProgressDisplay(),
-                          const Spacer(flex: 2),
-                          SizedBox(
-                            height: 56,
-                            child: FilledButton(
-                              onPressed: () {
-                                Navigator.restorablePushNamed(
-                                  context,
-                                  StagePage.routeName,
-                                );
-                              },
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: _kBgTop,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                AppLocalizations.of(context)!.start,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            height: 52,
-                            child: FilledButton(
-                              onPressed: () async {
-                                final stageNo = await showStageSelectDialog(
-                                  context,
-                                );
-                                if (stageNo == null) {
-                                  return;
-                                }
-                                await ref
-                                    .read(currentStageNoProvider.notifier)
-                                    .setStageNo(stageNo);
-                                if (context.mounted) {
-                                  await Navigator.pushNamed(
-                                    context,
                                     StagePage.routeName,
                                   );
-                                }
-                              },
+                                },
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: _kBgTop,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  AppLocalizations.of(context)!.start,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: 52,
+                              child: FilledButton(
+                                onPressed: () async {
+                                  final stageNo = await showStageSelectDialog(
+                                    context,
+                                  );
+                                  if (stageNo == null) {
+                                    return;
+                                  }
+                                  await ref
+                                      .read(currentStageNoProvider.notifier)
+                                      .setStageNo(stageNo);
+                                  if (context.mounted) {
+                                    await Navigator.pushNamed(
+                                      context,
+                                      StagePage.routeName,
+                                    );
+                                  }
+                                },
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.white.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  AppLocalizations.of(context)!.selectStage,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: 52,
+                              child: FilledButton(
+                                onPressed: () {
+                                  Navigator.restorablePushNamed(
+                                    context,
+                                    CreateStagePage.routeName,
+                                  );
+                                },
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.white.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  AppLocalizations.of(context)!.createStage,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            AccountButton(
+                              height: 52,
                               style: FilledButton.styleFrom(
                                 backgroundColor: Colors.white.withValues(
                                   alpha: 0.12,
@@ -140,58 +193,10 @@ class TitlePage extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: Text(
-                                AppLocalizations.of(context)!.selectStage,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            height: 52,
-                            child: FilledButton(
-                              onPressed: () {
-                                Navigator.restorablePushNamed(
-                                  context,
-                                  CreateStagePage.routeName,
-                                );
-                              },
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.white.withValues(
-                                  alpha: 0.12,
-                                ),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                AppLocalizations.of(context)!.createStage,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          AccountButton(
-                            height: 52,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: Colors.white.withValues(
-                                alpha: 0.12,
-                              ),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
+                            const SizedBox(height: 16),
+                          ],
+                        ),
                       ),
                     ),
                   ),
