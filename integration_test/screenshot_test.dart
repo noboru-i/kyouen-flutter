@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'test_main.dart' as app;
@@ -41,6 +42,11 @@ Future<void> _tapLocalizedText(
   fail('Could not find any of the texts: ${labels.join(', ')}');
 }
 
+Future<void> _popCurrentRoute(WidgetTester tester) async {
+  tester.state<NavigatorState>(find.byType(Navigator)).pop();
+  await _settleAfterRouteChange(tester);
+}
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -72,8 +78,7 @@ void main() {
       await _takeStableScreenshot(binding, tester, '02_stage_1');
 
       // タイトル画面へ戻る
-      await tester.pageBack();
-      await _settleAfterRouteChange(tester);
+      await _popCurrentRoute(tester);
 
       // ステージ作成画面へ遷移
       await _tapLocalizedText(tester, ['ステージ作成', 'Create Stage']);
