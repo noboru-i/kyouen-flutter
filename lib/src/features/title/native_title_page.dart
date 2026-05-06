@@ -12,6 +12,7 @@ import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/title/total_stage_count_provider.dart';
 import 'package:kyouen_flutter/src/features/title/views/account_button.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
+import 'package:kyouen_flutter/src/widgets/common/stage_select_dialog.dart';
 
 const _kBgTop = Color(0xFF1C2334);
 const _kBgBottom = Color(0xFF0D1117);
@@ -105,6 +106,45 @@ class TitlePage extends ConsumerWidget {
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 52,
+                            child: FilledButton(
+                              onPressed: () async {
+                                final stageNo = await showStageSelectDialog(
+                                  context,
+                                );
+                                if (stageNo == null) {
+                                  return;
+                                }
+                                await ref
+                                    .read(currentStageNoProvider.notifier)
+                                    .setStageNo(stageNo);
+                                if (context.mounted) {
+                                  await Navigator.pushNamed(
+                                    context,
+                                    StagePage.routeName,
+                                  );
+                                }
+                              },
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.12,
+                                ),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.selectStage,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),

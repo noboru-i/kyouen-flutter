@@ -10,6 +10,7 @@ import 'package:kyouen_flutter/src/utils/web_url_updater.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
+import 'package:kyouen_flutter/src/widgets/common/stage_select_dialog.dart';
 
 class _IsNavigatingNotifier extends Notifier<bool> {
   @override
@@ -123,6 +124,17 @@ class _HeaderState extends ConsumerState<_Header> {
     }
   }
 
+  Future<void> _selectStage() async {
+    if (_activeNavigation != null) {
+      return;
+    }
+    final stageNo = await showStageSelectDialog(context);
+    if (stageNo == null || !mounted) {
+      return;
+    }
+    await ref.read(currentStageNoProvider.notifier).setStageNo(stageNo);
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentStage = ref.watch(currentStageProvider);
@@ -162,14 +174,7 @@ class _HeaderState extends ConsumerState<_Header> {
                       () => ref.read(currentStageNoProvider.notifier).prev(),
                     )
                   : null,
-              onLongPress: !isBusy && currentStageNo > 1
-                  ? () => _navigate(
-                      _NavDirection.prev,
-                      () => ref
-                          .read(currentStageNoProvider.notifier)
-                          .prevUncleared(),
-                    )
-                  : null,
+              onLongPress: isBusy ? null : _selectStage,
               child: isLoadingShown && _activeNavigation == _NavDirection.prev
                   ? const SizedBox(
                       height: 20,
@@ -230,14 +235,7 @@ class _HeaderState extends ConsumerState<_Header> {
                       _NavDirection.next,
                       () => ref.read(currentStageNoProvider.notifier).next(),
                     ),
-              onLongPress: isBusy
-                  ? null
-                  : () => _navigate(
-                      _NavDirection.next,
-                      () => ref
-                          .read(currentStageNoProvider.notifier)
-                          .nextUncleared(),
-                    ),
+              onLongPress: isBusy ? null : _selectStage,
               child: isLoadingShown && _activeNavigation == _NavDirection.next
                   ? const SizedBox(
                       height: 20,

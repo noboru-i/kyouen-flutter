@@ -12,6 +12,7 @@ import 'package:kyouen_flutter/src/features/title/views/my_app_bar.dart';
 import 'package:kyouen_flutter/src/features/title/views/my_drawer.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/stage_select_dialog.dart';
 import 'package:kyouen_flutter/src/widgets/theme/app_theme.dart';
 
 class WebTitlePage extends ConsumerWidget {
@@ -63,7 +64,7 @@ class WebTitlePage extends ConsumerWidget {
                   const SizedBox(height: 40),
 
                   // Navigation Links
-                  _buildNavigationSection(context),
+                  _buildNavigationSection(context, ref),
 
                   const SizedBox(height: 48),
 
@@ -95,7 +96,7 @@ class WebTitlePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildNavigationSection(BuildContext context) {
+  Widget _buildNavigationSection(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.10),
@@ -111,6 +112,31 @@ class WebTitlePage extends ConsumerWidget {
               Navigator.restorablePushNamed(context, StagePage.routeName);
             },
             child: Text(AppLocalizations.of(context)!.start),
+          ),
+
+          const SizedBox(height: 12),
+
+          FilledButton(
+            onPressed: () async {
+              final stageNo = await showStageSelectDialog(context);
+              if (stageNo == null) {
+                return;
+              }
+              await ref
+                  .read(currentStageNoProvider.notifier)
+                  .setStageNo(stageNo);
+              if (context.mounted) {
+                await Navigator.pushNamed(context, StagePage.routeName);
+              }
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.12),
+              foregroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+            ),
+            child: Text(AppLocalizations.of(context)!.selectStage),
           ),
 
           const SizedBox(height: 12),

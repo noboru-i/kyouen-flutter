@@ -20,6 +20,18 @@
   "@createStage": {
     "description": "Create stage button label"
   },
+  "selectStage": "Select Stage",
+  "@selectStage": {
+    "description": "Select stage button and dialog title"
+  },
+  "stageNumber": "Stage Number",
+  "@stageNumber": {
+    "description": "Stage number input label"
+  },
+  "go": "Go",
+  "@go": {
+    "description": "Button label to open the selected stage"
+  },
   "latestRegistrations": "Latest Registrations",
   "@latestRegistrations": {
     "description": "Section title for latest registrations"
