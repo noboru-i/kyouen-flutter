@@ -56,10 +56,18 @@ Future<StageResponse> fetchStage(Ref ref, {required int stageNo}) async {
 
   final localStage = await dao.findStage(stageNo);
   if (localStage != null) {
+    // 過去のバグにより、6x6 ステージが 81 文字（9x9 サイズ）で保存された不正データが
+    // 一部端末の SQLite キャッシュに残っている。DB 上のデータはマイグレーション済みだが、
+    // マイグレーション前にキャッシュ済みの端末向けにここで切り詰める。
+    // 不正データは末尾が '0'（空マス）で埋まっていることを前提とする。
+    final expectedLength = localStage.size * localStage.size;
+    final stage = localStage.stage.length > expectedLength
+        ? localStage.stage.substring(0, expectedLength)
+        : localStage.stage;
     return StageResponse(
       stageNo: localStage.stageNo,
       size: localStage.size,
-      stage: localStage.stage,
+      stage: stage,
       creator: localStage.creator,
       registDate: '', // This field isn't stored in SQLite
     );
