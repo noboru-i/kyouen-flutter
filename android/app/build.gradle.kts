@@ -57,6 +57,12 @@ android {
 
         // Set app name from dart-defines
         resValue("string", "app_name", dartDefines["APP_NAME"] ?: "詰め共円")
+        // AdMob App ID (test ID as default; override via ADMOB_APP_ID_ANDROID dart-define)
+        resValue(
+            "string",
+            "admob_app_id",
+            dartDefines["ADMOB_APP_ID_ANDROID"] ?: "ca-app-pub-3940256099942544~3347511713",
+        )
     }
 
     signingConfigs {

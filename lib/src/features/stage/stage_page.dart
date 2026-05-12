@@ -1,13 +1,17 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
+import 'package:kyouen_flutter/src/features/stage/ads/banner_ad_widget.dart';
+import 'package:kyouen_flutter/src/features/stage/ads/hint_rewarded_ad_service.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 import 'package:kyouen_flutter/src/features/stage/widgets/stage_board.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/utils/web_url_updater.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/hint_highlight_overlay.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_answer_overlay_widget.dart';
 import 'package:kyouen_flutter/src/widgets/common/kyouen_success_dialog.dart';
 import 'package:kyouen_flutter/src/widgets/common/stage_select_dialog.dart';
@@ -43,6 +47,23 @@ final showKyouenOverlayProvider =
       ShowKyouenOverlayNotifier.new,
     );
 
+class _HintHighlightNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    ref.watch(currentStageNoProvider);
+    return null;
+  }
+
+  // ignore: use_setters_to_change_properties
+  void show(int index) => state = index;
+  void clear() => state = null;
+}
+
+final _hintHighlightIndexProvider =
+    NotifierProvider<_HintHighlightNotifier, int?>(
+      _HintHighlightNotifier.new,
+    );
+
 class StagePage extends ConsumerWidget {
   const StagePage({super.key});
 
@@ -65,6 +86,8 @@ class StagePage extends ConsumerWidget {
               _Header(),
               Expanded(child: _Body()),
               _Footer(),
+              SizedBox(height: 8),
+              _BannerAdSection(),
             ],
           ),
         ),
@@ -251,74 +274,87 @@ class _HeaderState extends ConsumerState<_Header> {
   }
 }
 
-class _Footer extends ConsumerWidget {
+class _Footer extends ConsumerStatefulWidget {
   const _Footer();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentStage = ref.watch(currentStageProvider);
-    final hasFourWhiteStones =
-        currentStage.asData?.value.stage
-            .split('')
-            .where(
-              (element) => StoneState.fromString(element) == StoneState.white,
-            )
-            .length ==
-        4;
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: FilledButton(
-        onPressed: hasFourWhiteStones
-            ? () async {
-                final isKyouen = ref
-                    .read(currentStageProvider.notifier)
-                    .isKyouen();
-                if (isKyouen) {
-                  debugPrint('KYOUEN!');
+  ConsumerState<_Footer> createState() => _FooterState();
+}
 
-                  // Show kyouen overlay
-                  ref.read(showKyouenOverlayProvider.notifier).show();
+class _FooterState extends ConsumerState<_Footer> {
+  bool _isHintLoading = false;
 
-                  // オーバーレイアニメーション(500ms)完了を待ちつつ、DB書き込みを並列実行
-                  await Future.wait([
-                    Future<void>.delayed(const Duration(milliseconds: 600)),
-                    ref
-                        .read(currentStageProvider.notifier)
-                        .markCurrentStageCleared(),
-                  ]);
+  Future<void> _onKyouenPressed() async {
+    final isKyouen = ref.read(currentStageProvider.notifier).isKyouen();
+    if (isKyouen) {
+      debugPrint('KYOUEN!');
+      ref.read(showKyouenOverlayProvider.notifier).show();
 
-                  if (context.mounted) {
-                    await showKyouenSuccessDialog(
-                      context: context,
-                      onClose: () {
-                        Navigator.of(context).pop();
-                      },
-                    );
-                    final moved = await ref
-                        .read(currentStageNoProvider.notifier)
-                        .next();
-                    if (!moved && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context)!.noMoreStages,
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                } else {
-                  debugPrint('NOT KYOUEN!');
-                  if (context.mounted) {
-                    await _showNotKyouenDialog(context);
-                  }
-                  ref.read(currentStageProvider.notifier).reset();
-                }
+      await Future.wait([
+        Future<void>.delayed(const Duration(milliseconds: 600)),
+        ref.read(currentStageProvider.notifier).markCurrentStageCleared(),
+      ]);
+
+      if (!mounted) {
+        return;
+      }
+      await showKyouenSuccessDialog(
+        context: context,
+        onClose: () {
+          Navigator.of(context).pop();
+        },
+      );
+      final moved = await ref.read(currentStageNoProvider.notifier).next();
+      if (!moved && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.noMoreStages),
+          ),
+        );
+      }
+    } else {
+      debugPrint('NOT KYOUEN!');
+      if (mounted) {
+        await _showNotKyouenDialog(context);
+      }
+      ref.read(currentStageProvider.notifier).reset();
+    }
+  }
+
+  Future<void> _onHintPressed() async {
+    if (_isHintLoading) {
+      return;
+    }
+    setState(() => _isHintLoading = true);
+    try {
+      await ref
+          .read(hintRewardedAdProvider.notifier)
+          .show(
+            onEarnedReward: _applyHint,
+            onFailed: () {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to load ad')),
+                );
               }
-            : null,
-        child: Text(AppLocalizations.of(context)!.kyouenButton),
-      ),
-    );
+            },
+          );
+    } finally {
+      if (mounted) {
+        setState(() => _isHintLoading = false);
+      }
+    }
+  }
+
+  void _applyHint() {
+    final index = ref
+        .read(currentStageProvider.notifier)
+        .pickRandomUnselectedSolutionIndex();
+    if (index == null) {
+      return;
+    }
+    ref.read(currentStageProvider.notifier).toggleSelect(index);
+    ref.read(_hintHighlightIndexProvider.notifier).show(index);
   }
 
   Future<void> _showNotKyouenDialog(BuildContext context) {
@@ -342,6 +378,49 @@ class _Footer extends ConsumerWidget {
       },
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentStage = ref.watch(currentStageProvider);
+    final stoneStates =
+        currentStage.asData?.value.stage.split('').map(StoneState.fromString) ??
+        [];
+    final whiteCount = stoneStates.where((s) => s == StoneState.white).length;
+    final hasFourWhiteStones = whiteCount == 4;
+    final hasAnyWhiteStone = whiteCount > 0;
+
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: [
+          Expanded(
+            child: FilledButton(
+              onPressed: hasFourWhiteStones ? _onKyouenPressed : null,
+              child: Text(AppLocalizations.of(context)!.kyouenButton),
+            ),
+          ),
+          if (!kIsWeb) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: (!hasAnyWhiteStone && !_isHintLoading)
+                  ? _onHintPressed
+                  : null,
+              tooltip: 'Hint (Ad)',
+              icon: _isHintLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator.adaptive(
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Icons.lightbulb_outline),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
 class _Body extends ConsumerWidget {
@@ -352,6 +431,7 @@ class _Body extends ConsumerWidget {
     final isNavigating = ref.watch(_isNavigatingProvider);
     final currentStage = ref.watch(currentStageProvider);
     final showOverlay = ref.watch(showKyouenOverlayProvider);
+    final hintIndex = ref.watch(_hintHighlightIndexProvider);
 
     if (isNavigating) {
       return const StageBoard();
@@ -360,25 +440,36 @@ class _Body extends ConsumerWidget {
     return currentStage.when(
       data: (data) {
         final boardSize = data.size;
+
+        Widget? overlay;
+        if (showOverlay) {
+          overlay = Consumer(
+            builder: (context, ref, child) {
+              final kyouenData = ref
+                  .read(currentStageProvider.notifier)
+                  .getKyouenData();
+              if (kyouenData != null) {
+                return KyouenAnswerOverlayWidget(
+                  kyouenData: kyouenData,
+                  boardSize: boardSize,
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          );
+        } else if (hintIndex != null) {
+          overlay = HintHighlightOverlayWidget(
+            targetIndex: hintIndex,
+            boardSize: boardSize,
+            onComplete: () =>
+                ref.read(_hintHighlightIndexProvider.notifier).clear(),
+          );
+        }
+
         return StageBoard(
           stageData: data,
           onTapStone: (index) => _onTapStone(ref, index),
-          overlay: showOverlay
-              ? Consumer(
-                  builder: (context, ref, child) {
-                    final kyouenData = ref
-                        .read(currentStageProvider.notifier)
-                        .getKyouenData();
-                    if (kyouenData != null) {
-                      return KyouenAnswerOverlayWidget(
-                        kyouenData: kyouenData,
-                        boardSize: boardSize,
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                )
-              : null,
+          overlay: overlay,
         );
       },
       error: (error, stackTrace) {
@@ -394,5 +485,17 @@ class _Body extends ConsumerWidget {
 
   void _onTapStone(WidgetRef ref, int index) {
     ref.watch(currentStageProvider.notifier).toggleSelect(index);
+  }
+}
+
+class _BannerAdSection extends StatelessWidget {
+  const _BannerAdSection();
+
+  @override
+  Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return const SizedBox.shrink();
+    }
+    return const BannerAdWidget();
   }
 }

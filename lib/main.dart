@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kyouen_flutter/firebase_options.dart';
 import 'package:kyouen_flutter/src/app.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
@@ -21,6 +22,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
   await _setupFirebase();
+  if (!kIsWeb) {
+    await MobileAds.instance.initialize();
+  }
 
   final initialStageNo = await _resolveInitialStageNo();
 

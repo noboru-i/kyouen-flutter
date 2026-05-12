@@ -314,6 +314,42 @@ class CurrentStage extends _$CurrentStage {
     return kyouenStage.hasKyouen();
   }
 
+  int? pickRandomUnselectedSolutionIndex() {
+    final stage = state.asData!.value.stage;
+    final size = sqrt(stage.length).toInt();
+
+    final candidates = <(KyouenPoint, int)>[];
+    for (var x = 0; x < size; x++) {
+      for (var y = 0; y < size; y++) {
+        final index = x + y * size;
+        if (StoneState.fromString(stage[index]) != StoneState.none) {
+          candidates.add((KyouenPoint(x.toDouble(), y.toDouble()), index));
+        }
+      }
+    }
+
+    final kyouenData = Kyouen(candidates.map((e) => e.$1).toList()).hasKyouen();
+    if (kyouenData == null) {
+      return null;
+    }
+
+    final solutionPoints = kyouenData.points;
+    final unselected = candidates.where((entry) {
+      final (point, idx) = entry;
+      final inSolution = solutionPoints.any(
+        (sp) => sp.x == point.x && sp.y == point.y,
+      );
+      final isBlack = StoneState.fromString(stage[idx]) == StoneState.black;
+      return inSolution && isBlack;
+    }).toList();
+
+    if (unselected.isEmpty) {
+      return null;
+    }
+    final random = Random();
+    return unselected[random.nextInt(unselected.length)].$2;
+  }
+
   Future<void> markCurrentStageCleared() async {
     final currentStageNoAsync = ref.read(currentStageNoProvider);
     final currentStageNo = currentStageNoAsync.when(
