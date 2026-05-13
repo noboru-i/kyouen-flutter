@@ -11,6 +11,7 @@ import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/features/consent/web_consent_banner.dart';
 import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/notification/push_notification_service.dart';
 import 'package:kyouen_flutter/src/features/options/options_page.dart';
@@ -180,7 +181,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         ? StagePage.routeName
         : TitlePage.routeName;
 
-    return MaterialApp(
+    final app = MaterialApp(
       navigatorKey: _navigatorKey,
       navigatorObservers: [_analyticsObserver],
       restorationScopeId: 'app',
@@ -231,5 +232,10 @@ class _MyAppState extends ConsumerState<MyApp> {
         );
       },
     );
+
+    if (kIsWeb) {
+      return WebConsentBanner(child: app);
+    }
+    return app;
   }
 }
