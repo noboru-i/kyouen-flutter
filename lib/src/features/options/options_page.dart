@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/consent/consent_service.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
+import 'package:kyouen_flutter/src/features/terms/terms_of_service_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -55,6 +56,17 @@ class OptionsPage extends ConsumerWidget {
                   );
                 },
               ),
+            ListTile(
+              leading: const Icon(Icons.article_outlined),
+              title: const Text('Terms of Service'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.restorablePushNamed(
+                  context,
+                  TermsOfServicePage.routeName,
+                );
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.description_outlined),
               title: Text(l10n.licenses),

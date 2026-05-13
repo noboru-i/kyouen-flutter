@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
+import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
+
+class TermsOfServicePage extends StatelessWidget {
+  const TermsOfServicePage({super.key});
+
+  static const routeName = '/terms';
+
+  @override
+  Widget build(BuildContext context) {
+    return BackgroundWidget(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text('Terms of Service'),
+        ),
+        body: FutureBuilder<String>(
+          future: rootBundle.loadString('assets/terms_of_service.md'),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const Center(
+                child: Text('Failed to load terms of service.'),
+              );
+            }
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: MarkdownText(snapshot.data!),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

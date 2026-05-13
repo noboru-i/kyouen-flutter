@@ -30,7 +30,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             }
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: _MarkdownText(snapshot.data!),
+              child: MarkdownText(snapshot.data!),
             );
           },
         ),
@@ -39,8 +39,8 @@ class PrivacyPolicyPage extends StatelessWidget {
   }
 }
 
-class _MarkdownText extends StatelessWidget {
-  const _MarkdownText(this.content);
+class MarkdownText extends StatelessWidget {
+  const MarkdownText(this.content, {super.key});
 
   final String content;
 

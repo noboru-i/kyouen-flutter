@@ -67,6 +67,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/privacy_policy.md
+    - assets/terms_of_service.md
 
 flutter_launcher_icons:
   android: "launcher_icon"

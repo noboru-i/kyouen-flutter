@@ -1,124 +1,155 @@
 # Privacy Policy
 
-Effective date: October 13, 2018
+Effective date: May 13, 2026  
+Previous version: October 13, 2018
 
-TumeKyouen ("us", "we", or "our") operates the TumeKyouen mobile application (the "Service").
+TumeKyouen ("us", "we", or "our") operates the TumeKyouen mobile application and website at https://kyouen.app (collectively, the "Service"). This policy explains how we collect, use, and protect your personal data.
 
-This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
+**Data Controller:** Noboru Ishikura  
+**Contact:** ishikura.noboru@gmail.com
 
-We use your data to provide and improve the Service. By using the Service, you agree to the collection and use of information in accordance with this policy.
+---
 
-## Information Collection And Use
+## 1. Data We Collect
 
-We collect several different types of information for various purposes to provide and improve our Service to you.
+### 1-1. Analytics and Usage Data
 
-### Types of Data Collected
+When you use the Service, we collect analytics data to understand how the Service is used and to improve it. This includes:
 
-#### Personal Data
+- App events (e.g. stages started, cleared, hints used)
+- Screen views and navigation patterns
+- Device type, operating system, and browser
+- IP address and approximate location (country/region level)
+- Session duration
 
-While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you ("Personal Data"). Personally identifiable information may include, but is not limited to:
+This data is collected via **Firebase Analytics** (Google LLC). On web, it uses cookies (`_ga`, `_gid`).
 
-- Cookies and Usage Data
-- IDFA, Advertising ID
-- Twitter account
+### 1-2. Account Data
 
-#### Usage Data
+If you sign in with Twitter (X) or Apple, we receive:
 
-We may also collect information that your browser sends whenever you visit our Service or when you access the Service by or through a mobile device ("Usage Data").
+- A unique user ID from the identity provider
+- Display name (used only for in-app display)
+- OAuth access tokens (used only for API requests; not stored beyond the session)
 
-This Usage Data may include information such as your computer's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that you visit, the time and date of your visit, the time spent on those pages, unique device identifiers and other diagnostic data.
+### 1-3. Advertising Data
 
-When you access the Service by or through a mobile device, this Usage Data may include information such as the type of mobile device you use, your mobile device unique ID, the IP address of your mobile device, your mobile operating system, the type of mobile Internet browser you use, unique device identifiers and other diagnostic data.
+We serve ads via **Google AdMob** and **Google AdSense**. Advertising identifiers (IDFA on iOS, Advertising ID on Android) and cookie-based identifiers (on web) may be used for personalized ads, subject to your consent.
 
-#### Tracking & Cookies Data
+### 1-4. Crash Reports
 
-We use cookies and similar tracking technologies to track the activity on our Service and hold certain information.
+We use **Firebase Crashlytics** to collect crash reports, which may include device state and a stack trace at the time of the crash. No personally identifiable information is intentionally included.
 
-Cookies are files with small amount of data which may include an anonymous unique identifier. Cookies are sent to your browser from a website and stored on your device. Tracking technologies also used are beacons, tags, and scripts to collect and track information and to improve and analyze our Service.
+### 1-5. Push Notifications
 
-You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.
+If you authorize push notifications, your Firebase Cloud Messaging (FCM) token is stored on our server and used only to send you notifications about new stages.
 
-Examples of Cookies we use:
+---
 
-- Session Cookies. We use Session Cookies to operate our Service.
-- Preference Cookies. We use Preference Cookies to remember your preferences and various settings.
-- Security Cookies. We use Security Cookies for security purposes.
+## 2. Legal Basis for Processing (GDPR Article 6)
 
-## Use of Data
+| Purpose | Legal Basis |
+|---|---|
+| Analytics and usage statistics | Consent (Art. 6(1)(a)) |
+| Personalized advertising | Consent (Art. 6(1)(a)) |
+| Account creation and stage sync | Contract performance (Art. 6(1)(b)) |
+| Crash reporting and service security | Legitimate interest (Art. 6(1)(f)) |
+| Push notifications | Consent (Art. 6(1)(a)) |
 
-TumeKyouen uses the collected data for various purposes:
+For users in the **EEA or UK**, we obtain your consent before collecting analytics or serving personalized ads, using the Google User Messaging Platform (UMP) on mobile and a Cookie consent banner on web.
 
-- To provide and maintain the Service
-- To notify you about changes to our Service
-- To allow you to participate in interactive features of our Service when you choose to do so
-- To provide customer care and support
-- To provide analysis or valuable information so that we can improve the Service
-- To monitor the usage of the Service
-- To detect, prevent and address technical issues
+---
 
-## Transfer Of Data
+## 3. Consent and Consent Mode v2
 
-Your information, including Personal Data, may be transferred to — and maintained on — computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from your jurisdiction.
+We implement **Google Consent Mode v2** to respect your privacy choices:
 
-If you are located outside Japan and choose to provide information to us, please note that we transfer the data, including Personal Data, to Japan and process it there.
+- **Before consent:** Analytics and advertising signals default to `denied`. Firebase Analytics operates in a cookieless / non-personalized mode.
+- **After consent granted:** Full analytics and personalized ads are enabled.
+- **After consent denied:** Basic aggregate analytics (without personal identifiers) may still be collected for service improvement purposes in accordance with Google's Consent Mode documentation.
 
-Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.
+You can change your consent choice at any time:
+- **Mobile:** Settings → Options → 「広告・解析の同意設定」
+- **Web:** Clear your browser's localStorage entry `consent_choice_v1`, then reload the page.
 
-TumeKyouen will take all steps reasonably necessary to ensure that your data is treated securely and in accordance with this Privacy Policy and no transfer of your Personal Data will take place to an organization or a country unless there are adequate controls in place including the security of your data and other personal information.
+---
 
-## Disclosure Of Data
+## 4. Third-Party Service Providers
 
-### Legal Requirements
+We use the following third-party services. Each has their own privacy policy:
 
-TumeKyouen may disclose your Personal Data in the good faith belief that such action is necessary to:
+| Provider | Purpose | Privacy Policy |
+|---|---|---|
+| Google Firebase Analytics | Usage analytics | https://firebase.google.com/support/privacy |
+| Google Firebase Auth | Authentication | https://firebase.google.com/support/privacy |
+| Google Firebase Crashlytics | Crash reporting | https://firebase.google.com/support/privacy |
+| Google Firebase Cloud Messaging | Push notifications | https://firebase.google.com/support/privacy |
+| Google Firebase Hosting | Web hosting | https://firebase.google.com/support/privacy |
+| Google AdMob | In-app advertising (mobile) | https://policies.google.com/privacy |
+| Google AdSense | In-app advertising (web) | https://policies.google.com/privacy |
+| Twitter / X Corp. | Sign-in with Twitter | https://twitter.com/privacy |
+| Apple Inc. | Sign in with Apple | https://www.apple.com/legal/privacy/ |
 
-- To comply with a legal obligation
-- To protect and defend the rights or property of TumeKyouen
-- To prevent or investigate possible wrongdoing in connection with the Service
-- To protect the personal safety of users of the Service or the public
-- To protect against legal liability
+---
 
-## Security Of Data
+## 5. Data Retention
 
-The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.
+| Data type | Retention period |
+|---|---|
+| Firebase Analytics events | 14 months (user-level data) |
+| Firebase Auth account | Until account deletion |
+| Stage clear records (local SQLite) | Until app uninstall |
+| FCM tokens | Until account deletion or token rotation |
+| Crash reports | 90 days |
+| Ad identifiers | Per advertising platform policy |
 
-## Service Providers
+---
 
-We may employ third party companies and individuals to facilitate our Service ("Service Providers"), to provide the Service on our behalf, to perform Service-related services or to assist us in analyzing how our Service is used.
+## 6. International Data Transfers
 
-These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.
+Your data may be transferred to and processed in the United States and other countries where Google LLC operates data centers. Such transfers are carried out under **Standard Contractual Clauses (SCCs)** approved by the European Commission, providing adequate safeguards for your personal data.
 
-Link to privacy policy of Service Providers used by the app:
+---
 
-- Google Play Services: https://www.google.com/policies/privacy/
-- AdMob: https://support.google.com/admob/answer/6128543?hl=en
-- Google Analytics: https://policies.google.com/privacy?hl=en
-- Firebase Analytics: https://firebase.google.com/policies/analytics
+## 7. Your Rights (EEA / UK Residents)
 
-## Links To Other Sites
+If you are located in the EEA or UK, you have the following rights under the GDPR / UK GDPR:
 
-Our Service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
+- **Access:** Request a copy of your personal data we hold.
+- **Rectification:** Ask us to correct inaccurate data.
+- **Erasure:** Request deletion of your personal data ("right to be forgotten").
+- **Portability:** Receive your data in a structured, machine-readable format.
+- **Withdraw consent:** Withdraw consent at any time without affecting the lawfulness of prior processing.
+- **Object / Restrict:** Object to or request restriction of certain processing activities.
+- **Lodge a complaint:** File a complaint with your national data protection authority (e.g. the ICO in the UK, the BfDI in Germany, or the CNIL in France).
 
-We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
+To exercise your rights, contact us at: **ishikura.noboru@gmail.com**
 
-## Children's Privacy
+We will respond within 30 days.
 
-Our Service does not address anyone under the age of 18 ("Children").
+---
 
-We do not knowingly collect personally identifiable information from anyone under the age of 18. If you are a parent or guardian and you are aware that your Children has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.
+## 8. Children's Privacy
 
-## Changes To This Privacy Policy
+The Service is intended for users aged **13 and over**. We do not knowingly collect personal data from children under 13. If you believe a child under 13 has provided us with personal data, please contact us and we will delete it promptly.
 
-We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.
+---
 
-We will let you know via email and/or a prominent notice on our Service, prior to the change becoming effective and update the "effective date" at the top of this Privacy Policy.
+## 9. Security
 
-You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.
+We use commercially reasonable measures to protect your data. However, no method of Internet transmission or electronic storage is 100% secure. We cannot guarantee absolute security.
 
-## Contact Us
+---
 
-If you have any questions about this Privacy Policy, please contact us:
+## 10. Changes to This Policy
 
-- By Twitter: @noboru_i
+We may update this policy from time to time. We will post the updated policy on this page and update the effective date. For material changes, we will notify you via the app or push notification where practicable.
 
-Copyright 2013-2024 noboru All Rights Reserved.
+---
+
+## 11. Contact
+
+**Email:** ishikura.noboru@gmail.com  
+**Twitter / X:** @noboru_i
+
+Copyright 2013-2026 noboru All Rights Reserved.

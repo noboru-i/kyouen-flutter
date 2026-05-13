@@ -18,6 +18,7 @@ import 'package:kyouen_flutter/src/features/options/options_page.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
+import 'package:kyouen_flutter/src/features/terms/terms_of_service_page.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 import 'package:kyouen_flutter/src/features/title/web_title_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
@@ -216,6 +217,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const OptionsPage();
               case PrivacyPolicyPage.routeName:
                 return const PrivacyPolicyPage();
+              case TermsOfServicePage.routeName:
+                return const TermsOfServicePage();
               case CreateStagePage.routeName:
                 return const CreateStagePage();
               default:
