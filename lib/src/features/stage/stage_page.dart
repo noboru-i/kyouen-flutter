@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/stage/ads/banner_ad_widget.dart';
 import 'package:kyouen_flutter/src/features/stage/ads/hint_rewarded_ad_service.dart';
@@ -314,6 +315,24 @@ class _FooterState extends ConsumerState<_Footer> {
       }
     } else {
       debugPrint('NOT KYOUEN!');
+      final stageNo = ref.read(currentStageNoProvider).asData?.value;
+      final whiteCount =
+          ref
+              .read(currentStageProvider)
+              .asData
+              ?.value
+              .stage
+              .split('')
+              .where((s) => s == StoneState.white.value)
+              .length ??
+          0;
+      if (stageNo != null) {
+        unawaited(
+          ref
+              .read(analyticsServiceProvider)
+              .logStageFail(stageNo: stageNo, whiteStonesCount: whiteCount),
+        );
+      }
       if (mounted) {
         await _showNotKyouenDialog(context);
       }
@@ -324,6 +343,18 @@ class _FooterState extends ConsumerState<_Footer> {
   Future<void> _onHintPressed() async {
     if (_isHintLoading) {
       return;
+    }
+    final stageNo = ref.read(currentStageNoProvider).asData?.value;
+    final adReady = ref.read(hintRewardedAdProvider);
+    if (stageNo != null) {
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logHintRequested(
+              stageNo: stageNo,
+              adReady: adReady,
+            ),
+      );
     }
     setState(() => _isHintLoading = true);
     try {
@@ -347,6 +378,7 @@ class _FooterState extends ConsumerState<_Footer> {
   }
 
   void _applyHint() {
+    ref.read(currentStageProvider.notifier).markHintUsed();
     final index = ref
         .read(currentStageProvider.notifier)
         .pickRandomUnselectedSolutionIndex();

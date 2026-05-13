@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kyouen_flutter/src/data/ads/ad_config.dart';
+import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
+import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 
 class HintRewardedAdNotifier extends Notifier<bool> {
   RewardedAd? _ad;
@@ -50,6 +52,9 @@ class HintRewardedAdNotifier extends Notifier<bool> {
     required VoidCallback onEarnedReward,
     required VoidCallback onFailed,
   }) async {
+    final stageNo = ref.read(currentStageNoProvider).asData?.value ?? 0;
+    final analytics = ref.read(analyticsServiceProvider);
+
     if (_ad == null) {
       // ロード中なら完了まで最大10秒待つ
       if (_isLoading) {
@@ -62,6 +67,9 @@ class HintRewardedAdNotifier extends Notifier<bool> {
       if (_ad == null) {
         onFailed();
         unawaited(_preload());
+        unawaited(
+          analytics.logHintAdFailed(stageNo: stageNo, reason: 'no_fill'),
+        );
         return;
       }
     }
@@ -71,6 +79,8 @@ class HintRewardedAdNotifier extends Notifier<bool> {
     if (ref.mounted) {
       state = false;
     }
+
+    unawaited(analytics.logHintAdShown(stageNo: stageNo));
 
     final completer = Completer<void>();
     ad.fullScreenContentCallback = FullScreenContentCallback(
@@ -85,12 +95,22 @@ class HintRewardedAdNotifier extends Notifier<bool> {
         ad.dispose();
         onFailed();
         unawaited(_preload());
+        unawaited(
+          analytics.logHintAdFailed(stageNo: stageNo, reason: 'show_failed'),
+        );
         if (!completer.isCompleted) {
           completer.complete();
         }
       },
     );
-    unawaited(ad.show(onUserEarnedReward: (ad, reward) => onEarnedReward()));
+    unawaited(
+      ad.show(
+        onUserEarnedReward: (ad, reward) {
+          unawaited(analytics.logHintRewardEarned(stageNo: stageNo));
+          onEarnedReward();
+        },
+      ),
+    );
 
     await completer.future;
   }
