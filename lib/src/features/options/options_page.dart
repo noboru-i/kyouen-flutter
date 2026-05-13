@@ -1,16 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kyouen_flutter/src/data/consent/consent_service.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class OptionsPage extends StatelessWidget {
+class OptionsPage extends ConsumerWidget {
   const OptionsPage({super.key});
 
   static const routeName = '/options';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return BackgroundWidget(
       child: Scaffold(
@@ -33,6 +36,25 @@ class OptionsPage extends StatelessWidget {
                 );
               },
             ),
+            if (!kIsWeb)
+              FutureBuilder<bool>(
+                future: ref
+                    .read(consentServiceProvider)
+                    .isPrivacyOptionsRequired,
+                builder: (context, snapshot) {
+                  if (snapshot.data != true) {
+                    return const SizedBox.shrink();
+                  }
+                  return ListTile(
+                    leading: const Icon(Icons.manage_accounts_outlined),
+                    title: const Text('広告・解析の同意設定'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      ref.read(consentServiceProvider).showPrivacyOptions();
+                    },
+                  );
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.description_outlined),
               title: Text(l10n.licenses),

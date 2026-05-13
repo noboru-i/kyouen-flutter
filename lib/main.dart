@@ -10,6 +10,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kyouen_flutter/firebase_options.dart';
 import 'package:kyouen_flutter/src/app.dart';
+import 'package:kyouen_flutter/src/data/consent/consent_service.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 
 /// バックグラウンド・終了状態でのFCMメッセージハンドラー
@@ -25,6 +26,7 @@ void main() async {
   await _setupFirebase();
   if (!kIsWeb) {
     await _requestATT();
+    await _setupConsent();
     await MobileAds.instance.initialize();
   }
 
@@ -39,6 +41,18 @@ void main() async {
       child: const MyApp(),
     ),
   );
+}
+
+Future<void> _setupConsent() async {
+  final container = ProviderContainer();
+  try {
+    final consentService = container.read(consentServiceProvider);
+    await consentService.requestConsent();
+    // 同意結果に基づいて広告リクエスト可否をAnalyticsServiceへ伝搬済み
+    // (ConsentService._applyConsentToAnalyticsで実施)
+  } finally {
+    container.dispose();
+  }
 }
 
 /// アプリ起動時のURLからステージ番号を解決する。
