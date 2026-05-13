@@ -1,4 +1,5 @@
 import 'package:app_links/app_links.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,6 +24,7 @@ void main() async {
   usePathUrlStrategy();
   await _setupFirebase();
   if (!kIsWeb) {
+    await _requestATT();
     await MobileAds.instance.initialize();
   }
 
@@ -68,6 +70,16 @@ int? _extractStageNo(Uri? uri) {
     return null;
   }
   return stageNo;
+}
+
+Future<void> _requestATT() async {
+  if (defaultTargetPlatform != TargetPlatform.iOS) {
+    return;
+  }
+  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+  if (status == TrackingStatus.notDetermined) {
+    await AppTrackingTransparency.requestTrackingAuthorization();
+  }
 }
 
 Future<void> _setupFirebase() async {
