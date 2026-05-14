@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
+import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:web/web.dart' as web;
 
 const _storageKey = 'consent_choice_v1';
@@ -84,6 +85,7 @@ class _ConsentBannerBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Material(
       color: Colors.grey[900],
       child: Padding(
@@ -92,10 +94,9 @@ class _ConsentBannerBar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'このサイトではFirebase AnalyticsおよびGoogle AdSenseのためにCookieを使用しています。'
-              '同意することでより良いサービスの提供に役立てられます。',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+            Text(
+              l10n.consentBannerMessage,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),
             const SizedBox(height: 8),
             Row(
@@ -103,9 +104,9 @@ class _ConsentBannerBar extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: onReject,
-                  child: const Text(
-                    '拒否',
-                    style: TextStyle(color: Colors.white54),
+                  child: Text(
+                    l10n.consentReject,
+                    style: const TextStyle(color: Colors.white54),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -114,7 +115,7 @@ class _ConsentBannerBar extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(80, 40),
                   ),
-                  child: const Text('すべて許可'),
+                  child: Text(l10n.consentAcceptAll),
                 ),
               ],
             ),

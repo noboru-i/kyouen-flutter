@@ -48,7 +48,7 @@ class OptionsPage extends ConsumerWidget {
                   }
                   return ListTile(
                     leading: const Icon(Icons.manage_accounts_outlined),
-                    title: const Text('広告・解析の同意設定'),
+                    title: Text(l10n.adConsentSettings),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       ref.read(consentServiceProvider).showPrivacyOptions();
@@ -58,7 +58,7 @@ class OptionsPage extends ConsumerWidget {
               ),
             ListTile(
               leading: const Icon(Icons.article_outlined),
-              title: const Text('Terms of Service'),
+              title: Text(l10n.termsOfService),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.restorablePushNamed(
