@@ -61,12 +61,13 @@ class _WebConsentBannerState extends ConsumerState<WebConsentBanner> {
       return widget.child;
     }
 
+    final screenWidth = MediaQuery.sizeOf(context).width;
     return Stack(
       children: [
         widget.child,
         Positioned(
           left: 0,
-          right: 0,
+          width: screenWidth,
           bottom: 0,
           child: _ConsentBannerBar(onAccept: _accept, onReject: _reject),
         ),
@@ -110,6 +111,9 @@ class _ConsentBannerBar extends StatelessWidget {
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: onAccept,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(80, 40),
+                  ),
                   child: const Text('すべて許可'),
                 ),
               ],
