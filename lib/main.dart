@@ -98,13 +98,15 @@ Future<void> _requestATT() async {
 
 Future<void> _setupFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FlutterError.onError = (errorDetails) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-  };
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+  if (!kIsWeb) {
+    FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
   if (!kIsWeb) {
     await _setupMessaging();
   }
