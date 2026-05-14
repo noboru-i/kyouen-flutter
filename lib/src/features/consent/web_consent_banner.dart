@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
+import 'package:kyouen_flutter/src/features/consent/web_storage.dart'
+    if (dart.library.js_interop) 'package:kyouen_flutter/src/features/consent/web_storage_web.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
-import 'package:web/web.dart' as web;
 
 const _storageKey = 'consent_choice_v1';
 
@@ -27,7 +28,7 @@ class _WebConsentBannerState extends ConsumerState<WebConsentBanner> {
   void initState() {
     super.initState();
     if (kIsWeb) {
-      final saved = web.window.localStorage.getItem(_storageKey);
+      final saved = getConsentStorage(_storageKey);
       if (saved == null) {
         setState(() => _showBanner = true);
       }
@@ -35,7 +36,7 @@ class _WebConsentBannerState extends ConsumerState<WebConsentBanner> {
   }
 
   Future<void> _accept() async {
-    web.window.localStorage.setItem(_storageKey, 'granted');
+    setConsentStorage(_storageKey, 'granted');
     await ref
         .read(analyticsServiceProvider)
         .setConsent(
@@ -46,7 +47,7 @@ class _WebConsentBannerState extends ConsumerState<WebConsentBanner> {
   }
 
   Future<void> _reject() async {
-    web.window.localStorage.setItem(_storageKey, 'denied');
+    setConsentStorage(_storageKey, 'denied');
     await ref
         .read(analyticsServiceProvider)
         .setConsent(
