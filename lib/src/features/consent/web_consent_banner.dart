@@ -62,6 +62,7 @@ class _WebConsentBannerState extends ConsumerState<WebConsentBanner> {
     }
 
     return Stack(
+      textDirection: TextDirection.ltr,
       children: [
         widget.child,
         Positioned(
