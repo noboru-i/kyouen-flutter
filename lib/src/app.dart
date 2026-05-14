@@ -182,10 +182,13 @@ class _MyAppState extends ConsumerState<MyApp> {
         ? StagePage.routeName
         : TitlePage.routeName;
 
-    final app = MaterialApp(
+    return MaterialApp(
       navigatorKey: _navigatorKey,
       navigatorObservers: [_analyticsObserver],
       restorationScopeId: 'app',
+      builder: kIsWeb
+          ? (context, child) => WebConsentBanner(child: child!)
+          : null,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -235,10 +238,5 @@ class _MyAppState extends ConsumerState<MyApp> {
         );
       },
     );
-
-    if (kIsWeb) {
-      return WebConsentBanner(child: app);
-    }
-    return app;
   }
 }
