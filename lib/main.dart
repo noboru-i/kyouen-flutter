@@ -1,5 +1,6 @@
 import 'package:app_links/app_links.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -99,6 +100,7 @@ Future<void> _requestATT() async {
 Future<void> _setupFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   if (!kIsWeb) {
+    await _setDefaultConsentDenied();
     FlutterError.onError = (errorDetails) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
     };
@@ -111,6 +113,14 @@ Future<void> _setupFirebase() async {
     await _setupMessaging();
   }
 }
+
+Future<void> _setDefaultConsentDenied() =>
+    FirebaseAnalytics.instance.setConsent(
+      analyticsStorageConsentGranted: false,
+      adStorageConsentGranted: false,
+      adUserDataConsentGranted: false,
+      adPersonalizationSignalsConsentGranted: false,
+    );
 
 Future<void> _setupMessaging() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

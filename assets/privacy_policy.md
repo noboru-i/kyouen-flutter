@@ -3,7 +3,7 @@
 Effective date: May 13, 2026  
 Previous version: October 13, 2018
 
-TumeKyouen ("us", "we", or "our") operates the TumeKyouen mobile application and website at https://kyouen.app (collectively, the "Service"). This policy explains how we collect, use, and protect your personal data.
+TumeKyouen / 詰め共円 ("us", "we", or "our") operates the TumeKyouen / 詰め共円 mobile application and website at https://kyouen.app (collectively, the "Service"). This policy explains how we collect, use, and protect your personal data.
 
 **Data Controller:** Noboru Ishikura  
 **Contact:** ishikura.noboru@gmail.com
@@ -30,19 +30,31 @@ If you sign in with Twitter (X) or Apple, we receive:
 
 - A unique user ID from the identity provider
 - Display name (used only for in-app display)
-- OAuth access tokens (used only for API requests; not stored beyond the session)
+- Firebase ID token (used only to authenticate API requests)
 
-### 1-3. Advertising Data
+### 1-3. Puzzle and Progress Data
+
+When you play, create, or sync stages, we collect data necessary to provide the puzzle features. This may include:
+
+- Stage numbers you start, clear, reset, or open from a link or notification
+- Clear dates and cleared-stage sync data
+- The board state you submit when clearing a stage
+- Stages you create, including board size and board data
+- Creator name entered for a created stage
+
+The creator name saved with a created stage is always public and may be displayed to other users together with the stage.
+
+### 1-4. Advertising Data
 
 We serve ads via **Google AdMob** and **Google AdSense**. Advertising identifiers (IDFA on iOS, Advertising ID on Android) and cookie-based identifiers (on web) may be used for personalized ads, subject to your consent.
 
-### 1-4. Crash Reports
+### 1-5. Crash Reports
 
 We use **Firebase Crashlytics** to collect crash reports, which may include device state and a stack trace at the time of the crash. No personally identifiable information is intentionally included.
 
-### 1-5. Push Notifications
+### 1-6. Push Notifications
 
-If you authorize push notifications, your Firebase Cloud Messaging (FCM) token is stored on our server and used only to send you notifications about new stages.
+If you authorize push notifications, we use Firebase Cloud Messaging (FCM) to send notifications about new stages. We may store your FCM token on our server if necessary to deliver or manage notifications.
 
 ---
 
@@ -52,7 +64,7 @@ If you authorize push notifications, your Firebase Cloud Messaging (FCM) token i
 |---|---|
 | Analytics and usage statistics | Consent (Art. 6(1)(a)) |
 | Personalized advertising | Consent (Art. 6(1)(a)) |
-| Account creation and stage sync | Contract performance (Art. 6(1)(b)) |
+| Account creation, stage sync, and puzzle features | Contract performance (Art. 6(1)(b)) |
 | Crash reporting and service security | Legitimate interest (Art. 6(1)(f)) |
 | Push notifications | Consent (Art. 6(1)(a)) |
 
@@ -70,7 +82,7 @@ We implement **Google Consent Mode v2** to respect your privacy choices:
 
 You can change your consent choice at any time:
 - **Mobile:** Settings → Options → 「広告・解析の同意設定」
-- **Web:** Clear your browser's localStorage entry `consent_choice_v1`, then reload the page.
+- **Web:** Clear your browser's site data for https://kyouen.app, then reload the page.
 
 ---
 
@@ -98,8 +110,10 @@ We use the following third-party services. Each has their own privacy policy:
 |---|---|
 | Firebase Analytics events | 14 months (user-level data) |
 | Firebase Auth account | Until account deletion |
-| Stage clear records (local SQLite) | Until app uninstall |
-| FCM tokens | Until account deletion or token rotation |
+| Stage clear records and created stages | Until account deletion or as needed to provide the Service |
+| Stage clear records (local SQLite) | Until app uninstall, sign-out, or account deletion |
+| Creator name for created stages | While the created stage remains available |
+| FCM tokens, if stored | Until account deletion, token rotation, or notification settings change |
 | Crash reports | 90 days |
 | Ad identifiers | Per advertising platform policy |
 
