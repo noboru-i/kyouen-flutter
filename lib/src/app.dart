@@ -167,6 +167,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       restorationScopeId: 'app',
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
