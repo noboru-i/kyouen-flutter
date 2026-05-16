@@ -29,7 +29,7 @@ dependencies:
   http: ^1.6.0
   intl: ^0.20.2
   json_annotation: ^4.11.0
-  kyouen: ^0.0.1
+  kyouen: ^0.0.2
   logger: ^2.7.0
   package_info_plus: ^8.3.0
   path: ^1.9.1
