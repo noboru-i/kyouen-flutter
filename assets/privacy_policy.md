@@ -78,11 +78,11 @@ We implement **Google Consent Mode v2** to respect your privacy choices:
 
 - **Before consent:** Analytics and advertising signals default to `denied`. Firebase Analytics operates in a cookieless / non-personalized mode.
 - **After consent granted:** Full analytics and personalized ads are enabled.
-- **After consent denied:** Basic aggregate analytics (without personal identifiers) may still be collected for service improvement purposes in accordance with Google's Consent Mode documentation.
+- **After consent denied:** We do not send analytics or advertising data to any service. Google may apply statistical modeling based on aggregated, non-identifiable signals on their own servers under Google's Consent Mode documentation; no personal data is transmitted by us for this purpose.
 
 You can change your consent choice at any time:
 - **Mobile:** Settings → Options → 「広告・解析の同意設定」
-- **Web:** Clear your browser's site data for https://kyouen.app, then reload the page.
+- **Web:** Clear your browser's cookies and site data for https://kyouen.app and reload the page — the consent banner will be shown again automatically.
 
 ---
 
@@ -135,6 +135,7 @@ If you are located in the EEA or UK, you have the following rights under the GDP
 - **Portability:** Receive your data in a structured, machine-readable format.
 - **Withdraw consent:** Withdraw consent at any time without affecting the lawfulness of prior processing.
 - **Object / Restrict:** Object to or request restriction of certain processing activities.
+- **Object to legitimate interest processing:** Object to processing based on our legitimate interest (Article 21 GDPR), such as crash reporting. We will cease such processing unless we demonstrate compelling legitimate grounds that override your interests.
 - **Lodge a complaint:** File a complaint with your national data protection authority (e.g. the ICO in the UK, the BfDI in Germany, or the CNIL in France).
 
 To exercise your rights, contact us at: **ishikura.noboru@gmail.com**
@@ -145,7 +146,7 @@ We will respond within 30 days.
 
 ## 8. Children's Privacy
 
-The Service is intended for users aged **13 and over**. We do not knowingly collect personal data from children under 13. If you believe a child under 13 has provided us with personal data, please contact us and we will delete it promptly.
+The Service is intended for users aged **13 and over** (or the applicable minimum age of digital consent in your country; in most EEA member states this is **16** unless a lower national age has been set by law). We do not knowingly collect personal data from children below the applicable minimum age. If you believe a child under 13 has provided us with personal data, please contact us and we will delete it promptly.
 
 ---
 
