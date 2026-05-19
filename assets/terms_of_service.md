@@ -66,9 +66,9 @@ The Service displays banner and rewarded advertisements provided by Google AdMob
 
 ## 7. Disclaimer of Warranties
 
-The Service is provided **"as is"** and **"as available"** without warranties of any kind, either express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, or non-infringement.
+To the maximum extent permitted by applicable law, the Service is provided **"as is"** and **"as available"** without warranties of any kind, either express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, or non-infringement.
 
-We do not warrant that the Service will be uninterrupted, error-free, or free of viruses or other harmful components.
+To the maximum extent permitted by applicable law, we do not warrant that the Service will be uninterrupted, error-free, or free of viruses or other harmful components.
 
 ---
 
@@ -76,7 +76,7 @@ We do not warrant that the Service will be uninterrupted, error-free, or free of
 
 To the maximum extent permitted by applicable law, we shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of data or profits, arising out of or in connection with your use of the Service.
 
-Our total liability for any claim arising from these Terms or the Service shall not exceed JPY 1,000.
+To the maximum extent permitted by applicable law, our total liability for any claim arising from these Terms or the Service shall not exceed JPY 1,000.
 
 ---
 
