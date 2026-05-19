@@ -82,7 +82,7 @@ To the maximum extent permitted by applicable law, our total liability for any c
 
 ## 9. Changes to the Service
 
-We reserve the right to modify, suspend, or discontinue the Service (or any part of it) at any time without notice. We are not liable to you or any third party for any such modification, suspension, or discontinuation.
+We reserve the right to modify, suspend, or discontinue the Service (or any part of it) at any time, including permanent discontinuation, without prior notice. We are not liable to you or any third party for any such modification, suspension, or discontinuation.
 
 ---
 

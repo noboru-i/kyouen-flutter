@@ -78,7 +78,7 @@ We implement **Google Consent Mode v2** to respect your privacy choices:
 
 - **Before consent:** Analytics and advertising signals default to `denied`. Firebase Analytics operates in a cookieless / non-personalized mode.
 - **After consent granted:** Full analytics and personalized ads are enabled.
-- **After consent denied:** We do not send analytics or advertising data to any service. Google may apply statistical modeling based on aggregated, non-identifiable signals on their own servers under Google's Consent Mode documentation; no personal data is transmitted by us for this purpose.
+- **After consent denied:** We do not collect analytics or advertising data.
 
 You can change your consent choice at any time:
 - **Mobile:** Settings → Options → 「広告・解析の同意設定」
