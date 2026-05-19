@@ -27,7 +27,7 @@ You may use the Service for personal, non-commercial purposes in accordance with
 
 ## 3. Accounts
 
-If you create an account by signing in with Twitter or Apple, you are responsible for maintaining the security of your credentials and for all activities under your account. Notify us immediately at ishikura.noboru@gmail.com if you suspect unauthorized access.
+If you create an account by signing in with Twitter or Apple, you are responsible for maintaining the security of your credentials and for all activities under your account. Notify us immediately at ishikura.noboru+kyouen@gmail.com if you suspect unauthorized access.
 
 ---
 
@@ -100,7 +100,7 @@ These Terms are governed by the laws of **Japan**, without regard to its conflic
 
 ## 12. Contact
 
-**Email:** ishikura.noboru@gmail.com  
+**Email:** ishikura.noboru+kyouen@gmail.com  
 **Twitter / X:** @noboru_i
 
 Copyright 2013-2026 noboru All Rights Reserved.

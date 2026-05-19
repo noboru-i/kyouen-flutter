@@ -6,7 +6,7 @@ Previous version: October 13, 2018
 TumeKyouen / 詰め共円 ("us", "we", or "our") operates the TumeKyouen / 詰め共円 mobile application and website at https://kyouen.app (collectively, the "Service"). This policy explains how we collect, use, and protect your personal data.
 
 **Data Controller:** Noboru Ishikura  
-**Contact:** ishikura.noboru@gmail.com
+**Contact:** ishikura.noboru+kyouen@gmail.com
 
 ---
 
@@ -138,7 +138,7 @@ If you are located in the EEA or UK, you have the following rights under the GDP
 - **Object to legitimate interest processing:** Object to processing based on our legitimate interest (Article 21 GDPR), such as crash reporting. We will cease such processing unless we demonstrate compelling legitimate grounds that override your interests.
 - **Lodge a complaint:** File a complaint with your national data protection authority (e.g. the ICO in the UK, the BfDI in Germany, or the CNIL in France).
 
-To exercise your rights, contact us at: **ishikura.noboru@gmail.com**
+To exercise your rights, contact us at: **ishikura.noboru+kyouen@gmail.com**
 
 We will respond within 30 days.
 
@@ -164,7 +164,7 @@ We may update this policy from time to time. We will post the updated policy on 
 
 ## 11. Contact
 
-**Email:** ishikura.noboru@gmail.com  
+**Email:** ishikura.noboru+kyouen@gmail.com  
 **Twitter / X:** @noboru_i
 
 Copyright 2013-2026 noboru All Rights Reserved.
