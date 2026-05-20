@@ -1,16 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kyouen_flutter/src/data/consent/consent_service.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
+import 'package:kyouen_flutter/src/features/terms/terms_of_service_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class OptionsPage extends StatelessWidget {
+class OptionsPage extends ConsumerWidget {
   const OptionsPage({super.key});
 
   static const routeName = '/options';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return BackgroundWidget(
       child: Scaffold(
@@ -30,6 +34,36 @@ class OptionsPage extends StatelessWidget {
                 Navigator.restorablePushNamed(
                   context,
                   PrivacyPolicyPage.routeName,
+                );
+              },
+            ),
+            if (!kIsWeb)
+              FutureBuilder<bool>(
+                future: ref
+                    .read(consentServiceProvider)
+                    .isPrivacyOptionsRequired,
+                builder: (context, snapshot) {
+                  if (snapshot.data != true) {
+                    return const SizedBox.shrink();
+                  }
+                  return ListTile(
+                    leading: const Icon(Icons.manage_accounts_outlined),
+                    title: Text(l10n.adConsentSettings),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      ref.read(consentServiceProvider).showPrivacyOptions();
+                    },
+                  );
+                },
+              ),
+            ListTile(
+              leading: const Icon(Icons.article_outlined),
+              title: Text(l10n.termsOfService),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.restorablePushNamed(
+                  context,
+                  TermsOfServicePage.routeName,
                 );
               },
             ),

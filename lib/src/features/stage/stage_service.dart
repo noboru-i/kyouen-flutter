@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen/kyouen.dart';
+import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/stage_response.dart';
 import 'package:kyouen_flutter/src/data/local/database.dart';
@@ -264,14 +266,31 @@ class CurrentStageNo extends _$CurrentStageNo {
 
 @riverpod
 class CurrentStage extends _$CurrentStage {
+  late DateTime _stageStartAt;
+  int _tapCount = 0;
+  bool _usedHint = false;
+
   @override
   Future<StageResponse> build() async {
+    _stageStartAt = DateTime.now();
+    _tapCount = 0;
+    _usedHint = false;
+
     final currentStageNoAsync = ref.watch(currentStageNoProvider);
     final currentStageNo = currentStageNoAsync.when(
       data: (stageNo) => stageNo,
       loading: () => 1,
       error: (_, _) => 1,
     );
+
+    if (currentStageNoAsync.hasValue) {
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logStageStart(stageNo: currentStageNo, source: 'unknown'),
+      );
+    }
+
     return ref.watch(fetchStageProvider(stageNo: currentStageNo).future);
   }
 
@@ -283,6 +302,7 @@ class CurrentStage extends _$CurrentStage {
     if (currentState == StoneState.none) {
       return;
     }
+    _tapCount++;
     final newState = currentState == StoneState.black
         ? StoneState.white
         : StoneState.black;
@@ -290,7 +310,17 @@ class CurrentStage extends _$CurrentStage {
     state = AsyncData(currentStage.copyWith(stage: stageAsList.join()));
   }
 
+  void markHintUsed() => _usedHint = true;
+
   void reset() {
+    final currentStageNo = ref.read(currentStageNoProvider).asData?.value;
+    if (currentStageNo != null) {
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logStageReset(stageNo: currentStageNo),
+      );
+    }
     final currentStage = state.asData!.value;
     final stage = currentStage.stage;
     final stageAsList = stage.split('');
@@ -314,6 +344,42 @@ class CurrentStage extends _$CurrentStage {
     return kyouenStage.hasKyouen();
   }
 
+  int? pickRandomUnselectedSolutionIndex() {
+    final stage = state.asData!.value.stage;
+    final size = sqrt(stage.length).toInt();
+
+    final candidates = <(KyouenPoint, int)>[];
+    for (var x = 0; x < size; x++) {
+      for (var y = 0; y < size; y++) {
+        final index = x + y * size;
+        if (StoneState.fromString(stage[index]) != StoneState.none) {
+          candidates.add((KyouenPoint(x.toDouble(), y.toDouble()), index));
+        }
+      }
+    }
+
+    final kyouenData = Kyouen(candidates.map((e) => e.$1).toList()).hasKyouen();
+    if (kyouenData == null) {
+      return null;
+    }
+
+    final solutionPoints = kyouenData.points;
+    final unselected = candidates.where((entry) {
+      final (point, idx) = entry;
+      final inSolution = solutionPoints.any(
+        (sp) => sp.x == point.x && sp.y == point.y,
+      );
+      final isBlack = StoneState.fromString(stage[idx]) == StoneState.black;
+      return inSolution && isBlack;
+    }).toList();
+
+    if (unselected.isEmpty) {
+      return null;
+    }
+    final random = Random();
+    return unselected[random.nextInt(unselected.length)].$2;
+  }
+
   Future<void> markCurrentStageCleared() async {
     final currentStageNoAsync = ref.read(currentStageNoProvider);
     final currentStageNo = currentStageNoAsync.when(
@@ -322,11 +388,22 @@ class CurrentStage extends _$CurrentStage {
       error: (_, _) => 1,
     );
 
-    // Get the current stage state (user's solution)
-    final currentStageState = state.asData!.value.stage;
+    final currentStageData = state.asData!.value;
+    final durationMs = DateTime.now().difference(_stageStartAt).inMilliseconds;
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logStageClear(
+            stageNo: currentStageNo,
+            boardSize: currentStageData.size,
+            durationMs: durationMs,
+            usedHint: _usedHint,
+            tapsCount: _tapCount,
+          ),
+    );
 
     final stageRepository = await ref.read(stageRepositoryProvider.future);
-    await stageRepository.clearStage(currentStageNo, currentStageState);
+    await stageRepository.clearStage(currentStageNo, currentStageData.stage);
 
     ref
       ..invalidate(clearedStageNumbersProvider)
