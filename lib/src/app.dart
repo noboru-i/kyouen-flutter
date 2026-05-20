@@ -189,6 +189,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       builder: kIsWeb
           ? (context, child) => WebConsentBanner(child: child!)
           : null,
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
