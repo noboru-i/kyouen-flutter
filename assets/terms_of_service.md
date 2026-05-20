@@ -18,8 +18,7 @@ The Service is intended for users aged **13 and over**. By using the Service, yo
 
 You may use the Service for personal, non-commercial purposes in accordance with these Terms. You agree not to:
 
-- Reverse-engineer, decompile, or disassemble any part of the Service.
-- Use automated tools (bots, scrapers) to access the Service without our written permission.
+- Send requests at a volume or frequency that imposes an unreasonable or excessive load on the Service's infrastructure.
 - Attempt to interfere with or disrupt the Service's infrastructure.
 - Use the Service for any unlawful purpose.
 
