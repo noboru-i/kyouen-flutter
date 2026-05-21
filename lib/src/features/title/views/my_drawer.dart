@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
+import 'package:kyouen_flutter/src/features/terms/terms_of_service_page.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -79,6 +80,22 @@ class MyDrawer extends StatelessWidget {
               Navigator.restorablePushNamed(
                 context,
                 PrivacyPolicyPage.routeName,
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.article_outlined,
+              color: Colors.white70,
+            ),
+            title: Text(
+              l10n.termsOfService,
+              style: const TextStyle(color: Colors.white),
+            ),
+            onTap: () {
+              Navigator.restorablePushNamed(
+                context,
+                TermsOfServicePage.routeName,
               );
             },
           ),
