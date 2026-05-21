@@ -316,21 +316,12 @@ class _FooterState extends ConsumerState<_Footer> {
     } else {
       debugPrint('NOT KYOUEN!');
       final stageNo = ref.read(currentStageNoProvider).asData?.value;
-      final whiteCount =
-          ref
-              .read(currentStageProvider)
-              .asData
-              ?.value
-              .stage
-              .split('')
-              .where((s) => s == StoneState.white.value)
-              .length ??
-          0;
+      final stage = ref.read(currentStageProvider).asData?.value.stage ?? '';
       if (stageNo != null) {
         unawaited(
           ref
               .read(analyticsServiceProvider)
-              .logStageFail(stageNo: stageNo, whiteStonesCount: whiteCount),
+              .logStageFail(stageNo: stageNo, stage: stage),
         );
       }
       if (mounted) {

@@ -80,13 +80,10 @@ class AnalyticsService {
 
   Future<void> logStageFail({
     required int stageNo,
-    required int whiteStonesCount,
+    required String stage,
   }) => _analytics.logEvent(
     name: 'stage_fail',
-    parameters: {
-      'stage_no': stageNo,
-      'white_stones_count': whiteStonesCount,
-    },
+    parameters: {'stage_no': stageNo, 'stage': stage},
   );
 
   Future<void> logStageReset({required int stageNo}) => _analytics.logEvent(
