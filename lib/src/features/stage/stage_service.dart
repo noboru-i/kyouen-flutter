@@ -276,20 +276,22 @@ class CurrentStage extends _$CurrentStage {
     _tapCount = 0;
     _usedHint = false;
 
+    ref.listen<AsyncValue<int>>(currentStageNoProvider, (previous, next) {
+      if (next.hasValue) {
+        unawaited(
+          ref
+              .read(analyticsServiceProvider)
+              .logStageStart(stageNo: next.value!, source: 'unknown'),
+        );
+      }
+    });
+
     final currentStageNoAsync = ref.watch(currentStageNoProvider);
     final currentStageNo = currentStageNoAsync.when(
       data: (stageNo) => stageNo,
       loading: () => 1,
       error: (_, _) => 1,
     );
-
-    if (currentStageNoAsync.hasValue) {
-      unawaited(
-        ref
-            .read(analyticsServiceProvider)
-            .logStageStart(stageNo: currentStageNo, source: 'unknown'),
-      );
-    }
 
     return ref.watch(fetchStageProvider(stageNo: currentStageNo).future);
   }
