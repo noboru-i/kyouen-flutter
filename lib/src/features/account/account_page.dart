@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/account/account_service.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
@@ -281,6 +284,12 @@ class _LogoutView extends ConsumerWidget {
       ref
         ..invalidate(clearedStageNumbersProvider)
         ..invalidate(clearedStageCountProvider);
+      final clearedCount = await stageRepository.getClearedCount();
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .setUserContext(clearedCount: clearedCount),
+      );
 
       if (context.mounted) {
         Navigator.of(context).pop();

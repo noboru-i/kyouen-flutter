@@ -405,6 +405,13 @@ class CurrentStage extends _$CurrentStage {
     final stageRepository = await ref.read(stageRepositoryProvider.future);
     await stageRepository.clearStage(currentStageNo, currentStageData.stage);
 
+    final clearedCount = await stageRepository.getClearedCount();
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .setUserContext(clearedCount: clearedCount),
+    );
+
     ref
       ..invalidate(clearedStageNumbersProvider)
       ..invalidate(clearedStageCountProvider);

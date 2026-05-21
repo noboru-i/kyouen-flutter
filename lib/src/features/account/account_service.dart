@@ -190,6 +190,16 @@ class AccountService extends _$AccountService {
       ref
         ..invalidate(clearedStageNumbersProvider)
         ..invalidate(clearedStageCountProvider);
+      final clearedCount = await stageRepository.getClearedCount();
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .setUserContext(
+              uid: user.uid,
+              authMethod: authMethod,
+              clearedCount: clearedCount,
+            ),
+      );
       unawaited(
         ref.read(analyticsServiceProvider).logSyncStages(result: 'success'),
       );
