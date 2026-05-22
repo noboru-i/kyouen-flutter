@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
+import 'package:kyouen_flutter/src/widgets/common/markdown_text.dart';
 
 class TermsOfServicePage extends StatelessWidget {
   const TermsOfServicePage({super.key});
@@ -27,8 +27,8 @@ class TermsOfServicePage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || !snapshot.hasData) {
-              return const Center(
-                child: Text('Failed to load terms of service.'),
+              return Center(
+                child: Text(l10n.loadTermsOfServiceFailed),
               );
             }
             return SingleChildScrollView(

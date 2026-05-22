@@ -31,13 +31,18 @@ class HintRewardedAdNotifier extends Notifier<bool> {
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
+          if (!ref.mounted) {
+            ad.dispose();
+            _isLoading = false;
+            _loadCompleter?.complete();
+            _loadCompleter = null;
+            return;
+          }
           _ad = ad;
           _isLoading = false;
           _loadCompleter?.complete();
           _loadCompleter = null;
-          if (ref.mounted) {
-            state = true;
-          }
+          state = true;
         },
         onAdFailedToLoad: (error) {
           _isLoading = false;

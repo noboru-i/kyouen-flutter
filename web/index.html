@@ -59,14 +59,18 @@
 
     // Restore saved consent choice immediately to avoid 'denied' flash on reload
     (function() {
-      var saved = localStorage.getItem('consent_choice_v1');
-      if (saved === 'granted') {
-        gtag('consent', 'update', {
-          'ad_storage': 'granted',
-          'ad_user_data': 'granted',
-          'ad_personalization': 'granted',
-          'analytics_storage': 'granted'
-        });
+      try {
+        var saved = localStorage.getItem('consent_choice_v1');
+        if (saved === 'granted') {
+          gtag('consent', 'update', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+          });
+        }
+      } catch (e) {
+        // localStorage unavailable (e.g. private mode); treat as no saved consent
       }
     })();
   </script>

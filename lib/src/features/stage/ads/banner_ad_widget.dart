@@ -31,6 +31,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           if (!mounted) {
+            ad.dispose();
             return;
           }
           setState(() {

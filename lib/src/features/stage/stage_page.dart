@@ -356,7 +356,11 @@ class _FooterState extends ConsumerState<_Footer> {
             onFailed: () {
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to load ad')),
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.hintAdLoadFailed,
+                    ),
+                  ),
                 );
               }
             },
@@ -425,10 +429,13 @@ class _FooterState extends ConsumerState<_Footer> {
           if (!kIsWeb) ...[
             const SizedBox(width: 8),
             IconButton(
-              onPressed: (!hasAnyWhiteStone && !_isHintLoading)
+              onPressed:
+                  (currentStage.hasValue &&
+                      !hasAnyWhiteStone &&
+                      !_isHintLoading)
                   ? _onHintPressed
                   : null,
-              tooltip: 'Hint (Ad)',
+              tooltip: AppLocalizations.of(context)!.hintTooltip,
               icon: _isHintLoading
                   ? const SizedBox(
                       width: 20,
