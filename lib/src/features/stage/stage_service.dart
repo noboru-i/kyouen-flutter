@@ -392,6 +392,10 @@ class CurrentStage extends _$CurrentStage {
 
     final currentStageData = state.asData!.value;
     final durationMs = DateTime.now().difference(_stageStartAt).inMilliseconds;
+
+    final stageRepository = await ref.read(stageRepositoryProvider.future);
+    await stageRepository.clearStage(currentStageNo, currentStageData.stage);
+
     unawaited(
       ref
           .read(analyticsServiceProvider)
@@ -403,9 +407,6 @@ class CurrentStage extends _$CurrentStage {
             tapsCount: _tapCount,
           ),
     );
-
-    final stageRepository = await ref.read(stageRepositoryProvider.future);
-    await stageRepository.clearStage(currentStageNo, currentStageData.stage);
 
     final clearedCount = await stageRepository.getClearedCount();
     unawaited(

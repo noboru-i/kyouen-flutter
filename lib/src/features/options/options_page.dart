@@ -8,13 +8,30 @@ import 'package:kyouen_flutter/src/localization/app_localizations.dart';
 import 'package:kyouen_flutter/src/widgets/common/background_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class OptionsPage extends ConsumerWidget {
+class OptionsPage extends ConsumerStatefulWidget {
   const OptionsPage({super.key});
 
   static const routeName = '/options';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OptionsPage> createState() => _OptionsPageState();
+}
+
+class _OptionsPageState extends ConsumerState<OptionsPage> {
+  late final Future<bool> _privacyOptionsRequiredFuture;
+  late final Future<PackageInfo> _packageInfoFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _privacyOptionsRequiredFuture = ref
+        .read(consentServiceProvider)
+        .isPrivacyOptionsRequired;
+    _packageInfoFuture = PackageInfo.fromPlatform();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return BackgroundWidget(
       child: Scaffold(
@@ -39,9 +56,7 @@ class OptionsPage extends ConsumerWidget {
             ),
             if (!kIsWeb)
               FutureBuilder<bool>(
-                future: ref
-                    .read(consentServiceProvider)
-                    .isPrivacyOptionsRequired,
+                future: _privacyOptionsRequiredFuture,
                 builder: (context, snapshot) {
                   if (snapshot.data != true) {
                     return const SizedBox.shrink();
@@ -76,7 +91,7 @@ class OptionsPage extends ConsumerWidget {
               },
             ),
             FutureBuilder<PackageInfo>(
-              future: PackageInfo.fromPlatform(),
+              future: _packageInfoFuture,
               builder: (context, snapshot) {
                 final version = snapshot.hasData
                     ? '${snapshot.data!.version} (${snapshot.data!.buildNumber})'

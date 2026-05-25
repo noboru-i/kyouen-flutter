@@ -28,15 +28,21 @@ class _WebConsentBannerState extends ConsumerState<WebConsentBanner> {
   void initState() {
     super.initState();
     if (kIsWeb) {
-      final saved = getConsentStorage(_storageKey);
-      if (saved == null) {
+      try {
+        final saved = getConsentStorage(_storageKey);
+        if (saved == null) {
+          setState(() => _showBanner = true);
+        }
+      } on Exception catch (_) {
         setState(() => _showBanner = true);
       }
     }
   }
 
   Future<void> _accept() async {
-    setConsentStorage(_storageKey, 'granted');
+    try {
+      setConsentStorage(_storageKey, 'granted');
+    } on Exception catch (_) {}
     await ref
         .read(analyticsServiceProvider)
         .setConsent(
@@ -47,7 +53,9 @@ class _WebConsentBannerState extends ConsumerState<WebConsentBanner> {
   }
 
   Future<void> _reject() async {
-    setConsentStorage(_storageKey, 'denied');
+    try {
+      setConsentStorage(_storageKey, 'denied');
+    } on Exception catch (_) {}
     await ref
         .read(analyticsServiceProvider)
         .setConsent(
