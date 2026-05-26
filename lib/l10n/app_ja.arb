@@ -60,5 +60,13 @@
   "reset": "リセット",
   "errorWithMessage": "エラー: {error}",
   "newStageAdded": "新しいステージが追加されました",
-  "openAction": "開く"
+  "openAction": "開く",
+  "consentBannerMessage": "このサイトではFirebase AnalyticsおよびGoogle AdSenseのためにCookieを使用しています。同意することでより良いサービスの提供に役立てられます。",
+  "consentReject": "拒否",
+  "consentAcceptAll": "すべて許可",
+  "adConsentSettings": "広告・解析の同意設定",
+  "termsOfService": "利用規約",
+  "loadTermsOfServiceFailed": "利用規約の読み込みに失敗しました。",
+  "hintAdLoadFailed": "広告の読み込みに失敗しました",
+  "hintTooltip": "ヒント（広告）"
 }

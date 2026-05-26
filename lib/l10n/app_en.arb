@@ -289,5 +289,37 @@
   "openAction": "Open",
   "@openAction": {
     "description": "Snackbar action label to open the new stage"
+  },
+  "consentBannerMessage": "This site uses cookies for Firebase Analytics and Google AdSense. Agreeing helps us deliver a better service.",
+  "@consentBannerMessage": {
+    "description": "Cookie consent banner message shown on web"
+  },
+  "consentReject": "Reject",
+  "@consentReject": {
+    "description": "Cookie consent banner reject button label"
+  },
+  "consentAcceptAll": "Accept All",
+  "@consentAcceptAll": {
+    "description": "Cookie consent banner accept-all button label"
+  },
+  "adConsentSettings": "Ad & Analytics Consent Settings",
+  "@adConsentSettings": {
+    "description": "Options page item label to open the ad/analytics consent settings"
+  },
+  "termsOfService": "Terms of Service",
+  "@termsOfService": {
+    "description": "Terms of Service page title and menu label"
+  },
+  "loadTermsOfServiceFailed": "Failed to load terms of service.",
+  "@loadTermsOfServiceFailed": {
+    "description": "Error message when terms of service fails to load"
+  },
+  "hintAdLoadFailed": "Failed to load ad",
+  "@hintAdLoadFailed": {
+    "description": "Snackbar message when the hint rewarded ad fails to load"
+  },
+  "hintTooltip": "Hint (Ad)",
+  "@hintTooltip": {
+    "description": "Tooltip for the hint button that shows a rewarded ad"
   }
 }

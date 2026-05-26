@@ -45,6 +45,36 @@
   <title>詰め共円</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- Google Consent Mode v2: analytics/ads denied by default until user consents -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'analytics_storage': 'denied',
+      'wait_for_update': 500
+    });
+
+    // Restore saved consent choice immediately to avoid 'denied' flash on reload
+    (function() {
+      try {
+        var saved = localStorage.getItem('consent_choice_v1');
+        if (saved === 'granted') {
+          gtag('consent', 'update', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+          });
+        }
+      } catch (e) {
+        // localStorage unavailable (e.g. private mode); treat as no saved consent
+      }
+    })();
+  </script>
+
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter_bootstrap.js" async></script>
 </head>

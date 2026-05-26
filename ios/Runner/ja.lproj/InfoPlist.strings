@@ -1,2 +1,3 @@
 CFBundleDisplayName = "詰め共円";
 CFBundleName = "詰め共円";
+NSUserTrackingUsageDescription = "このIDはパーソナライズ広告の配信に使用されます。";

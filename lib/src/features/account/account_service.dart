@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
 import 'package:kyouen_flutter/src/data/api/api_client.dart';
 import 'package:kyouen_flutter/src/data/api/entity/login_request.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
@@ -16,7 +19,7 @@ class AccountService extends _$AccountService {
   Future<void> signInWithTwitter() async {
     final logger = Logger();
     final link = ref.keepAlive();
-    await signOut();
+    await signOut(skipAnalytics: true);
     final twitterProvider = TwitterAuthProvider();
 
     try {
@@ -35,7 +38,7 @@ class AccountService extends _$AccountService {
         logger.w('Ref not mounted after Twitter sign-in');
         return;
       }
-      await _callLoginApi(userCredential.user);
+      await _callLoginApi(userCredential.user, authMethod: 'twitter');
     } on Exception catch (e) {
       logger.e('Twitter sign-in failed: $e');
       rethrow;
@@ -65,7 +68,7 @@ class AccountService extends _$AccountService {
         logger.w('Ref not mounted after Apple sign-in');
         return;
       }
-      await _callLoginApi(userCredential.user);
+      await _callLoginApi(userCredential.user, authMethod: 'apple');
     } on Exception catch (e) {
       logger.e('Apple sign-in failed: $e');
       rethrow;
@@ -74,7 +77,7 @@ class AccountService extends _$AccountService {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut({bool skipAnalytics = false}) async {
     final logger = Logger();
     final link = ref.keepAlive();
     try {
@@ -88,6 +91,14 @@ class AccountService extends _$AccountService {
         ..invalidate(clearedStageNumbersProvider)
         ..invalidate(clearedStageCountProvider);
       await FirebaseAuth.instance.signOut();
+      if (!skipAnalytics) {
+        unawaited(
+          ref
+              .read(analyticsServiceProvider)
+              .setUserContext(authMethod: 'anonymous'),
+        );
+        unawaited(ref.read(analyticsServiceProvider).logLogout());
+      }
     } on Exception catch (e) {
       logger.e('Sign-out failed: $e');
       rethrow;
@@ -109,7 +120,8 @@ class AccountService extends _$AccountService {
           logger.w('Ref not mounted after deleteAccount API call');
           return;
         }
-        await signOut();
+        unawaited(ref.read(analyticsServiceProvider).logAccountDelete());
+        await signOut(skipAnalytics: true);
       } else {
         throw Exception('Failed to delete account: ${response.error}');
       }
@@ -121,7 +133,10 @@ class AccountService extends _$AccountService {
     }
   }
 
-  Future<void> _callLoginApi(User? user) async {
+  Future<void> _callLoginApi(
+    User? user, {
+    required String authMethod,
+  }) async {
     final logger = Logger();
     if (user == null) {
       return;
@@ -145,6 +160,17 @@ class AccountService extends _$AccountService {
 
       if (response.isSuccessful && response.body != null) {
         logger.i('Login successful: ${response.body!.screenName}');
+        unawaited(
+          ref.read(analyticsServiceProvider).logLogin(method: authMethod),
+        );
+        unawaited(
+          ref
+              .read(analyticsServiceProvider)
+              .setUserContext(
+                uid: user.uid,
+                authMethod: authMethod,
+              ),
+        );
       } else {
         logger.e('Login failed: ${response.error}');
         throw Exception('Login failed: ${response.error}');
@@ -164,8 +190,29 @@ class AccountService extends _$AccountService {
       ref
         ..invalidate(clearedStageNumbersProvider)
         ..invalidate(clearedStageCountProvider);
+      final clearedCount = await stageRepository.getClearedCount();
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .setUserContext(
+              uid: user.uid,
+              authMethod: authMethod,
+              clearedCount: clearedCount,
+            ),
+      );
+      unawaited(
+        ref.read(analyticsServiceProvider).logSyncStages(result: 'success'),
+      );
     } on Exception catch (e) {
       logger.w('Sync after login failed (non-fatal): $e');
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logSyncStages(
+              result: 'fail',
+              errorType: e.runtimeType.toString(),
+            ),
+      );
     }
   }
 }

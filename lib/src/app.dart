@@ -1,20 +1,24 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
+import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
+import 'package:kyouen_flutter/src/features/consent/web_consent_banner.dart';
 import 'package:kyouen_flutter/src/features/create_stage/create_stage_page.dart';
 import 'package:kyouen_flutter/src/features/notification/push_notification_service.dart';
 import 'package:kyouen_flutter/src/features/options/options_page.dart';
 import 'package:kyouen_flutter/src/features/privacy/privacy_policy_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_page.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
+import 'package:kyouen_flutter/src/features/terms/terms_of_service_page.dart';
 import 'package:kyouen_flutter/src/features/title/native_title_page.dart';
 import 'package:kyouen_flutter/src/features/title/web_title_page.dart';
 import 'package:kyouen_flutter/src/localization/app_localizations.dart';
@@ -30,6 +34,9 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  late final FirebaseAnalyticsObserver _analyticsObserver =
+      FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance);
+
   StreamSubscription<Uri>? _linkSubscription;
   StreamSubscription<RemoteMessage>? _messageOpenedSubscription;
   StreamSubscription<RemoteMessage>? _foregroundMessageSubscription;
@@ -37,6 +44,9 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
+    unawaited(
+      ref.read(analyticsServiceProvider).initPlatformProperty(),
+    );
     if (!kIsWeb) {
       _initDeepLinkStream();
       _initNotificationTapHandling();
@@ -54,6 +64,11 @@ class _MyAppState extends ConsumerState<MyApp> {
     if (stageNo == null) {
       return;
     }
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logDeepLinkOpen(stageNo: stageNo, source: 'app_links'),
+    );
     await _navigateToStage(stageNo);
   }
 
@@ -89,6 +104,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       return;
     }
 
+    unawaited(
+      ref.read(analyticsServiceProvider).logNotificationOpen(stageNo: stageNo),
+    );
     await _openStageFromNotification(stageNo);
   }
 
@@ -166,7 +184,11 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return MaterialApp(
       navigatorKey: _navigatorKey,
+      navigatorObservers: [_analyticsObserver],
       restorationScopeId: 'app',
+      builder: kIsWeb
+          ? (context, child) => WebConsentBanner(child: child!)
+          : null,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -199,6 +221,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                 return const OptionsPage();
               case PrivacyPolicyPage.routeName:
                 return const PrivacyPolicyPage();
+              case TermsOfServicePage.routeName:
+                return const TermsOfServicePage();
               case CreateStagePage.routeName:
                 return const CreateStagePage();
               default:
