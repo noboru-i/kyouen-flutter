@@ -1,14 +1,17 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kyouen_flutter/src/config/environment.dart';
 import 'package:kyouen_flutter/src/data/analytics/analytics_service.dart';
+import 'package:kyouen_flutter/src/data/consent/consent_service.dart';
 import 'package:kyouen_flutter/src/data/repository/stage_repository.dart';
 import 'package:kyouen_flutter/src/features/account/account_page.dart';
 import 'package:kyouen_flutter/src/features/consent/web_consent_banner.dart';
@@ -51,6 +54,35 @@ class _MyAppState extends ConsumerState<MyApp> {
       _initDeepLinkStream();
       _initNotificationTapHandling();
       _initForegroundNotificationHandling();
+      // ATTダイアログはウィンドウが表示済みである必要があるため、
+      // 最初のフレーム描画後に実行する
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        unawaited(_initTracking());
+      });
+    }
+  }
+
+  Future<void> _initTracking() async {
+    // 1. ATT: Apple要件。トラッキング前に最初に取得する
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+    }
+    // 2. UMP同意: ATTの結果を参照して広告・Analytics同意を取得する
+    await ref.read(consentServiceProvider).requestConsent();
+    // 3. PUSH通知: 広告同意とは独立しており、最後に確認する
+    await _requestPushPermission();
+    await MobileAds.instance.initialize();
+  }
+
+  Future<void> _requestPushPermission() async {
+    final messaging = FirebaseMessaging.instance;
+    final settings = await messaging.requestPermission();
+    if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional) {
+      await messaging.subscribeToTopic('stage_added');
     }
   }
 

@@ -1,5 +1,4 @@
 import 'package:app_links/app_links.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -8,10 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kyouen_flutter/firebase_options.dart';
 import 'package:kyouen_flutter/src/app.dart';
-import 'package:kyouen_flutter/src/data/consent/consent_service.dart';
 import 'package:kyouen_flutter/src/features/stage/stage_service.dart';
 
 /// バックグラウンド・終了状態でのFCMメッセージハンドラー
@@ -25,11 +22,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
   await _setupFirebase();
-  if (!kIsWeb) {
-    await _requestATT();
-    await _setupConsent();
-    await MobileAds.instance.initialize();
-  }
 
   final initialStageNo = await _resolveInitialStageNo();
 
@@ -42,18 +34,6 @@ void main() async {
       child: const MyApp(),
     ),
   );
-}
-
-Future<void> _setupConsent() async {
-  final container = ProviderContainer();
-  try {
-    final consentService = container.read(consentServiceProvider);
-    await consentService.requestConsent();
-    // 同意結果に基づいて広告リクエスト可否をAnalyticsServiceへ伝搬済み
-    // (ConsentService._applyConsentToAnalyticsで実施)
-  } finally {
-    container.dispose();
-  }
 }
 
 /// アプリ起動時のURLからステージ番号を解決する。
@@ -87,16 +67,6 @@ int? _extractStageNo(Uri? uri) {
   return stageNo;
 }
 
-Future<void> _requestATT() async {
-  if (defaultTargetPlatform != TargetPlatform.iOS) {
-    return;
-  }
-  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-  if (status == TrackingStatus.notDetermined) {
-    await AppTrackingTransparency.requestTrackingAuthorization();
-  }
-}
-
 Future<void> _setupFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   if (!kIsWeb) {
@@ -108,9 +78,7 @@ Future<void> _setupFirebase() async {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-  }
-  if (!kIsWeb) {
-    await _setupMessaging();
+    _setupMessaging();
   }
 }
 
@@ -122,13 +90,8 @@ Future<void> _setDefaultConsentDenied() =>
       adPersonalizationSignalsConsentGranted: false,
     );
 
-Future<void> _setupMessaging() async {
+void _setupMessaging() {
+  // バックグラウンドハンドラーの登録はアプリ起動直後に必要
+  // 通知許可ダイアログは app.dart の _initTracking() で ATT・UMP の後に表示する
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  final messaging = FirebaseMessaging.instance;
-  final settings = await messaging.requestPermission();
-  if (settings.authorizationStatus == AuthorizationStatus.authorized ||
-      settings.authorizationStatus == AuthorizationStatus.provisional) {
-    await messaging.subscribeToTopic('stage_added');
-  }
 }
