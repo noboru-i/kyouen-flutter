@@ -56,8 +56,11 @@ class _MyAppState extends ConsumerState<MyApp> {
       _initForegroundNotificationHandling();
       // ATTダイアログはウィンドウが表示済みである必要があるため、
       // 最初のフレーム描画後に実行する
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        unawaited(_initTracking());
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // release ビルドでは AOT により描画が速く、addPostFrameCallback 発火時点で
+        // iOS がシステムダイアログを表示できる状態でない場合がある
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) unawaited(_initTracking());
       });
     }
   }
