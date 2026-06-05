@@ -59,8 +59,10 @@ class _MyAppState extends ConsumerState<MyApp> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // release ビルドでは AOT により描画が速く、addPostFrameCallback 発火時点で
         // iOS がシステムダイアログを表示できる状態でない場合がある
-        await Future.delayed(const Duration(milliseconds: 500));
-        if (mounted) unawaited(_initTracking());
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          unawaited(_initTracking());
+        }
       });
     }
   }
